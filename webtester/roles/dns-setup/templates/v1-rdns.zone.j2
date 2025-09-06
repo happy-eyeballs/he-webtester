@@ -1,0 +1,53 @@
+$TTL 3600
+$ORIGIN v1-rdns.{{ basedomain }}.
+
+@                 IN  SOA    ns1.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+@                 IN  NS     ns1.{{ basedomain }}.
+@                 IN  NS     ns2.{{ basedomain }}.
+
+{% for num in [1, 2] %}
+ns{{ num }}       IN  A         {{ nsaddrs.ipv4[num - 1] }}
+ns{{ num }}       IN  AAAA      {{ nsaddrs.ipv6[num - 1] }}
+{% endfor %}
+
+ipv6-only          IN  AAAA     {{ v6onlyaddress }}
+ipv4-only          IN  A        {{ v4onlyaddress }}
+
+$TTL 300
+
+id-*.v6ns-only                  IN    NS ipv6-only.v1-rdns.{{ basedomain }}.
+
+{% for headdr in headdresses %}
+{% if ":" in headdr.address %}
+ns1-id-*.delay-{{ headdr.delay_id}}        IN AAAA {{ headdr.address }}
+ns2-id-*.delay-{{ headdr.delay_id}}        IN AAAA {{ headdr.address }}
+{% else %}
+ns1-id-*.delay-{{ headdr.delay_id}}        IN A    {{ headdr.address }}
+ns2-id-*.delay-{{ headdr.delay_id}}        IN A    {{ headdr.address }}
+{% endif %}
+{% endfor %}
+
+{% for hedelayid in headdresses | map(attribute='delay_id') | unique | sort %}
+id-*.dns-delay-{{ hedelayid }}      IN    NS  ns1-id---.delay-{{ hedelayid }}.v1-rdns.{{ basedomain }}.
+id-*.dns-delay-{{ hedelayid }}      IN    NS  ns2-id---.delay-{{ hedelayid }}.v1-rdns.{{ basedomain }}.
+{% endfor %}
+
+$ORIGIN id-*.v6ns-only.v1-rdns.{{ basedomain }}.
+@                 IN  SOA    ipv6-only.v1-rdns.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+# @                 IN  NS     ipv6-only.v1-rdns.{{ basedomain }}.
+
+@          IN  A 138.246.253.189
+@          IN  AAAA 2001:4ca0:108:42:0:25:4f:0
+
+
+{% for hedelayid in headdresses | map(attribute='delay_id') | unique | sort %}
+$ORIGIN id-*.dns-delay-{{ hedelayid }}.v1-rdns.{{ basedomain }}.
+@                 IN  SOA    ns1-id---.delay-{{ hedelayid }}.v1-rdns.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+# @                 IN  NS     ns1-id---.delay-{{ hedelayid }}.v1-rdns.{{ basedomain }}.
+# @                 IN  NS     ns2-id---.delay-{{ hedelayid }}.v1-rdns.{{ basedomain }}.
+
+@          IN  A    {{ v4onlyaddress }}
+@          IN  AAAA {{ v6onlyaddress }}
+
+{% endfor %}
+

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ZONEFILE="{{ basepath }}/dns/zones/acme.zone.part"
+ACMEDOMAIN="_acme-challenge.${CERTBOT_DOMAIN}"
+
+if [[ ! -e ${ZONEFILE} ]]; then
+    echo '$TTL 60' > ${ZONEFILE}
+    echo '$ORIGIN .' >> ${ZONEFILE}
+fi
+
+# Add the new challenge record
+echo "${ACMEDOMAIN} IN TXT \"${CERTBOT_VALIDATION}\"" >> "$ZONEFILE"
+
+cat {{ basepath }}/dns/zones/*.zone.part > {{ basepath }}/dns/zones/dns.zone
+
+# Wait to ensure propagation
+sleep 5

@@ -1,0 +1,214 @@
+all:
+    children:
+        develop:
+            hosts:
+                he-host:
+                    ansible_host: planetlab25.net.in.tum.de
+                    ansible_user: root
+                    ansible_port: 10022
+                    heinterface: eno1.220
+                    v6onlyaddress: 2001:4ca0:108:42:0:25:4f:0
+                    v4onlyaddress: 138.246.253.189
+                    v6delayprefix: 2001:4ca0:108:42:0:25:4e:0/112
+                    basepath: /data/happy-eyeballs-test
+                    basedomain: he-test.net.in.tum.de
+                    hedomains:
+                        - www.happy-eyeballs.net
+                        - happy-eyeballs.net
+                    nsaddrs:
+                        ipv4:
+                            - 138.246.253.190
+                            - 138.246.253.191
+                        ipv6:
+                            - 2001:4ca0:108:42:0:25:d:1
+                            - 2001:4ca0:108:42:0:25:d:2
+                    headdresses:
+                        -
+                            address: 138.246.253.160
+                            effective_delay: 0
+                            delay_id: 0
+                        -
+                            address: 138.246.253.161
+                            effective_delay: 0
+                            delay_id: 50
+                        -
+                            address: 138.246.253.162
+                            effective_delay: 0
+                            delay_id: 100
+                        -
+                            address: 138.246.253.163
+                            effective_delay: 0
+                            delay_id: 150
+                        -
+                            address: 138.246.253.164
+                            effective_delay: 0
+                            delay_id: 200
+                        -
+                            address: 138.246.253.165
+                            effective_delay: 0
+                            delay_id: 250
+                        -
+                            address: 138.246.253.166
+                            effective_delay: 0
+                            delay_id: 300
+                        -
+                            address: 138.246.253.167
+                            effective_delay: 0
+                            delay_id: 400
+                        -
+                            address: 138.246.253.168
+                            effective_delay: 0
+                            delay_id: 500
+                        -
+                            address: 138.246.253.169
+                            effective_delay: 0
+                            delay_id: 600
+                        -
+                            address: 138.246.253.170
+                            effective_delay: 0
+                            delay_id: 750
+                        -
+                            address: 138.246.253.171
+                            effective_delay: 0
+                            delay_id: 1000
+                        -
+                            address: 138.246.253.172
+                            effective_delay: 0
+                            delay_id: 1250
+                        -
+                            address: 138.246.253.173
+                            effective_delay: 0
+                            delay_id: 1500
+                        -
+                            address: 138.246.253.174
+                            effective_delay: 0
+                            delay_id: 1750
+                        -
+                            address: 138.246.253.175
+                            effective_delay: 0
+                            delay_id: 2000
+                        -
+                            address: 138.246.253.176
+                            effective_delay: 0
+                            delay_id: 3000
+                        -
+                            address: 138.246.253.177
+                            effective_delay: 0
+                            delay_id: 4000
+                        -
+                            address: 138.246.253.178
+                            effective_delay: 0
+                            delay_id: 5000
+                        -
+                            address: 138.246.253.179
+                            effective_delay: 0
+                            delay_id: 10000
+                        -
+                            address: 138.246.253.180
+                            effective_delay: 0
+                            delay_id: 60000
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:0
+                            effective_delay: 0
+                            delay_id: 0
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:50
+                            effective_delay: 50
+                            delay_id: 50
+                            classid: 50
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:100
+                            effective_delay: 100
+                            delay_id: 100
+                            classid: 100
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:150
+                            effective_delay: 150
+                            delay_id: 150
+                            classid: 150
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:200
+                            effective_delay: 200
+                            delay_id: 200
+                            classid: 200
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:250
+                            effective_delay: 250
+                            delay_id: 250
+                            classid: 250
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:300
+                            effective_delay: 300
+                            delay_id: 300
+                            classid: 300
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:400
+                            effective_delay: 400
+                            delay_id: 400
+                            classid: 400
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:500
+                            effective_delay: 500
+                            delay_id: 500
+                            classid: 500
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:600
+                            effective_delay: 600
+                            delay_id: 600
+                            classid: 600
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:750
+                            effective_delay: 750
+                            delay_id: 750
+                            classid: 750
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:1000
+                            effective_delay: 1000
+                            delay_id: 1000
+                            classid: 1000
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:1250
+                            effective_delay: 1250
+                            delay_id: 1250
+                            classid: 1250
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:1500
+                            effective_delay: 1500
+                            delay_id: 1500
+                            classid: 1500
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:1750
+                            effective_delay: 1750
+                            delay_id: 1750
+                            classid: 1750
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:2000
+                            effective_delay: 2000
+                            delay_id: 2000
+                            classid: 2000
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:3000
+                            effective_delay: 3000
+                            delay_id: 3000
+                            classid: 3000
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:4000
+                            effective_delay: 4000
+                            delay_id: 4000
+                            classid: 4000
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:5000
+                            effective_delay: 5000
+                            delay_id: 5000
+                            classid: 5000
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:a000
+                            effective_delay: 10000
+                            delay_id: 10000
+                            classid: 1001
+                        -
+                            address: 2001:4ca0:108:42:0:25:4e:6f00
+                            effective_delay: 60000
+                            delay_id: 60000
+                            classid: 6001
+

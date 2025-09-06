@@ -1,0 +1,69 @@
+---
+
+- name: Setting up DNS
+  tags:
+    - dnssetup
+  block:
+    - name: Copy DNS python server
+      ansible.posix.synchronize:
+        src: dns/
+        dest: "{{ basepath }}/dns/"
+        owner: false
+        group: false
+
+    - name: Copy DNS server service file
+      ansible.builtin.template:
+        src: he-dns-server.service.j2
+        dest: /etc/systemd/system/he-dns-server.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy docker compose file
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: "{{ basepath }}/dns/docker-compose.yml"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy zone file templates
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "{{ basepath }}/dns/zones/{{ item }}.part"
+        owner: root
+        group: root
+        mode: '0644'
+      with_items:
+        - v1.zone
+        - v2.zone
+        - v1-rdns.zone
+      register: zoneresult
+
+    - name: Remove zone file
+      ansible.builtin.file:
+        path: "{{ basepath }}/dns/zones/dns.zone"
+        state: absent
+
+    - name: Cut all zone files to a single file
+      ansible.builtin.shell:
+        cmd: "cat {{ basepath }}/dns/zones/{{ item }}.part >> {{ basepath }}/dns/zones/dns.zone"
+      with_items:
+        - v1.zone
+        - v2.zone
+        - v1-rdns.zone
+      changed_when: zoneresult.changed
+
+    - name: Create output dir
+      ansible.builtin.file:
+        path: "{{ basepath }}/dns-query-data"
+        state: directory
+        owner: "{{ dns_user }}"
+        group: "{{ dns_group }}"
+        mode: '0755'
+
+    - name: Reload systemd and start DNS server
+      ansible.builtin.systemd_service:
+        name: he-dns-server.service
+        daemon_reload: true
+        state: restarted

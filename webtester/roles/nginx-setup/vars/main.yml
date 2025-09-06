@@ -1,0 +1,36 @@
+certbot_admin_email: sattler@net.in.tum.de
+certbot_domains: "{{ headdresses | map(attribute='effective_delay') | map('string') | map('regex_replace', '(.+)', '*.delay-\\1.v1.' ~  basedomain) | unique | list }}"
+certbot_v2_domain: "*.v2.{{ basedomain }}"
+certbot_common_args: >-
+  --manual-auth-hook {{ basepath }}/cert-scripts/auth-hook-handler.sh --manual-cleanup-hook {{ basepath }}/cert-scripts/auth-cleanup-handler.sh
+  --email {{ certbot_admin_email }}
+  --manual --preferred-challenges=dns --agree-tos
+
+certbot_command: >-
+  certbot certonly {{ certbot_common_args }}
+  -d {{ certbot_domains | join(',') }}
+
+certbot_command_v2: >-
+  certbot certonly {{ certbot_common_args }}
+  -d {{ certbot_v2_domain }}
+
+certbot_v6only_domain: "ipv6-only.v1.{{ basedomain }}"
+certbot_v4only_domain: "ipv4-only.v1.{{ basedomain }}"
+
+certbot_command_version_only: >-
+  certbot certonly {{ certbot_common_args }}
+  -d {{ certbot_v6only_domain }},{{ certbot_v4only_domain }}
+
+certbot_command_he: >-
+  certbot certonly --nginx --noninteractive --agree-tos
+  --email {{ certbot_admin_email }}
+  -d {{ hedomains | join(',') }}
+
+server_base_path: "{{ basepath }}/upload-server"
+server_venv_path: "{{ basepath }}/upload-server/venv"
+upload_dir: "{{ basepath }}/results-data"
+dns_upload_dir: "{{ basepath }}/dns-query-data"
+v2_upload_dir: "{{ basepath }}/v2-results-data"
+
+upload_user: sattler
+upload_group: sattler

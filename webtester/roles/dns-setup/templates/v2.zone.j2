@@ -1,0 +1,13 @@
+$TTL 3600
+$ORIGIN v2.{{ basedomain }}.
+
+@                 IN  SOA    ns1.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+@                 IN  NS     ns1.{{ basedomain }}.
+@                 IN  NS     ns2.{{ basedomain }}.
+
+v2delay_a-*             IN  A    {{ v4onlyaddress }}
+v2delay_a-*             IN  AAAA {{ v6onlyaddress }}
+
+v2delay_aaaa-*          IN  A    {{ v4onlyaddress }}
+v2delay_aaaa-*          IN  AAAA {{ v6onlyaddress }}
+

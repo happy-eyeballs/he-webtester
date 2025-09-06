@@ -1,0 +1,74 @@
+---
+
+- name: Prepare cert creation
+  block:
+    - name: Create cert scripts dir
+      ansible.builtin.file:
+        path: "{{ basepath }}/cert-scripts"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy auth scripts
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "{{ basepath }}/cert-scripts/{{ item }}"
+        owner: root
+        group: root
+        mode: '0755'
+      with_items:
+        - auth-hook-handler.sh
+        - auth-cleanup-handler.sh
+
+- name: Create cert for delay domains
+  block:
+    - name: Check if certificate already exists.
+      ansible.builtin.stat:
+        path: /etc/letsencrypt/live/{{  certbot_domains | first | replace('*.', '') }}/cert.pem
+      register: wildcard_cert
+
+    - name: Creating v1 cert
+      ansible.builtin.command:
+        cmd: "{{ certbot_command }}"
+      changed_when: true
+      when: not wildcard_cert.stat.exists
+
+- name: Create cert for v2 wildcard domain
+  block:
+    - name: Check if certificate already exists.
+      ansible.builtin.stat:
+        path: /etc/letsencrypt/live/{{  certbot_v2_domain | replace('*.', '') }}/cert.pem
+      register: v2wildcard_cert
+
+    - name: Creating v2 cert
+      ansible.builtin.command:
+        cmd: "{{ certbot_command_v2 }}"
+      changed_when: true
+      when: not v2wildcard_cert.stat.exists
+
+- name: Create cert for version only domains
+  block:
+    - name: Check if certificate already exists.
+      ansible.builtin.stat:
+        path: /etc/letsencrypt/live/{{ certbot_v6only_domain }}/cert.pem
+      register: only_cert
+
+    - name: Command for Cert creation
+      ansible.builtin.command:
+        cmd: "{{ certbot_command_version_only }}"
+      changed_when: true
+      when: not only_cert.stat.exists
+
+- name: Create cert for version only domains
+  block:
+    - name: Check if certificate already exists.
+      ansible.builtin.stat:
+        path: /etc/letsencrypt/live/{{ hedomains | first }}/cert.pem
+      register: he_cert
+
+    - name: Command for Cert creation
+      ansible.builtin.command:
+        cmd: "{{ certbot_command_he }}"
+      changed_when: true
+      when: not he_cert.stat.exists

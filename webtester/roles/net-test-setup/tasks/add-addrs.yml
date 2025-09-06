@@ -1,0 +1,11 @@
+---
+
+- name: Add addresses to interface
+  ansible.builtin.command:
+    cmd: "ip a add {{ item }} dev {{ heinterface }}"
+  with_items:
+    - "{{ headdresses | map(attribute='address') | list }}"
+    - "{{ nsaddrs.ipv4 }}"
+    - "{{ nsaddrs.ipv6 }}"
+    - "{{ v4onlyaddress }}"
+    - "{{ v6onlyaddress }}"

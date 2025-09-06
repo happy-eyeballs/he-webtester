@@ -1,0 +1,13 @@
+services:
+  dns:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    restart: unless-stopped
+    network_mode: 'host'
+    command: --listen6 --local-ns-ip {{ nsaddrs.ipv4 | join(' ') }} {{ nsaddrs.ipv6 | join(' ') }} --v6delay-prefix {{ v6delayprefix }} --output-dir /data --basedomain {{ basedomain }}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./zones:/app/zones:ro
+      - {{ basepath }}/dns-query-data:/data
+#      - ./queries:/data
