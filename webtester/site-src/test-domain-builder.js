@@ -78,6 +78,7 @@ document.getElementById('measurementForm').addEventListener("submit", (event) =>
     }
 
     resultText.innerText = url;
+    resultText.href = url;
     resultBox.style.display = 'block';
 });
 

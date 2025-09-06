@@ -48,7 +48,9 @@
   <div class="container form-container">
     <div class="card shadow-sm rounded-3">
       <div class="card-body">
-        <h3 class="card-title mb-4 text-center">Measurement Settings</h3>
+        <a href="/main.html"><h1 class="text-center">Happy Eyeballs Webtester</h1></a>
+
+        <h3 class="card-title mb-4 text-center">Measurement Domain Builder</h3>
 
         <form id="measurementForm">
           <div class="mb-3">
@@ -93,14 +95,14 @@
           </div>
 
           <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Generate Domain</button>
           </div>
         </form>
         <div class="result-box-info">
           The generated domains contain a random number as a mitigation to caching effects. You can change this identifier to any value.
         </div>
         <div id="resultBox" class="result-box">
-          <div id="resultText"></div>
+          <a id="resultText" target="_blank" rel="noreferrer noopener"></a>
           <div id="resultInfo" class="result-box-info">
             Click on the box to copy the URL to your clipboard.
           </div>
