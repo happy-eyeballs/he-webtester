@@ -70,7 +70,7 @@
             </select>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 hidden" id="delayContainer">
             <label for="delayRange" class="form-label">Delay (ms)</label>
             <div class="d-flex align-items-center gap-3">
               <input
@@ -95,7 +95,7 @@
           </div>
 
           <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Generate Domain</button>
+            <button id="generateDomainsBtn" type="submit" class="btn btn-primary" disabled>Generate Domain</button>
           </div>
         </form>
         <div class="result-box-info">

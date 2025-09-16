@@ -14,6 +14,7 @@ function getNearestValue(selectedValue, acceptedValues) {
 
 const delayRange = document.getElementById('delayRange');
 const delayNumber = document.getElementById('delayNumber');
+const delayContainer = document.getElementById('delayContainer');
 const resultBox = document.getElementById('resultBox');
 const resultText = document.getElementById('resultText');
 const resultInfo = document.getElementById('resultInfo');
@@ -21,6 +22,7 @@ const measurementTypeSelect = document.getElementById('measurementType');
 const recordTypeContainer = document.getElementById('recordTypeContainer');
 const recordType = document.getElementById('recordType');
 const resultError = document.getElementById('resultError');
+const submitButton = document.getElementById('generateDomainsBtn');
 
 
 document.addEventListener('DOMContentLoaded', main.setup);
@@ -42,6 +44,9 @@ delayNumber.addEventListener('input', () => {
 
 // Show/hide RD options based on selection
 measurementTypeSelect.addEventListener('change', () => {
+    delayContainer.classList.remove("hidden");
+    submitButton.removeAttribute('disabled');
+
     if (measurementTypeSelect.value === "rd") {
         recordTypeContainer.classList.remove("hidden");
     } else {
