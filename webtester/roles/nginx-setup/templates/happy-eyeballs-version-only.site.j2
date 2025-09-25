@@ -13,8 +13,13 @@ server {
         return 200 "$remote_addr\n";
     }
 
-    listen [::]:443 ssl; # managed by Certbot
-    listen 443 ssl; # managed by Certbot
+    listen [::]:443 ssl;
+    listen 443 ssl;
+    # listen [::]:443 quic;
+    # listen 443 quic;
+    # http2 on;
+    # http3_hq on;
+
     ssl_certificate /etc/letsencrypt/live/{{ certbot_v6only_domain }}/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/{{ certbot_v6only_domain }}/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
@@ -26,6 +31,7 @@ server {
 
     listen 80 ;
     listen [::]:80 ;
+    # add_header Alt-Svc 'h3=":443"; ma=86400';
     server_name {{ certbot_v6only_domain }} {{ certbot_v4only_domain }};
     return 404; # managed by Certbot
 }

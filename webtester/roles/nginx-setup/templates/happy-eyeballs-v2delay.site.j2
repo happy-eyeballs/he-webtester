@@ -13,8 +13,13 @@ server {
         return 200 "$server_addr\n";
     }
 
-    listen [::]:443 ssl; # managed by Certbot
-    listen 443 ssl; # managed by Certbot
+    listen [::]:443 ssl;
+    listen 443 ssl;
+    # listen [::]:443 quic;
+    # listen 443 quic;
+    # http2 on;
+    # http3_hq on;
+
     ssl_certificate /etc/letsencrypt/live/{{  certbot_v2_domain | replace('*.', '') }}/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/{{  certbot_v2_domain | replace('*.', '') }}/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot

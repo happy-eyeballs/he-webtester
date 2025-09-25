@@ -1,0 +1,19 @@
+$TTL 3600
+$ORIGIN v3-quic.{{ basedomain }}.
+
+@                 IN  SOA    ns1.v3-quic.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+@                 IN  NS     ns1.{{ basedomain }}.
+@                 IN  NS     ns2.{{ basedomain }}.
+
+{% for num in [1, 2] %}
+ns{{ num }}       IN  A         {{ nsaddrs.ipv4[num - 1] }}
+ns{{ num }}       IN  AAAA      {{ nsaddrs.ipv6[num - 1] }}
+{% endfor %}
+
+$TTL 300
+{% for headdr in headdresses %}
+{% if ":" in headdr.address %}
+id-*.delay-{{ headdr.delay_id }}        IN AAAA {{ headdr.address }}
+id-*.delay-{{ headdr.delay_id }}        IN HTTPS    1   .   alpn=h3,h2
+{% endif %}
+{% endfor %}

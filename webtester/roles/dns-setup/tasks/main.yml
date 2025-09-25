@@ -38,6 +38,7 @@
         - v1.zone
         - v2.zone
         - v1-rdns.zone
+        - v3-quic.zone
       register: zoneresult
 
     - name: Remove zone file
@@ -52,6 +53,7 @@
         - v1.zone
         - v2.zone
         - v1-rdns.zone
+        - v3-quic.zone
       changed_when: zoneresult.changed
 
     - name: Create output dir
