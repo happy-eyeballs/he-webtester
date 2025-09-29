@@ -1,5 +1,5 @@
 ---
 
-dns_user: sattler
-dns_group: sattler
-user_uid: 1008
+dns_user: "{{ he_user }}"
+dns_group: "{{ he_group }}"
+user_uid: "{{ he_user_uid }}"

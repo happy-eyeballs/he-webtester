@@ -32,5 +32,5 @@ upload_dir: "{{ basepath }}/results-data"
 dns_upload_dir: "{{ basepath }}/dns-query-data"
 v2_upload_dir: "{{ basepath }}/v2-results-data"
 
-upload_user: sattler
-upload_group: sattler
+upload_user: "{{ he_user }}"
+upload_group: "{{ he_group }}"
