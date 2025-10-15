@@ -1,19 +1,31 @@
 $TTL 3600
-$ORIGIN v3-quic.{{ basedomain }}.
+$ORIGIN v3-quic.{{ happy_eyeballs.nameserver.base_domain }}.
 
-@                 IN  SOA    ns1.v3-quic.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
-@                 IN  NS     ns1.{{ basedomain }}.
-@                 IN  NS     ns2.{{ basedomain }}.
+@                 IN  SOA    ns1.{{ happy_eyeballs.nameserver.base_domain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+@                 IN  NS     ns1.{{ happy_eyeballs.nameserver.base_domain }}.
+@                 IN  NS     ns2.{{ happy_eyeballs.nameserver.base_domain }}.
 
-{% for num in [1, 2] %}
-ns{{ num }}       IN  A         {{ nsaddrs.ipv4[num - 1] }}
-ns{{ num }}       IN  AAAA      {{ nsaddrs.ipv6[num - 1] }}
-{% endfor %}
 
 $TTL 300
-{% for headdr in headdresses %}
-{% if ":" in headdr.address %}
-id-*.delay-{{ headdr.delay_id }}        IN AAAA {{ headdr.address }}
-id-*.delay-{{ headdr.delay_id }}        IN HTTPS    1   .   alpn=h3,h2
-{% endif %}
-{% endfor %}
+
+id-*.http3               IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
+id-*.http3               IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+
+id-*.http3-https         IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
+id-*.http3-https         IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+id-*.http3-https         IN  HTTPS  1  . alpn=h3,h2
+
+id-*.http3-altsvc        IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
+id-*.http3-altsvc        IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+
+id-*.http3-https-altsvc  IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
+id-*.http3-https-altsvc  IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+id-*.http3-https-altsvc  IN  HTTPS  1  . alpn=h3,h2
+
+id-*.http3-only          IN  A         {{ happy_eyeballs.webserver.http3_only.ipv4 }}
+id-*.http3-only          IN  AAAA      {{ happy_eyeballs.webserver.http3_only.ipv6 }}
+
+id-*.http3-only-https    IN  A         {{ happy_eyeballs.webserver.http3_only.ipv4 }}
+id-*.http3-only-https    IN  AAAA      {{ happy_eyeballs.webserver.http3_only.ipv6 }}
+id-*.http3-only-https    IN  HTTPS  1  . alpn=h3
+

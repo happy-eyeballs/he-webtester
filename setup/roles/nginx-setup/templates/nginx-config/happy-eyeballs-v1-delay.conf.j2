@@ -1,0 +1,29 @@
+server {
+    listen [::]:443 ssl;
+    listen 443 ssl;
+
+    server_name {{ happy_eyeballs_domains.v1 | join(' ') }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    root {{ happy_eyeballs.base_path }}/www-root;
+
+    location /ping {
+        include /etc/nginx/happy-eyeballs-cors.conf;
+
+        add_header 'Content-Type' 'text/plain charset=UTF-8';
+        return 200 '$server_addr\n';
+    }
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ happy_eyeballs_domains.v1 | join(' ') }};
+
+    return 301 https://$host$request_uri;
+}

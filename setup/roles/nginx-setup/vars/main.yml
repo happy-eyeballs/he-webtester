@@ -1,36 +1,12 @@
-certbot_admin_email: sattler@net.in.tum.de
-certbot_domains: "{{ headdresses | map(attribute='effective_delay') | map('string') | map('regex_replace', '(.+)', '*.delay-\\1.v1.' ~  basedomain) | unique | list }}"
-certbot_v2_domain: "*.v2.{{ basedomain }}"
-certbot_common_args: >-
-  --manual-auth-hook {{ basepath }}/cert-scripts/auth-hook-handler.sh --manual-cleanup-hook {{ basepath }}/cert-scripts/auth-cleanup-handler.sh
-  --email {{ certbot_admin_email }}
-  --manual --preferred-challenges=dns --agree-tos
-
-certbot_command: >-
-  certbot certonly {{ certbot_common_args }}
-  -d {{ certbot_domains | join(',') }}
-
-certbot_command_v2: >-
-  certbot certonly {{ certbot_common_args }}
-  -d {{ certbot_v2_domain }}
-
-certbot_v6only_domain: "ipv6-only.v1.{{ basedomain }}"
-certbot_v4only_domain: "ipv4-only.v1.{{ basedomain }}"
-
-certbot_command_version_only: >-
-  certbot certonly {{ certbot_common_args }}
-  -d {{ certbot_v6only_domain }},{{ certbot_v4only_domain }}
-
-certbot_command_he: >-
-  certbot certonly --nginx --noninteractive --agree-tos
-  --email {{ certbot_admin_email }}
-  -d {{ hedomains | join(',') }}
-
-server_base_path: "{{ basepath }}/upload-server"
-server_venv_path: "{{ basepath }}/upload-server/venv"
-upload_dir: "{{ basepath }}/results-data"
-dns_upload_dir: "{{ basepath }}/dns-query-data"
-v2_upload_dir: "{{ basepath }}/v2-results-data"
-
-upload_user: "{{ he_user }}"
-upload_group: "{{ he_group }}"
+happy_eyeballs_domains:
+  v1: '{{ happy_eyeballs.webserver.delays | map(attribute="delay") | map("string") | map("regex_replace", "(.+)", "*.delay-\1.v1." ~ happy_eyeballs.nameserver.base_domain) | unique | list }}'
+  v1_ipv6_only: 'ipv6-only.v1.{{ happy_eyeballs.nameserver.base_domain }}'
+  v1_ipv4_only: 'ipv4-only.v1.{{ happy_eyeballs.nameserver.base_domain }}'
+  v2: '*.v2.{{ happy_eyeballs.nameserver.base_domain }}'
+  v3_quic:
+    http3: '*.http3.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'
+    http3_https: '*.http3-https.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'
+    http3_altsvc: '*.http3-altsvc.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'
+    http3_https_altsvc: '*.http3-https-altsvc.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'
+    http3_only: '*.http3-only.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'
+    http3_only_https: '*.http3-only-https.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'

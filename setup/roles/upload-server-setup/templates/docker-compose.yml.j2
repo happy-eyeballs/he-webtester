@@ -1,0 +1,15 @@
+services:
+  upload-server:
+    container_name: he-upload-server
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    restart: unless-stopped
+    user: '{{ happy_eyeballs.user.uid }}:{{ happy_eyeballs.user.uid }}'
+    ports:
+      - '{{ happy_eyeballs.uploadserver.host }}:{{ happy_eyeballs.uploadserver.port }}:3000/tcp'
+    volumes:
+      - '{{ happy_eyeballs.base_path }}/{{ happy_eyeballs.uploadserver.results_directory.v1 }}:/var/he-upload-server/results-data'
+      - '{{ happy_eyeballs.base_path }}/{{ happy_eyeballs.uploadserver.results_directory.v1_rdns }}:/var/he-upload-server/dns-query-data'
+      - '{{ happy_eyeballs.base_path }}/{{ happy_eyeballs.uploadserver.results_directory.v2 }}:/var/he-upload-server/v2-results-data'
+      - '{{ happy_eyeballs.base_path }}/{{ happy_eyeballs.uploadserver.results_directory.v3_quic }}:/var/he-upload-server/v3-quic-results-data'

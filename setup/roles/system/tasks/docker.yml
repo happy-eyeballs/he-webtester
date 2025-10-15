@@ -1,0 +1,21 @@
+- name: Add Docker apt key
+  apt_key:
+    url: 'https://download.docker.com/linux/{{ os.name }}/gpg'
+    state: present
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: 'deb https://download.docker.com/linux/{{ os.name }} {{ os.version_codename }} stable'
+    state: present
+
+- name: Install Docker
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - 'docker-ce'
+    - 'docker-ce-cli'
+    - 'containerd.io'
+    - 'docker-buildx-plugin'
+    - 'docker-compose-plugin'
+  notify: restart docker

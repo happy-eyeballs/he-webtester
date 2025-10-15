@@ -1,0 +1,34 @@
+- name: Add IPv4 addresses to webserver interface
+  ansible.builtin.shell:
+    cmd: 'ip a add {{ item }}/{{ happy_eyeballs.webserver.ipv4_net_mask }} dev {{ happy_eyeballs.webserver.interface }}'
+  with_items:
+    - '{{ happy_eyeballs.webserver.delays | map(attribute="ipv4") | list }}'
+    - '{{ happy_eyeballs.webserver.ipv4_only_ip }}'
+    - '{{ happy_eyeballs.webserver.http3.ipv4 }}'
+    - '{{ happy_eyeballs.webserver.http3_only.ipv4 }}'
+
+- name: Add IPv6 addresses to webserver interface
+  ansible.builtin.shell:
+    cmd: 'ip a add {{ item }}/{{ happy_eyeballs.webserver.ipv6_net_mask }} dev {{ happy_eyeballs.webserver.interface }}'
+  with_items:
+    - '{{ happy_eyeballs.webserver.delays | map(attribute="ipv6") | list }}'
+    - '{{ happy_eyeballs.webserver.ipv6_only_ip }}'
+    - '{{ happy_eyeballs.webserver.http3.ipv6 }}'
+    - '{{ happy_eyeballs.webserver.http3_only.ipv6 }}'
+
+- name: Add IPv4 addresses to namesever interface
+  ansible.builtin.shell:
+    cmd: 'ip a add {{ item }}/{{ happy_eyeballs.nameserver.ipv4_net_mask }} dev {{ happy_eyeballs.nameserver.interface }}'
+  with_items:
+    - '{{ happy_eyeballs.nameserver.ipv4 }}'
+
+- name: Add IPv6 addresses to namesever interface
+  ansible.builtin.shell:
+    cmd: 'ip a add {{ item }}/{{ happy_eyeballs.nameserver.ipv6_net_mask }} dev {{ happy_eyeballs.nameserver.interface }}'
+  with_items:
+    - '{{ happy_eyeballs.nameserver.ipv6 }}'
+
+
+
+# ip route add default via 138.246.253.254 dev eno4.220 metric 512
+# ip -6 route add default via fe80::21c:73ff:fe00:99 dev eno4.220 metric 512

@@ -1,24 +1,18 @@
 $TTL 3600
-$ORIGIN v1.{{ basedomain }}.
+$ORIGIN v1.{{ happy_eyeballs.nameserver.base_domain }}.
 
-@                 IN  SOA    ns1.v1.{{ basedomain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
-@                 IN  NS     ns1.{{ basedomain }}.
-@                 IN  NS     ns2.{{ basedomain }}.
+@                 IN  SOA    ns1.{{ happy_eyeballs.nameserver.base_domain }}. mail.net.in.tum.de. 1722513549 3600 900 604800 180
+@                 IN  NS     ns1.{{ happy_eyeballs.nameserver.base_domain }}.
+@                 IN  NS     ns2.{{ happy_eyeballs.nameserver.base_domain }}.
 
-{% for num in [1, 2] %}
-ns{{ num }}       IN  A         {{ nsaddrs.ipv4[num - 1] }}
-ns{{ num }}       IN  AAAA      {{ nsaddrs.ipv6[num - 1] }}
-{% endfor %}
+ipv4-only          IN  A        {{ happy_eyeballs.webserver.ipv4_only_ip }}
+ipv6-only          IN  AAAA     {{ happy_eyeballs.webserver.ipv6_only_ip }}
 
-ipv6-only          IN  AAAA     {{ v6onlyaddress }}
-ipv4-only          IN  A        {{ v4onlyaddress }}
 
 $TTL 300
-{% for headdr in headdresses %}
-{% if ":" in headdr.address %}
-id-*.delay-{{ headdr.delay_id }}        IN AAAA {{ headdr.address }}
-{% else %}
-id-*.delay-{{ headdr.delay_id }}        IN A    {{ headdr.address }}
-{% endif %}
+
+{% for item in happy_eyeballs.webserver.delays %}
+id-*.delay-{{ item.delay }}        IN A    {{ item.ipv4 }}
+id-*.delay-{{ item.delay }}        IN AAAA {{ item.ipv6 }}
 {% endfor %}
 

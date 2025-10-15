@@ -40,8 +40,6 @@ def init_argparse() -> argparse.ArgumentParser:
         usage="%(prog)s [OPTIONS]",
         description="Custom Python-based DNS server using a single DNS zonefile."
     )
-    # parser.add_argument("--listen", help="IPv4 address the server will listen on")
-    parser.add_argument("--listen6", help="enable dual stack listening", action='store_true')
     parser.add_argument("--port", help="UDP port the server will listen on")
     parser.add_argument("--zonefile", help="path to the DNS zonefile")
     parser.add_argument("--local-ns-ip", nargs="+", help="IP address only used for DNS (not related to HE tests)")

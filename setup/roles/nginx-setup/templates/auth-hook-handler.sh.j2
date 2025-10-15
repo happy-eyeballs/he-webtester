@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZONEFILE="{{ basepath }}/dns/zones/acme.zone.part"
+ZONEFILE="{{ happy_eyeballs.base_path }}/dns/zones/acme.zone.part"
 ACMEDOMAIN="_acme-challenge.${CERTBOT_DOMAIN}"
 
 if [[ ! -e ${ZONEFILE} ]]; then
@@ -11,7 +11,7 @@ fi
 # Add the new challenge record
 echo "${ACMEDOMAIN} IN TXT \"${CERTBOT_VALIDATION}\"" >> "$ZONEFILE"
 
-cat {{ basepath }}/dns/zones/*.zone.part > {{ basepath }}/dns/zones/dns.zone
+cat {{ happy_eyeballs.base_path }}/dns/zones/*.zone.part > {{ happy_eyeballs.base_path }}/dns/zones/dns.zone
 
 # Wait to ensure propagation
 sleep 5

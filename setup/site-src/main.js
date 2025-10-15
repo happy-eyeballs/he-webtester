@@ -94,10 +94,11 @@ export async function setup() {
         });
 
     if (configFunc != null) {
-        if (resultsPath != "v2results") {
+        if (testName !== "ip-v2") {
             configuredDelays.pop();
             configuredDelays.pop();
         }
+
         let tableHeader = document.getElementById("testRunTableHeader");
         let delayHeader = document.createElement("th");
         delayHeader.textContent = "Delays [ms]";
@@ -124,9 +125,9 @@ export async function setup() {
         delayHeaders.forEach(element => {
             tableSubHeader.appendChild(element);
         });
-
-        document.getElementById('autoTransmit').checked = false;
     }
+
+    document.getElementById('autoTransmit').checked = false;
 
     console.log(configuredDelays);
 
@@ -180,15 +181,13 @@ export function getBasedomain() {
  }
 
 export async function measureHappyEyeballs() {
-    const transmitEnabled = document.getElementById('transmitResultsBtn').getAttribute('disabled') == null
-    const downloadEnabled = document.getElementById('downloadResultsBtn').getAttribute('disabled') == null
-    disableUserInteraction()
+    disableUserInteraction();
 
     const repetitions = Number(document.getElementById('repetitions').value);
     const randomizeDomains = document.getElementById('domainRandomization').checked;
 
     // check if ipv4 and ipv6 is available
-    if (userIPv4Address == "" || userIPv6Address == "") {
+    if (userIPv4Address === "" || userIPv6Address === "") {
         try {
             await getAddresses();
         } catch (error) {
@@ -561,9 +560,9 @@ function createDNSResultRow(testRunCount, repetition, repetitions) {
     newRow.appendChild(cellRunNumber);
     newRow.appendChild(cellTimestamp);
 
-    delayElements = {};
+    const delayElements = {};
     for (const delay of configuredDelays) {
-        element = document.createElement("td");
+        const element = document.createElement("td");
 
         delayElements[delay] = element;
         newRow.appendChild(element);
@@ -648,14 +647,13 @@ async function performDNSRequest(delay, randid) {
 
 
 export async function measureHappyEyeballsV2() {
-    const transmitEnabled = document.getElementById('transmitResultsBtn').getAttribute('disabled') == null
-    disableUserInteraction()
+    disableUserInteraction();
 
     const repetitions = Number(document.getElementById('repetitions').value);
     const randomizeDomains = document.getElementById('domainRandomization').checked;
 
     // check if ipv4 and ipv6 is available
-    if (userIPv4Address == "" || userIPv6Address == "") {
+    if (userIPv4Address === "" || userIPv6Address === "") {
         try {
             await getAddresses();
         } catch (error) {
@@ -813,11 +811,278 @@ async function executeV2TestRun(runInfo, delayElements, runUIdMapping, randomize
     runInfo["timestampEnd"] = endDate.getTime();
 }
 
+
+const hev3ScenarioIDs = [
+    'http3',
+    'http3_https',
+    'http3_altsvc',
+    'http3_altsvc_https',
+    'http3_only',
+    'http3_only_https',
+];
+
+export async function setupHappyEyeballsV3() {
+    const tableHeader = document.getElementById("testRunTableHeader");
+
+    const header = document.createElement("th");
+    header.textContent = "Scenarios";
+    header.setAttribute("colspan", hev3ScenarioIDs.length.toString());
+    tableHeader.appendChild(header);
+
+    const headerColumns = [
+        'HTTP/3',
+        'HTTP/3\nwith HTTPS RR',
+        'HTTP/3\nwith Alt-Svc',
+        'HTTP/3\nwith Alt-Svc\nand HTTPS RR',
+        'HTTP/3 only',
+        'HTTP/3 only\nwith HTTPS RR',
+    ].map((scenario) => {
+        const element = document.createElement("th");
+        element.style.verticalAlign = "bottom";
+        element.style.alignContent = "start";
+
+        const elementDiv = document.createElement("div");
+        elementDiv.textContent = scenario;
+        elementDiv.style.whiteSpace = "pre";
+        elementDiv.style.textAlign = "right";
+        element.appendChild(elementDiv);
+
+        return element;
+    });
+
+    const tableSubHeader = document.getElementById("testRunTableHeaderDelays");
+    headerColumns.forEach(element => tableSubHeader.appendChild(element));
+}
+
+export async function measureHappyEyeballsV3() {
+    disableUserInteraction();
+
+    const repetitions = Number(document.getElementById('repetitions').value);
+
+    // check if ipv4 and ipv6 is available
+    if (userIPv4Address === "" || userIPv6Address === "") {
+        try {
+            await getAddresses();
+        } catch (error) {
+            console.error('An error occurred while getting addresses:', error.message);
+            return;
+        }
+    }
+
+    // increment test run count
+    testRunCount++;
+    const runId = getRand();
+    const runInfo = {
+        "id": runId,
+        "runCount": testRunCount,
+        "timestampStart": Date.now(),
+        "userAgent": window.navigator.userAgent,
+        "platform": window.navigator.platform,
+        "vendor": window.navigator.vendor,
+        "domainRandomization": true,
+        "repetitions": repetitions,
+        "userInfo": document.getElementById('userInfo').value,
+        "results": {}
+    };
+
+    const infoElement = document.getElementById("testInfo");
+    const infoElementText = document.getElementById("testInfoText");
+
+    infoElement.classList.remove("d-none");
+
+    for (let i = 0; i < repetitions; i++) {
+        await executeHeV3TestRun(runInfo, infoElementText, i, repetitions);
+
+        if (i + 1 < repetitions) {
+            infoElementText.textContent = `Sleeping for 5s between Test Runs (Run ${i + 1} of ${repetitions})`
+            await sleep(5000);
+        }
+    }
+
+    testRunData[runId] = runInfo;
+
+    infoElement.classList.add("d-none");
+
+    enableUserInteraction()
+
+    if (document.getElementById('autoTransmit').checked) {
+        await transmitResults()
+    }
+}
+
+async function executeHeV3TestRun(runInfo, infoElementText, repetition, totalRepetitions) {
+    const tableColumns = createHEv3ResultRow(testRunCount, repetition, totalRepetitions);
+
+    infoElementText.textContent = `Checking HTTP/3 support (Run ${repetition + 1} of ${totalRepetitions})`;
+
+    // HTTP/3 enabled
+    {
+        const url = `https://id-${getRandomRunId()}.http3.v3-quic.${basedomain}/ping`;
+        const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null);
+        console.log('HTTP/3 enabled', result);
+
+        const protocol = result === null ? 'ERR' : result['protocol'];
+        const expected = 'HTTP/3.0';
+
+        runInfo['results'][hev3ScenarioIDs[0]] = protocol;
+        tableColumns[0].textContent = protocol;
+        tableColumns[0].setAttribute("class", protocol === 'ERR' ? "bg-danger" : protocol === expected ? "bg-success" : "bg-warning");
+    }
+
+    await sleep(50);
+
+    // HTTP/3 enabled with HTTPS RR
+    {
+        const url = `https://id-${getRandomRunId()}.http3-https.v3-quic.${basedomain}/ping`;
+        const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null);
+        console.log('HTTP/3 enabled (with HTTPS RR)', result);
+
+        const protocol = result === null ? 'ERR' : result['protocol'];
+        const expected = 'HTTP/3.0';
+
+        runInfo['results'][hev3ScenarioIDs[1]] = protocol;
+        tableColumns[1].textContent = protocol;
+        tableColumns[1].setAttribute("class", protocol === 'ERR' ? "bg-danger" : protocol === expected ? "bg-success" : "bg-warning");
+    }
+
+    await sleep(50);
+
+    // HTTP/3 enabled with Alt-Svc
+    {
+        const id = getRandomRunId();
+
+        const startTime = Date.now();
+        const results = [];
+
+        for(let i = 0; i < 10; i++) {
+            const timeOffset = Date.now() - startTime;
+
+            const url = `https://id-${id}.http3-altsvc.v3-quic.${basedomain}/ping`;
+            const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null)
+            console.log('HTTP/3 enabled (Alt-Svc)', result);
+
+            const protocol = result['protocol'];
+            results.push(result === null ? 'ERR' : `[#${i + 1} | T+${timeOffset}ms]: ${protocol}`)
+
+            if (protocol === 'HTTP/3.0') {
+                break;
+            }
+        }
+
+        runInfo['results'][hev3ScenarioIDs[2]] = results;
+        tableColumns[2].textContent = results.join(',\n');
+        tableColumns[2].setAttribute("class", results.some((result) => result.includes('ERR')) ? "bg-danger"
+            : results.some((result) => result.includes('HTTP/3.0')) ? "bg-success" : "bg-warning");
+    }
+
+    await sleep(50);
+
+    // HTTP/3 enabled HTTPS RR and Alt-Svc
+    {
+        const id = getRandomRunId();
+
+        const startTime = Date.now();
+        const results = [];
+
+        for(let i = 0; i < 10; i++) {
+            const timeOffset = Date.now() - startTime;
+
+            const url = `https://id-${id}.http3-https-altsvc.v3-quic.${basedomain}/ping`;
+            const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null)
+            console.log('HTTP/3 enabled (Alt-Svc)', result);
+
+            const protocol = result['protocol'];
+            results.push(result === null ? 'ERR' : `[#${i + 1} | T+${timeOffset}ms]: ${protocol}`)
+
+            if (protocol === 'HTTP/3.0') {
+                break;
+            }
+        }
+
+        runInfo['results'][hev3ScenarioIDs[3]] = results;
+        tableColumns[3].textContent = results.join(',\n');
+        tableColumns[3].setAttribute("class", results.some((result) => result.includes('ERR')) ? "bg-danger"
+            : results.some((result) => result.includes('HTTP/3.0')) ? "bg-success" : "bg-warning");
+    }
+
+    await sleep(50);
+
+    // HTTP/3 only
+    {
+        const url = `https://id-${getRandomRunId()}.http3-only.v3-quic.${basedomain}/ping`;
+        const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null);
+        console.log('HTTP/3 only', result);
+
+        const protocol = result === null ? 'ERR' : result['protocol'];
+        const expected = 'HTTP/3.0';
+
+        runInfo['results'][hev3ScenarioIDs[4]] = protocol;
+        tableColumns[4].textContent = protocol;
+        tableColumns[4].setAttribute("class", protocol === 'ERR' ? "bg-danger" : protocol === expected ? "bg-success" : "bg-warning");
+    }
+
+    await sleep(50);
+
+    // HTTP/3 only with HTTPS RR
+    {
+        const url = `https://id-${getRandomRunId()}.http3-only-https.v3-quic.${basedomain}/ping`;
+        const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null);
+        console.log('HTTP/3 only (with HTTPS RR)', result);
+
+        const protocol = result === null ? 'ERR' : result['protocol'];
+        const expected = 'HTTP/3.0';
+
+        runInfo['results'][hev3ScenarioIDs[5]] = protocol;
+        tableColumns[5].textContent = protocol;
+        tableColumns[5].setAttribute("class", protocol === 'ERR' ? "bg-danger" : protocol === expected ? "bg-success" : "bg-warning");
+    }
+
+    runInfo["timestampEnd"] = Date.now();
+}
+
+function createHEv3ResultRow(testRunCount, repetition, repetitions) {
+    // Create new row
+    const newRow = document.createElement("tr");
+
+    // Create cells
+    const cellRunNumber = document.createElement("td");
+    const cellTimestamp = document.createElement("td");
+
+    // Populate cells
+    cellRunNumber.textContent = `${testRunCount} (${repetition + 1}/${repetitions})`;
+    cellTimestamp.textContent = new Date().toLocaleString();
+
+    const templateImg = document.querySelector('#randomizeImg');
+    const clone = templateImg.content.cloneNode(true);
+    cellRunNumber.appendChild(clone);
+
+    newRow.appendChild(cellRunNumber);
+    newRow.appendChild(cellTimestamp);
+
+    const columns = [];
+    for (let i = 0; i < hev3ScenarioIDs.length; i++) {
+        const element = document.createElement("td");
+        element.style.whiteSpace = "pre";
+
+        newRow.appendChild(element);
+
+        columns.push(element);
+    }
+
+    document.getElementById("testRunTableBody").appendChild(newRow);
+    return columns;
+}
+
 async function getAddresses() {
     disableUserInteraction();
+
+    const transmitEnabled = document.getElementById('transmitResultsBtn').getAttribute('disabled') == null;
+    const downloadEnabled = document.getElementById('downloadResultsBtn').getAttribute('disabled') == null;
+
     // check if ipv4 and ipv6 is available
     const v4address = await getAddress(false);
     const v6address = await getAddress(true);
+
     if (v4address == null) {
         alert('No IPv4 Address available');
         enableUserInteraction();
@@ -829,6 +1094,7 @@ async function getAddresses() {
         }
         throw new Error('No IPv4 Address available');
     }
+
     if (v6address == null) {
         alert('No IPv6 Address available');
         enableUserInteraction();
@@ -838,14 +1104,14 @@ async function getAddresses() {
         if (!downloadEnabled) {
             document.getElementById('downloadResultsBtn').setAttribute('disabled', true);
         }
-        throw new Error('No IPv6 Address available');
     }
+
     userIPv4Address = v4address.replace(/(\r\n|\n|\r)/gm, "");
     userIPv6Address = v6address.replace(/(\r\n|\n|\r)/gm, "");
 }
 
 export async function autofillUserInfo() {
-    if (userIPv4Address == "" || userIPv6Address == "") {
+    if (userIPv4Address === "" || userIPv6Address === "") {
         try {
             await getAddresses();
         } catch (error) {

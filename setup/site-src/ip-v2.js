@@ -41,7 +41,7 @@ function getTestConfig(configuredDelays, basedomain) {
 
 let ipv2UserFormIds = ["startTestBtn", "transmitResultsBtn", "repetitions", "domainRandomization", "userInfo", "resolverInfo", "autoTransmit", "downloadResultsBtn", "autofillUserInfo"];
 main.setUserFormIds(ipv2UserFormIds);
-main.setResultsPath("v2results");
+main.setResultsPath("/results/v2");
 main.setTestName("ip-v2");
 main.setConfigFunc(getTestConfig);
 

@@ -26,6 +26,6 @@ function getTestConfig(configuredDelays, basedomain) {
 
 let dnsv1UserFormIds = ["startTestBtn", "repetitions", "runRandomization", "resolverInfo", "autoTransmit"];
 main.setUserFormIds(dnsv1UserFormIds);
-main.setResultsPath("dnsresults");
+main.setResultsPath("/results/dnsresults");
 main.setTestName("dns-v1");
 main.setConfigFunc(getTestConfig);

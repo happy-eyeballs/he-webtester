@@ -38,6 +38,6 @@ function getTestConfig(configuredDelays, basedomain) {
 
 let ipv1UserFormIds = ["startTestBtn", "transmitResultsBtn", "repetitions", "domainRandomization", "userInfo", "autoTransmit", "downloadResultsBtn", "autofillUserInfo"];
 main.setUserFormIds(ipv1UserFormIds);
-main.setResultsPath("results");
+main.setResultsPath("/results/v1");
 main.setTestName("ip-v1");
 main.setConfigFunc(getTestConfig);

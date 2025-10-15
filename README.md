@@ -14,7 +14,7 @@ The current development team is:
 
 ## Install
 
-We use [Ansible](https://docs.ansible.com/ansible/latest/index.html) to automatically setup and deploy this tool to hosts.
+We use [Ansible](https://docs.ansible.com/ansible/latest/index.html) to automatically set up and deploy this tool to hosts.
 
 ### Prerequisites
 
@@ -22,46 +22,34 @@ We use [Ansible](https://docs.ansible.com/ansible/latest/index.html) to automati
 - [Podman](https://podman.io) on the deployment host
 - An interface where [tc netem](https://www.man7.org/linux/man-pages/man8/tc-netem.8.html) delay is working (usually needs to be non virtual)
 - 2 IPv6 and 2 IPv4 addresses for the nameserver
-- One dedicated IPv4 and IPv6 address to check if the client actually supports both IP versions (currently it is not supported to reuse delay addresses, namerserver addresses might work but are untested)
+- One dedicated IPv4 and IPv6 address to check if the client actually supports both IP versions (currently it is not supported to reuse delay addresses, nameserver addresses might work but are untested)
 - As many IPv4 and IPv6 addresses as delays should be tested
   - Our default configuration uses 21 delays.
+- 2 dedicated IPv4 and IPv6 addresses for HTTP/3 tests.
 
 ### Configuration
 
-Check the [example configuration file](https://github.com/happy-eyeballs/he-webtester/blob/main/setup/example-hosts) to see a full example.
-
-Main points are:
-- `ansible_hosts`: The host were the webtester should be deployed
-- `heinterface`: Interface to use when setting up. All used addresses must be configurable on this interface (ansible will add the addresses itself using the `ip` tool)
-- `v[6/4]onlyaddress`: The dedicated address to check version availability
-- `v6delayprefix`: The prefix where all IPv6 addresses with delay are located in (nameserver and version-only addresses must be outside of this prefix)
-- `basepath`: Path where to store the results sent to the server
-- `basedomain`: Domain used for the webtests itself (not domain name of webtester; They should be different or the basedomain is a subdomain of an entry in `hedomains`)
-- `hedomains`: Domains of the webtester
-- `nsaddrs`: Addresses used for the name servers
-- `headdresses`: Addreses used for the actual webtesting
-  - `address`: The IP address
-  - `effective_delay`: delay in ms which should be applied (usually 0 on IPv4)
-  - `delay_id`: An id coupling an IPv4 and IPv6 address to it. Every delay_id must have both address versions. The example uses the actual number of delay milliseconds also as its id
-  - `classid`: used by tc when an `effective_delay` is applied. Must be a unique hexadecimal number below 0xffff. Used as a minor value with tc
-
+Check the [example configuration file](./setup/hosts.yml) for a complete example setup.
+The main points to update are the host that the webtester should be deployed to, the domains, network interfaces, IP addresses, and delays.
+For detailed explanations of each configuration option, refer to the inline comments within the example config.
 
 ### Ansible
 
-We added several tags to control the setup process:
-- addaddrs (adds addresses to the interface). Always included except when skipped
-- dropaddrs (deletes addresses to the interface). Never included except when specifically called
-- delayconfig - configures the tc delays
-- dnssetup
-- nginxsetup
-- createcerts
+After configuring the host in `setup/hosts.yml`, the setup playbook can be run using `ansible-playbook setup/setup.yml -i setup/hosts.yml`.
 
-To just drop addresses from an interface use --skip-tags=addaddr,delayconfig
+We added several tags to control the setup process:
+- `system`: installs required packages (such as Docker) and creates the user
+- `interface`: assigns the configured addresses to the interfaces and configures the tc delays
+  - `interface-ip-delete`: include this tag specifically if you want to delete the configured addresses from the interface
+- `dns`: sets up the nameserver
+- `nginx`: sets up nginx, certificates, and the webtester
+- `uploadserver`: sets up the result upload server
+
+Note: all tags have their own "sub-tags" (such as `nginx-certs`) for only executing specific subtasks.
+Those can be found in the `tasks/main.yml` inside the individual ansible roles.
+
 
 ## Helpful setup and debug commands
-### Enable users to open port 53 and above
-
-`sysctl -w net.ipv4.ip_unprivileged_port_start=53`
 
 ### Drop tc config
 

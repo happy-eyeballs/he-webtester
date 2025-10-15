@@ -1,74 +1,54 @@
----
-
-- name: Prepare cert creation
+- name: Prepare certificate creation
   block:
-    - name: Create cert scripts dir
+    - name: Create certificate scripts directory
       ansible.builtin.file:
-        path: "{{ basepath }}/cert-scripts"
-        state: directory
+        path: '{{ happy_eyeballs.base_path }}/cert-scripts'
         owner: root
         group: root
         mode: '0755'
+        state: directory
 
     - name: Copy auth scripts
       ansible.builtin.template:
-        src: "{{ item }}.j2"
-        dest: "{{ basepath }}/cert-scripts/{{ item }}"
+        src: '{{ item }}.j2'
+        dest: '{{ happy_eyeballs.base_path }}/cert-scripts/{{ item }}'
         owner: root
         group: root
         mode: '0755'
       with_items:
-        - auth-hook-handler.sh
-        - auth-cleanup-handler.sh
+        - 'auth-hook-handler.sh'
+        - 'auth-cleanup-handler.sh'
 
-- name: Create cert for delay domains
+- name: Create certificates
+  ansible.builtin.include_tasks: create-cert.yml
+  vars:
+    domains: '{{ item }}'
+  loop:
+    - '{{ happy_eyeballs_domains.v1 | join(",") }}'
+    - '{{ happy_eyeballs_domains.v1_ipv6_only }},{{ happy_eyeballs_domains.v1_ipv4_only }}'
+    - '{{ happy_eyeballs_domains.v2 }}'
+    - '{{ happy_eyeballs_domains.v3_quic.http3 }}'
+    - '{{ happy_eyeballs_domains.v3_quic.http3_https }}'
+    - '{{ happy_eyeballs_domains.v3_quic.http3_altsvc }}'
+    - '{{ happy_eyeballs_domains.v3_quic.http3_https_altsvc }}'
+    - '{{ happy_eyeballs_domains.v3_quic.http3_only }}'
+    - '{{ happy_eyeballs_domains.v3_quic.http3_only_https }}'
+
+- name: Create certificate for webtester domain
   block:
-    - name: Check if certificate already exists.
+    - name: Check if certificate for webtester domain already exists
       ansible.builtin.stat:
-        path: /etc/letsencrypt/live/{{  certbot_domains | first | replace('*.', '') }}/cert.pem
-      register: wildcard_cert
+        path: '/etc/letsencrypt/live/{{ happy_eyeballs.webtester.domain }}/cert.pem'
+      register: webtester_certificate
 
-    - name: Creating v1 cert
+    - name: Issue certificate for webtester domain
       ansible.builtin.command:
-        cmd: "{{ certbot_command }}"
+        cmd: >-
+          certbot certonly
+          --nginx
+          --noninteractive
+          --agree-tos
+          --email {{ certbot.email }}
+          -d {{ happy_eyeballs.webtester.domain }}
       changed_when: true
-      when: not wildcard_cert.stat.exists
-
-- name: Create cert for v2 wildcard domain
-  block:
-    - name: Check if certificate already exists.
-      ansible.builtin.stat:
-        path: /etc/letsencrypt/live/{{  certbot_v2_domain | replace('*.', '') }}/cert.pem
-      register: v2wildcard_cert
-
-    - name: Creating v2 cert
-      ansible.builtin.command:
-        cmd: "{{ certbot_command_v2 }}"
-      changed_when: true
-      when: not v2wildcard_cert.stat.exists
-
-- name: Create cert for version only domains
-  block:
-    - name: Check if certificate already exists.
-      ansible.builtin.stat:
-        path: /etc/letsencrypt/live/{{ certbot_v6only_domain }}/cert.pem
-      register: only_cert
-
-    - name: Command for Cert creation
-      ansible.builtin.command:
-        cmd: "{{ certbot_command_version_only }}"
-      changed_when: true
-      when: not only_cert.stat.exists
-
-- name: Create cert for version only domains
-  block:
-    - name: Check if certificate already exists.
-      ansible.builtin.stat:
-        path: /etc/letsencrypt/live/{{ hedomains | first }}/cert.pem
-      register: he_cert
-
-    - name: Command for Cert creation
-      ansible.builtin.command:
-        cmd: "{{ certbot_command_he }}"
-      changed_when: true
-      when: not he_cert.stat.exists
+      when: not webtester_certificate.stat.exists
