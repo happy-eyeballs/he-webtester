@@ -70,8 +70,11 @@
             </div>
 
             <div class="mb-3">
-                <label for="userInfo" class="form-label">Device and user information for easier debugging (optional)</label>
-                <input type="text" class="form-control" id="userInfo" placeholder="OS, Device, Browser, YourName">
+                <label for="userInfo" class="form-label">Device and user information for easier debugging (<em>optional</em> - please update auto-filled data if incorrect)</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="userInfo" placeholder="OS, Device, Browser, YourName">
+                    <button class="btn btn-primary" type="button" id="autofillUserInfo">Autofill</button>
+                </div>
             </div>
 
             <div class="text-center input-group mb-3">

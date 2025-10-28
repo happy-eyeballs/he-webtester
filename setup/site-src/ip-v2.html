@@ -79,8 +79,11 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="userInfo" class="form-label ms-2">Device and user information for easier debugging (<em>optional</em>)</label>
-                        <input type="text" class="form-control" id="userInfo" placeholder="OS, Device, Browser, YourName">
+                        <label for="userInfo" class="form-label ms-2">Device and user information for easier debugging (<em>optional</em> - please update auto-filled data if incorrect)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="userInfo" placeholder="OS, Device, Browser, YourName">
+                            <button class="btn btn-primary" type="button" id="autofillUserInfo">Autofill</button>
+                        </div>
                     </div>
                 </div>
             </div>

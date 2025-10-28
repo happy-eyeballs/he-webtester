@@ -5,6 +5,7 @@ document.getElementById("startTestBtn").addEventListener("click", main.measureHa
 document.getElementById("transmitResultsBtn").addEventListener("click", main.transmitResults);
 document.getElementById("downloadResultsBtn").addEventListener("click", main.downloadResults);
 document.getElementById("downloadConfigBtn").addEventListener("click", main.downloadConfiguration);
+document.getElementById("autofillUserInfo").addEventListener("click", main.autofillUserInfo);
 
 document.addEventListener('DOMContentLoaded', main.setup);
 
@@ -35,7 +36,7 @@ function getTestConfig(configuredDelays, basedomain) {
     return configurationMapping
 }
 
-let ipv1UserFormIds = ["startTestBtn", "transmitResultsBtn", "repetitions", "domainRandomization", "userInfo", "autoTransmit", "downloadResultsBtn"];
+let ipv1UserFormIds = ["startTestBtn", "transmitResultsBtn", "repetitions", "domainRandomization", "userInfo", "autoTransmit", "downloadResultsBtn", "autofillUserInfo"];
 main.setUserFormIds(ipv1UserFormIds);
 main.setResultsPath("results");
 main.setTestName("ip-v1");

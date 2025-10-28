@@ -5,6 +5,7 @@ document.getElementById("startTestBtn").addEventListener("click", main.measureHa
 document.getElementById("transmitResultsBtn").addEventListener("click", main.transmitResults);
 document.getElementById("downloadResultsBtn").addEventListener("click", main.downloadResults);
 document.getElementById("downloadConfigBtn").addEventListener("click", main.downloadConfiguration);
+document.getElementById("autofillUserInfo").addEventListener("click", main.autofillUserInfo);
 
 function getTestConfig(configuredDelays, basedomain) {
     const repetitions = Number(document.getElementById('repetitions').value);
@@ -38,7 +39,7 @@ function getTestConfig(configuredDelays, basedomain) {
     return configurationMapping
 }
 
-let ipv2UserFormIds = ["startTestBtn", "transmitResultsBtn", "repetitions", "domainRandomization", "userInfo", "resolverInfo", "autoTransmit", "downloadResultsBtn"];
+let ipv2UserFormIds = ["startTestBtn", "transmitResultsBtn", "repetitions", "domainRandomization", "userInfo", "resolverInfo", "autoTransmit", "downloadResultsBtn", "autofillUserInfo"];
 main.setUserFormIds(ipv2UserFormIds);
 main.setResultsPath("v2results");
 main.setTestName("ip-v2");

@@ -61,6 +61,8 @@ async function checkv6ForV2(delay, randid, delayType) {
 
 let configuredDelays = [];
 let basedomain = "";
+let userIPv4Address = "";
+let userIPv6Address = "";
 
 export async function setup() {
     await fetch("delays.csv", { cache: 'no-store' })
@@ -186,29 +188,13 @@ export async function measureHappyEyeballs() {
     const randomizeDomains = document.getElementById('domainRandomization').checked;
 
     // check if ipv4 and ipv6 is available
-    const v4address = await getAddress(false);
-    const v6address = await getAddress(true);
-    if (v4address == null) {
-        alert('No IPv4 Address available');
-        enableUserInteraction();
-        if (!transmitEnabled) {
-            document.getElementById('transmitResultsBtn').setAttribute('disabled', true);
+    if (userIPv4Address == "" || userIPv6Address == "") {
+        try {
+            await getAddresses();
+        } catch (error) {
+            console.error('An error occurred while getting addresses:', error.message);
+            return;
         }
-        if (!downloadEnabled) {
-            document.getElementById('downloadResultsBtn').setAttribute('disabled', true);
-        }
-        return;
-    }
-    if (v6address == null) {
-        alert('No IPv6 Address available');
-        enableUserInteraction();
-        if (!transmitEnabled) {
-            document.getElementById('transmitResultsBtn').setAttribute('disabled', true);
-        }
-        if (!downloadEnabled) {
-            document.getElementById('downloadResultsBtn').setAttribute('disabled', true);
-        }
-        return;
     }
 
     // Increment test run count
@@ -669,23 +655,13 @@ export async function measureHappyEyeballsV2() {
     const randomizeDomains = document.getElementById('domainRandomization').checked;
 
     // check if ipv4 and ipv6 is available
-    const v4address = await getAddress(false);
-    const v6address = await getAddress(true);
-    if (v4address == null) {
-        alert('No IPv4 Address available');
-        enableUserInteraction();
-        if (!transmitEnabled) {
-            document.getElementById('transmitResultsBtn').setAttribute('disabled', true);
+    if (userIPv4Address == "" || userIPv6Address == "") {
+        try {
+            await getAddresses();
+        } catch (error) {
+            console.error('An error occurred while getting addresses:', error.message);
+            return;
         }
-        return;
-    }
-    if (v6address == null) {
-        alert('No IPv6 Address available');
-        enableUserInteraction();
-        if (!transmitEnabled) {
-            document.getElementById('transmitResultsBtn').setAttribute('disabled', true);
-        }
-        return;
     }
 
     // Increment test run count
@@ -835,4 +811,81 @@ async function executeV2TestRun(runInfo, delayElements, runUIdMapping, randomize
 
     const endDate = new Date();
     runInfo["timestampEnd"] = endDate.getTime();
+}
+
+async function getAddresses() {
+    disableUserInteraction();
+    // check if ipv4 and ipv6 is available
+    const v4address = await getAddress(false);
+    const v6address = await getAddress(true);
+    if (v4address == null) {
+        alert('No IPv4 Address available');
+        enableUserInteraction();
+        if (!transmitEnabled) {
+            document.getElementById('transmitResultsBtn').setAttribute('disabled', true);
+        }
+        if (!downloadEnabled) {
+            document.getElementById('downloadResultsBtn').setAttribute('disabled', true);
+        }
+        throw new Error('No IPv4 Address available');
+    }
+    if (v6address == null) {
+        alert('No IPv6 Address available');
+        enableUserInteraction();
+        if (!transmitEnabled) {
+            document.getElementById('transmitResultsBtn').setAttribute('disabled', true);
+        }
+        if (!downloadEnabled) {
+            document.getElementById('downloadResultsBtn').setAttribute('disabled', true);
+        }
+        throw new Error('No IPv6 Address available');
+    }
+    userIPv4Address = v4address.replace(/(\r\n|\n|\r)/gm, "");
+    userIPv6Address = v6address.replace(/(\r\n|\n|\r)/gm, "");
+}
+
+export async function autofillUserInfo() {
+    if (userIPv4Address == "" || userIPv6Address == "") {
+        try {
+            await getAddresses();
+        } catch (error) {
+            console.error('An error occurred while getting addresses:', error.message);
+            return;
+        }
+    }
+
+    const userInfoElement = document.getElementById('userInfo');
+    userInfoElement.value = "{\"platform\": \"" + window.navigator.platform + "\", \"vendor\": \"" + window.navigator.vendor + "\", \"client_addr_v4\": \"" + anonymizeIPv4Address(userIPv4Address) + "\", \"client_addr_v6\": \"" + anonymizeIPv6Address(userIPv6Address) + ", \"otherInformation\": \"\"}";
+    enableUserInteraction();
+}
+
+function anonymizeIPv4Address(ipAddress) {
+    const octets = ipAddress.split('.');
+    return `${octets[0]}.${octets[1]}.${octets[2]}.0/24`;
+}
+
+function anonymizeIPv6Address(ipAddress) {
+    const fullIpv6 = expandIPv6(ipAddress);
+
+    const parts = fullIpv6.split(':');
+    return `${parts[0]}:${parts[1]}:${parts[2]}::/48`;
+}
+
+function expandIPv6(shortAddress) {
+    if ((shortAddress.match(/:/g) || []).length === 7) {
+        return shortAddress;
+    }
+
+    if (shortAddress.includes('::')) {
+        const parts = shortAddress.split('::');
+        const beforeParts = parts[0] ? parts[0].split(':') : [];
+        const afterParts = parts[1] ? parts[1].split(':') : [];
+
+        const zeroGroups = Array(8 - beforeParts.length - afterParts.length).fill('0');
+
+        return [...beforeParts, ...zeroGroups, ...afterParts]
+            .join(':');
+    }
+
+    throw new Error("Error at expanding IPv6 address")
 }
