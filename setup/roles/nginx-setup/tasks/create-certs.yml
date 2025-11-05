@@ -38,7 +38,7 @@
   block:
     - name: Check if certificate for webtester domain already exists
       ansible.builtin.stat:
-        path: '/etc/letsencrypt/live/{{ happy_eyeballs.webtester.domain }}/cert.pem'
+        path: '/etc/letsencrypt/live/{{ happy_eyeballs.webtester.domains | first }}/cert.pem'
       register: webtester_certificate
 
     - name: Issue certificate for webtester domain
@@ -49,6 +49,6 @@
           --noninteractive
           --agree-tos
           --email {{ certbot.email }}
-          -d {{ happy_eyeballs.webtester.domain }}
+          -d {{ happy_eyeballs.webtester.domains | join(',') }}
       changed_when: true
       when: not webtester_certificate.stat.exists
