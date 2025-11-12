@@ -1,0 +1,19 @@
+- name: Copy webtester site source directory
+  ansible.posix.synchronize:
+    src: 'site-src/'
+    dest: '{{ happy_eyeballs.base_path }}/www-root/'
+    owner: false
+    group: false
+    rsync_opts:
+      - '--exclude=.DS_Store'
+
+- name: Copy webtester static files
+  ansible.builtin.template:
+    src: 'static/{{ item }}.j2'
+    dest: '{{ happy_eyeballs.base_path }}/www-root/{{ item }}'
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - 'delays.csv'
+    - 'he-test-domain'

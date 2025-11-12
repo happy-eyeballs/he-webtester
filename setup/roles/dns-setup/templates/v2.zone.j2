@@ -5,9 +5,9 @@ $ORIGIN v2.{{ happy_eyeballs.nameserver.base_domain }}.
 @                 IN  NS     ns1.{{ happy_eyeballs.nameserver.base_domain }}.
 @                 IN  NS     ns2.{{ happy_eyeballs.nameserver.base_domain }}.
 
-v2delay_a-*             IN  A          {{ happy_eyeballs.webserver.ipv4_only_ip }}
-v2delay_a-*             IN  AAAA       {{ happy_eyeballs.webserver.ipv6_only_ip }}
+v2delay_a-*             IN  A          {{ happy_eyeballs.webserver.ipv4 }}
+v2delay_a-*             IN  AAAA       {{ happy_eyeballs.webserver.ipv6 }}
 
-v2delay_aaaa-*          IN  A          {{ happy_eyeballs.webserver.ipv4_only_ip }}
-v2delay_aaaa-*          IN  AAAA       {{ happy_eyeballs.webserver.ipv6_only_ip }}
+v2delay_aaaa-*          IN  A          {{ happy_eyeballs.webserver.ipv4 }}
+v2delay_aaaa-*          IN  AAAA       {{ happy_eyeballs.webserver.ipv6 }}
 
