@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: build/Dockerfile
     restart: unless-stopped
-    user: '{{ happy_eyeballs.user.uid }}:{{ happy_eyeballs.user.uid }}'
     ports:
       - '{{ happy_eyeballs.uploadserver.host }}:{{ happy_eyeballs.uploadserver.port }}:3000/tcp'
     volumes:

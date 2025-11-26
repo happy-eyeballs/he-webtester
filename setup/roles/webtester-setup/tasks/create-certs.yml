@@ -33,3 +33,29 @@
     - '{{ happy_eyeballs_domains.v3_quic.http3_https_altsvc }}'
     - '{{ happy_eyeballs_domains.v3_quic.http3_only }}'
     - '{{ happy_eyeballs_domains.v3_quic.http3_only_https }}'
+
+# Adjust permissions of certificates and private keys so that caddy running as non-root can access them
+# https://eff-certbot.readthedocs.io/en/stable/using.html#where-are-my-certificates
+- name: Adjust permissions of certificates directory
+  ansible.builtin.file:
+    path: '{{ item }}'
+    mode: '0755'
+  with_items:
+    - '/etc/letsencrypt/live'
+    - '/etc/letsencrypt/archive'
+
+- name: Find certificate private keys
+  ansible.builtin.find:
+    paths: '/etc/letsencrypt/live'
+    patterns: 'privkey.pem'
+    file_type: link
+    recurse: true
+  register: certificate_private_keys
+
+- name: Adjust permissions of certificate private keys
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    owner: root
+    group: '{{ happy_eyeballs.user.name }}'
+    mode: '0640'
+  with_items: '{{ certificate_private_keys.files }}'

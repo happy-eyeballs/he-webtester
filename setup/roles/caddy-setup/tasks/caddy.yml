@@ -1,16 +1,16 @@
 - name: Create caddy directory
   ansible.builtin.file:
     path: '{{ happy_eyeballs.base_path }}/caddy'
-    owner: root
-    group: root
+    owner: '{{ happy_eyeballs.user.name }}'
+    group: '{{ happy_eyeballs.user.name }}'
     mode: '0755'
     state: 'directory'
 
 - name: Create caddy data directory
   ansible.builtin.file:
     path: '{{ happy_eyeballs.base_path }}/caddy/data'
-    owner: root
-    group: root
+    owner: '{{ happy_eyeballs.user.name }}'
+    group: '{{ happy_eyeballs.user.name }}'
     mode: '0755'
     state: 'directory'
 
@@ -27,8 +27,8 @@
   ansible.builtin.template:
     src: 'caddy.json.j2'
     dest: '{{ happy_eyeballs.base_path }}/caddy/caddy.json'
-    owner: root
-    group: root
+    owner: '{{ happy_eyeballs.user.name }}'
+    group: '{{ happy_eyeballs.user.name }}'
     mode: '0644'
   notify: restart he-caddy
 

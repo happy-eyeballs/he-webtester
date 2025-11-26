@@ -4,7 +4,6 @@ services:
     image: caddy:latest
     restart: unless-stopped
     command: 'caddy run --config /etc/caddy/caddy.json'
-    #    user: '{{ happy_eyeballs.user.uid }}:{{ happy_eyeballs.user.uid }}'
     network_mode: host
     volumes:
       - '{{ happy_eyeballs.base_path }}/caddy/caddy.json:/etc/caddy/caddy.json:ro'
@@ -15,7 +14,7 @@ services:
       - "/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1_ipv6_only }}/privkey.pem:/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1_ipv6_only }}/privkey.pem:ro"
 
       - "/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/fullchain.pem:/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/fullchain.pem:ro"
-      - "/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') | replace('*.', '') }}/privkey.pem:/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/privkey.pem:ro"
+      - "/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/privkey.pem:/etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/privkey.pem:ro"
 
       - "/etc/letsencrypt/live/{{ happy_eyeballs_domains.v2 | replace('*.', '') }}/fullchain.pem:/etc/letsencrypt/live/{{ happy_eyeballs_domains.v2 | replace('*.', '') }}/fullchain.pem:ro"
       - "/etc/letsencrypt/live/{{ happy_eyeballs_domains.v2 | replace('*.', '') }}/privkey.pem:/etc/letsencrypt/live/{{ happy_eyeballs_domains.v2 | replace('*.', '') }}/privkey.pem:ro"
