@@ -1,2 +1,2 @@
 - ansible.builtin.import_tasks: caddy.yml
-  tags: [ 'caddy', 'caddy-caddy' ]
+  tags: [ 'caddy' ]
