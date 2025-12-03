@@ -1,25 +1,104 @@
 ---
-import "../styles/global.css";
-// Component Imports
-import { Button } from "../components/ui/button.tsx";
-
-// Full Astro Component Syntax:
-// https://docs.astro.build/basics/astro-components/
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import TestCard from "@/components/test-card.astro";
+import Link from "@/components/link.astro";
+import { CitationDialog } from "@/components/citation-dialog.tsx";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro + TailwindCSS</title>
-  </head>
+<PageLayout title="Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs" titleLine2="Webtester">
+    <p>
+      Initially developed as part of the paper "Lazy Eye Inspection: Capturing
+      the State of Happy Eyeballs Implementations" by Patrick Sattler.
+    </p>
+    <p>
+      See our
+      <Link href="development-team"> development team</Link>
+      and
+      <Link href="https://github.com/happy-eyeballs/he-webtester">
+        source code on GitHub
+      </Link>. Hosted on infrastructure of
+      <Link href="https://net.in.tum.de">TUM</Link>.
+    </p>
+    <p>
+      If you use this tool for your research, please
+      <CitationDialog client:idle>
+        <Link>cite</Link>
+      </CitationDialog>
+      our paper which discusses Happy Eyeballs and this tool.
+    </p>
+  </Header>
 
-  <body>
-    <div class="grid place-items-center h-screen content-center">
-      <Button>Button</Button>
-      <Button variant="secondary">Secondary Button</Button>
+  <div class="mt-20">
+    <h2 class="text-xl font-semibold mb-6">Core Tests</h2>
+    <div class="grid gap-6 items-start lg:grid-cols-2">
+      <TestCard
+        title="Connection Attempt Delay Test"
+        href="tests/connection-attempt-delay"
+      >
+        <i>Happy Eyeballs version 1</i> defines the racing of IPv4 vs. IPv6. The term
+        <i>Connection Attempt Delay (CAD)</i> describes the delay a client waits for
+        the IPv6 response before issuing an IPv4 connection. We test this behavior
+        of your client by artificially adding latency to IPv6 packets. Depending on
+        your client's settings, it will wait for the IPv6 connection attempt.
+      </TestCard>
+
+      <TestCard title="Resolution Delay Test" href="tests/resolution-delay">
+        <i>Happy Eyeballs version 2</i> defines the racing of A vs AAAA DNS queries
+        and uses the term <i>Resolution Delay (RD)</i> to describe the configured
+        accepted delay between A and AAAA responses. We test this behavior of your
+        client by artificially adding latency to A or AAAA queries. In this test,
+        not only your client but also the configured resolver and any forwarder in
+        the resolution chain can impact the result.
+      </TestCard>
+
+      <TestCard
+        title="[BETA] HTTP/3 Availability Test"
+        href="tests/http3-availability"
+      >
+        The test checks how your browser establishes connections when HTTP/3 is
+        available. We simulate various scenarios where HTTP/3 can be discovered
+        via Alt-Svc headers or HTTPS DNS records.
+      </TestCard>
     </div>
-  </body>
-</html>
+
+    <div class="mt-20">
+      <h2 class="text-xl font-semibold mb-6">Other Tests & Tools</h2>
+      <div class="grid gap-6 items-start lg:grid-cols-2">
+        <TestCard
+          title="Resolver CAD Test"
+          href="tests/resolver-connection-attempt-delay"
+          secondary={true}
+        >
+          This test does not test your device, OS, or browser, but targets your
+          recursive resolver. It uses a more complex DNS setup to infer if your
+          resolver performs any type of Happy Eyeballs. While the Happy Eyeballs
+          algorithm and suggested configuration parameters are not adjusted to
+          the iterative resolution process of a resolver, we are still
+          interested in seeing if and how resolvers prefer IPv6.
+
+          <br />
+          <br />
+
+          Only our authoritative name server observes the requests and analyzes
+          the results. As we have not yet implemented a way to live feed the
+          results back to your browser session, we cannot currently show these.
+        </TestCard>
+
+        <TestCard
+          title="Manually Create Measurement Domains"
+          href="tools/create-measurement-domains"
+          secondary={true}
+          actionText="Create"
+        >
+          This is a tool to generate a specific domain for a selected test
+          configuration. The domain can then be used with any client to test its
+          HE behavior. The server always returns the IP address at which it was
+          contacted. This enables you to easily know if your client used IPv4 or
+          IPv6.
+        </TestCard>
+      </div>
+    </div>
+  </div>
+</PageLayout>

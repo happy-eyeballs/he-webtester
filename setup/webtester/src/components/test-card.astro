@@ -1,0 +1,65 @@
+---
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { ArrowRightIcon } from "lucide-react";
+import { cn } from "@/lib/utils.ts";
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"a"> & {
+  title: string;
+  secondary?: boolean;
+  actionText?: string;
+};
+
+const {
+  title,
+  href,
+  secondary = false,
+  actionText = "Run test",
+  ...attributes
+} = Astro.props;
+---
+
+<a href={href} class="group cursor-pointer" {...attributes}>
+  <Card
+    className={cn(
+      "bg-transparent gap-2 transition-all duration-200",
+      secondary ? "hover:border-accent-secondary" : "hover:border-accent",
+    )}
+  >
+    <CardHeader>
+      <CardTitle
+        className={cn(secondary ? "text-accent-secondary" : "text-accent")}
+      >
+        {title}
+      </CardTitle>
+    </CardHeader>
+
+    <CardContent>
+      <p class="text-sm text-muted-foreground">
+        <slot />
+      </p>
+    </CardContent>
+
+    <CardFooter className="pt-2">
+      <div
+        class={cn(
+          "flex items-center gap-2 text-sm font-medium transition-colors duration-200",
+          secondary
+            ? "text-accent-secondary-muted group-hover:text-accent-secondary"
+            : "text-accent-muted group-hover:text-accent",
+        )}
+      >
+        {actionText}
+        <ArrowRightIcon
+          className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+        />
+      </div>
+    </CardFooter>
+  </Card>
+</a>
