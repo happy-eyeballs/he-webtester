@@ -20,13 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import { Button } from "@/components/ui/button.tsx";
-
-export type TestSettings = {
-  repetitions: number | undefined;
-  autoTransmitResults: boolean | undefined;
-  randomizeDomains: boolean | undefined;
-  deviceInfo: string | undefined;
-};
+import type { TestSettings } from "@/lib/test-run.ts";
 
 type Props = {
   enabledSettings: {
@@ -35,22 +29,29 @@ type Props = {
     randomizeDomains?: boolean;
     deviceInfo?: boolean;
   };
-  onStartTestRuns: (settings: TestSettings) => void;
+  onStartTestRun: (settings: TestSettings) => void;
+  disabled?: boolean;
+  statusWidget?: React.ReactNode;
 };
 
 export const TestSettingsSection: React.FC<Props> = ({
   enabledSettings,
-  onStartTestRuns,
+  onStartTestRun,
+  disabled = false,
+  statusWidget,
 }) => {
-  const [selectedRepetitions, setSelectedRepetitions] = useState<
-    number | undefined
-  >(enabledSettings.repetitions?.defaultOption);
-  const [shouldRandomizeDomains, setShouldRandomizeDomains] = useState<
-    boolean | undefined
-  >(enabledSettings.randomizeDomains ? true : undefined);
-  const [shouldAutoTransmitResults, setShouldAutoTransmitResults] = useState<
+  const [repetitions, setRepetitions] = useState<number | undefined>(
+    enabledSettings.repetitions?.defaultOption,
+  );
+
+  const [randomizeDomains, setRandomizeDomains] = useState<boolean | undefined>(
+    enabledSettings.randomizeDomains ? true : undefined,
+  );
+
+  const [autoTransmitResults, setAutoTransmitResults] = useState<
     boolean | undefined
   >(enabledSettings.autoTransmitResults ? false : undefined);
+
   const [deviceInfo, setDeviceInfo] = useState<string | undefined>(
     enabledSettings.deviceInfo ? "" : undefined,
   );
@@ -60,10 +61,10 @@ export const TestSettingsSection: React.FC<Props> = ({
       onSubmit={(e) => {
         e.preventDefault();
 
-        onStartTestRuns({
-          repetitions: selectedRepetitions,
-          randomizeDomains: shouldRandomizeDomains,
-          autoTransmitResults: shouldAutoTransmitResults,
+        onStartTestRun({
+          repetitions,
+          randomizeDomains,
+          autoTransmitResults,
           deviceInfo,
         } satisfies TestSettings);
       }}
@@ -78,10 +79,11 @@ export const TestSettingsSection: React.FC<Props> = ({
           <SettingsItem label="Repetitions">
             <Select
               defaultValue={enabledSettings.repetitions.defaultOption.toString()}
-              onValueChange={(value) => setSelectedRepetitions(Number(value))}
+              onValueChange={(value) => setRepetitions(Number(value))}
+              disabled={disabled}
             >
               <SelectTrigger className="w-30">
-                <SelectValue>{selectedRepetitions}</SelectValue>
+                <SelectValue>{repetitions}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {enabledSettings.repetitions.options.map((value) => (
@@ -97,10 +99,9 @@ export const TestSettingsSection: React.FC<Props> = ({
         {enabledSettings.randomizeDomains && (
           <SettingsItem label="Randomize domains">
             <Checkbox
-              defaultChecked={shouldRandomizeDomains ?? false}
-              onCheckedChange={(checked) =>
-                setShouldRandomizeDomains(!!checked)
-              }
+              defaultChecked={randomizeDomains ?? false}
+              onCheckedChange={(checked) => setRandomizeDomains(!!checked)}
+              disabled={disabled}
             />
           </SettingsItem>
         )}
@@ -108,10 +109,9 @@ export const TestSettingsSection: React.FC<Props> = ({
         {enabledSettings.autoTransmitResults && (
           <SettingsItem label="Automatically transmit results">
             <Checkbox
-              defaultChecked={shouldAutoTransmitResults ?? false}
-              onCheckedChange={(checked) =>
-                setShouldAutoTransmitResults(!!checked)
-              }
+              defaultChecked={autoTransmitResults ?? false}
+              onCheckedChange={(checked) => setAutoTransmitResults(!!checked)}
+              disabled={disabled}
             />
           </SettingsItem>
         )}
@@ -123,11 +123,12 @@ export const TestSettingsSection: React.FC<Props> = ({
                 type="text"
                 placeholder="OS, device, browser, your name, etc."
                 onChange={(e) => setDeviceInfo(e.target.value)}
+                disabled={disabled}
               />
               <InputGroupAddon align="inline-end">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <InputGroupButton variant="secondary">
+                    <InputGroupButton variant="secondary" disabled={disabled}>
                       <WandSparklesIcon />
                       Autofill
                     </InputGroupButton>
@@ -144,8 +145,12 @@ export const TestSettingsSection: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="mt-8">
-        <Button type="submit">Start test runs</Button>
+      <div className="mt-8 flex gap-8 items-center">
+        <Button type="submit" disabled={disabled}>
+          Start test runs
+        </Button>
+
+        {statusWidget}
       </div>
     </form>
   );

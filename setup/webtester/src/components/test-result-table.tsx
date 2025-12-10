@@ -1,27 +1,25 @@
 import React from "react";
 import { cn } from "@/lib/utils.ts";
-
-export type TestRunResultItem = {
-  label: string;
-  color: string;
-};
-
-export type TestRunResult = {
-  testRunId: string;
-  startedAt: Date;
-  results: TestRunResultItem[];
-};
+import { TestResultBadge } from "@/components/test-result-badge.tsx";
+import { Spinner } from "@/components/ui/spinner.tsx";
+import type { TestRun } from "@/lib/test-run.ts";
+import { ShuffleIcon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 
 type Props = {
   columnDescription: string;
   columns: string[];
-  rows: TestRunResult[];
+  testRuns: TestRun[];
 };
 
 export const TestResultTable: React.FC<Props> = ({
   columnDescription,
   columns,
-  rows,
+  testRuns,
 }) => {
   return (
     <div className="relative">
@@ -61,44 +59,67 @@ export const TestResultTable: React.FC<Props> = ({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.testRunId} className="border-t">
-                <td className="whitespace-nowrap px-5 border-r">
-                  #{row.testRunId}
-                </td>
-                <td className="whitespace-nowrap px-5 border-r">
-                  {row.startedAt.toLocaleString()}
-                </td>
+            {testRuns.flatMap((testRun) =>
+              testRun.repetitions.map((repetition) => (
+                <tr
+                  key={`${testRun.testRunNumber}|${repetition.repetitionNumber}`}
+                  className="border-t"
+                >
+                  <td className="whitespace-nowrap px-5 border-r">
+                    <div className="flex gap-4 items-center">
+                      <div>
+                        {testRun.settings.repetitions
+                          ? `#${testRun.testRunNumber} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
+                          : `#${testRun.testRunNumber}`}
+                      </div>
 
-                {row.results.map((result, index) => (
-                  <td
-                    key={index}
-                    className={cn(
-                      "px-5 py-3",
-                      index < columns.length - 1 && "border-r",
-                    )}
-                  >
-                    <div
-                      style={{ background: result.color }}
-                      className="w-max px-4 py-1 rounded-full text-white"
-                    >
-                      {result.label}
+                      {testRun.settings.randomizeDomains && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="size-7 bg-secondary text-secondary-foreground grid place-items-center rounded-md">
+                              <ShuffleIcon className="size-3.5" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>Randomized domains</TooltipContent>
+                        </Tooltip>
+                      )}
                     </div>
                   </td>
-                  // <td
-                  //   key={index}
-                  //   className={cn(index < columns.length - 1 && "border-r")}
-                  // >
-                  //   <div
-                  //     style={{ background: result.color }}
-                  //     className="px-5 py-3 text-white"
-                  //   >
-                  //     {result.label}
-                  //   </div>
-                  // </td>
-                ))}
-              </tr>
-            ))}
+                  <td className="whitespace-nowrap px-5 border-r">
+                    {repetition.startedAt.toLocaleString()}
+                  </td>
+
+                  {repetition.subtests.map((subtest, index) => (
+                    <td
+                      key={index}
+                      className={cn(
+                        "px-5 py-3",
+                        index < columns.length - 1 && "border-r",
+                      )}
+                    >
+                      {subtest.result ? (
+                        <TestResultBadge result={subtest.result} />
+                      ) : subtest.isRunning ? (
+                        <Spinner />
+                      ) : (
+                        <></>
+                      )}
+                    </td>
+                    // <td
+                    //   key={index}
+                    //   className={cn(index < columns.length - 1 && "border-r")}
+                    // >
+                    //   <div
+                    //     style={{ background: result.color }}
+                    //     className="px-5 py-3 text-white"
+                    //   >
+                    //     {result.label}
+                    //   </div>
+                    // </td>
+                  ))}
+                </tr>
+              )),
+            )}
           </tbody>
         </table>
       </div>
