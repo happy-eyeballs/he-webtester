@@ -1,0 +1,66 @@
+---
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import {
+  TestResultTable,
+  type TestRunResult,
+} from "@/components/test-result-table.tsx";
+
+// https://ui.shadcn.com/colors
+const IPV6_COLOR = "#0e7490"; // cyan-700
+const IPV4_COLOR = "#b45309"; // amber-700
+
+// TEMP
+const results: TestRunResult[] = [
+  {
+    testRunId: "1",
+    startedAt: new Date(),
+    results: [
+      { label: "IPv6", color: IPV6_COLOR },
+      { label: "IPv6", color: IPV6_COLOR },
+      { label: "IPv4", color: IPV4_COLOR },
+      { label: "IPv4", color: IPV4_COLOR },
+      { label: "IPv4", color: IPV4_COLOR },
+    ],
+  },
+  {
+    testRunId: "2",
+    startedAt: new Date(),
+    results: [
+      { label: "IPv6", color: IPV6_COLOR },
+      { label: "IPv6", color: IPV6_COLOR },
+      { label: "IPv6", color: IPV6_COLOR },
+      { label: "IPv6", color: IPV6_COLOR },
+      { label: "IPv4", color: IPV4_COLOR },
+    ],
+  },
+];
+---
+
+<PageLayout title="HE CAD Test | Happy Eyeballs Webtester">
+  <Header
+    titleLine1="Happy Eyeballs"
+    titleLine2="Connection Attempt Delay Test"
+  >
+    <p>
+      We set up a server with as many unique IPv4 and IPv6 addresses as measured
+      delays. Each delay has a corresponding IPv4 and IPv6 address bound to all
+      subdomains of a delay-specific domain name. By using tc netem, we delay
+      the traffic for the IPv6 address by the configured number of milliseconds.
+      This enables us to test how browsers deploy Happy Eyeballs.
+    </p>
+    <p>
+      We randomize domains to prevent caching effects on the browser's side. The
+      measurement without randomization shows us if the browser does any caching
+      or uses performance measurements to select IP versions.
+    </p>
+  </Header>
+
+  <div class="mt-20">
+    <TestResultTable
+      columnDescription="IPv6 Delay [ms]"
+      columns={["0", "100", "200", "300", "400"]}
+      rows={results}
+    />
+  </div>
+</PageLayout>
