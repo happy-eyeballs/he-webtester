@@ -1,40 +1,15 @@
 ---
 import PageLayout from "@/layouts/main.astro";
 import Header from "@/components/header.astro";
-import {
-  TestResultTable,
-  type TestRunResult,
-} from "@/components/test-result-table.tsx";
-
-// https://ui.shadcn.com/colors
-const IPV6_COLOR = "#0e7490"; // cyan-700
-const IPV4_COLOR = "#b45309"; // amber-700
-
-// TEMP
-const results: TestRunResult[] = [
-  {
-    testRunId: "1",
-    startedAt: new Date(),
-    results: [
-      { label: "IPv6", color: IPV6_COLOR },
-      { label: "IPv6", color: IPV6_COLOR },
-      { label: "IPv4", color: IPV4_COLOR },
-      { label: "IPv4", color: IPV4_COLOR },
-      { label: "IPv4", color: IPV4_COLOR },
-    ],
-  },
-  {
-    testRunId: "2",
-    startedAt: new Date(),
-    results: [
-      { label: "IPv6", color: IPV6_COLOR },
-      { label: "IPv6", color: IPV6_COLOR },
-      { label: "IPv6", color: IPV6_COLOR },
-      { label: "IPv6", color: IPV6_COLOR },
-      { label: "IPv4", color: IPV4_COLOR },
-    ],
-  },
-];
+// import {
+//   TestResultTable,
+//   type TestRunResult,
+// } from "@/components/test-result-table.tsx";
+// import {
+//   type TestSettings,
+//   TestSettingsSection,
+// } from "@/components/test-settings-section.tsx";
+import { ConnectionAttemptDelayTest } from "@/components/connection-attempt-delay-test.tsx";
 ---
 
 <PageLayout title="HE CAD Test | Happy Eyeballs Webtester">
@@ -56,11 +31,28 @@ const results: TestRunResult[] = [
     </p>
   </Header>
 
-  <div class="mt-20">
-    <TestResultTable
-      columnDescription="IPv6 Delay [ms]"
-      columns={["0", "100", "200", "300", "400"]}
-      rows={results}
-    />
+  <div class="mt-10">
+    <ConnectionAttemptDelayTest client:load />
   </div>
+
+  <!--<div class="mt-10">-->
+  <!--  <TestSettingsSection-->
+  <!--    client:load-->
+  <!--    enabledSettings={{-->
+  <!--      repetitions: { options: [1, 5, 10, 20, 30, 40, 50], defaultOption: 10 },-->
+  <!--      autoTransmitResults: true,-->
+  <!--      randomizeDomains: true,-->
+  <!--      deviceInfo: true,-->
+  <!--    }}-->
+  <!--    onStartTestRuns={startTestRuns}-->
+  <!--  />-->
+  <!--</div>-->
+
+  <!--<div class="mt-20">-->
+  <!--  <TestResultTable-->
+  <!--    columnDescription="IPv6 Delay [ms]"-->
+  <!--    columns={["0", "100", "200", "300", "400"]}-->
+  <!--    rows={results}-->
+  <!--  />-->
+  <!--</div>-->
 </PageLayout>
