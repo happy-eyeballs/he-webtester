@@ -23,13 +23,15 @@ import { Button } from "@/components/ui/button.tsx";
 import type { TestSettings } from "@/lib/test-run.ts";
 import { getDeviceInfo } from "@/lib/device-info.ts";
 
+export type EnabledTestSettings = {
+  repetitions?: { options: number[]; defaultOption: number };
+  autoTransmitResults?: boolean;
+  randomizeDomains?: boolean;
+  deviceInfo?: boolean;
+};
+
 type Props = {
-  enabledSettings: {
-    repetitions?: { options: number[]; defaultOption: number };
-    autoTransmitResults?: boolean;
-    randomizeDomains?: boolean;
-    deviceInfo?: boolean;
-  };
+  enabledSettings: EnabledTestSettings;
   onStartTestRun: (settings: TestSettings) => void;
   disabled?: boolean;
   statusWidget?: React.ReactNode;

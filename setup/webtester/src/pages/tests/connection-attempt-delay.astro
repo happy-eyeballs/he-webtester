@@ -1,15 +1,7 @@
 ---
 import PageLayout from "@/layouts/main.astro";
 import Header from "@/components/header.astro";
-// import {
-//   TestResultTable,
-//   type TestRunResult,
-// } from "@/components/test-result-table.tsx";
-// import {
-//   type TestSettings,
-//   TestSettingsSection,
-// } from "@/components/test-settings-section.tsx";
-import { ConnectionAttemptDelayTest } from "@/components/connection-attempt-delay-test.tsx";
+import { ConnectionAttemptDelayTest } from "@/components/tests/connection-attempt-delay-test.tsx";
 ---
 
 <PageLayout title="HE CAD Test | Happy Eyeballs Webtester">
@@ -34,25 +26,4 @@ import { ConnectionAttemptDelayTest } from "@/components/connection-attempt-dela
   <div class="mt-10">
     <ConnectionAttemptDelayTest client:load />
   </div>
-
-  <!--<div class="mt-10">-->
-  <!--  <TestSettingsSection-->
-  <!--    client:load-->
-  <!--    enabledSettings={{-->
-  <!--      repetitions: { options: [1, 5, 10, 20, 30, 40, 50], defaultOption: 10 },-->
-  <!--      autoTransmitResults: true,-->
-  <!--      randomizeDomains: true,-->
-  <!--      deviceInfo: true,-->
-  <!--    }}-->
-  <!--    onStartTestRuns={startTestRuns}-->
-  <!--  />-->
-  <!--</div>-->
-
-  <!--<div class="mt-20">-->
-  <!--  <TestResultTable-->
-  <!--    columnDescription="IPv6 Delay [ms]"-->
-  <!--    columns={["0", "100", "200", "300", "400"]}-->
-  <!--    rows={results}-->
-  <!--  />-->
-  <!--</div>-->
 </PageLayout>
