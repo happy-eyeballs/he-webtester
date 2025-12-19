@@ -4,9 +4,9 @@ import {
   TestSettingsSection,
 } from "@/components/test-settings-section.tsx";
 import {
-  type Subtest,
   type TestRun,
   type TestSettings,
+  type TestPart,
   executeTestRun,
 } from "@/lib/test-run.ts";
 import { TestResultTable } from "@/components/test-result-table.tsx";
@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { downloadResults, transmitResults } from "@/lib/transmit-results.ts";
 
 type Props = {
-  buildSubtests: (settings: TestSettings) => Promise<Subtest[]>;
+  buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
   enabledSettings: EnabledTestSettings;
   testName: string;
   resultsUrl: string;

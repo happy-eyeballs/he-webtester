@@ -42,7 +42,18 @@ const mapTestRunsToResults = (testRuns: TestRun[]) => {
       runCount: testRunRepetition.repetitionNumber,
       timestampStart: testRunRepetition.startedAt,
       settings: testRun.settings,
-      results: testRunRepetition.subtests.map((subTest) => subTest.result),
+      results: testRunRepetition.parts.reduce(
+        (result, testPart) => ({
+          ...result,
+          [testPart.name ?? ""]: testPart.subtests.map(
+            (subtest) => subtest.result,
+          ),
+        }),
+        {},
+      ),
+      platform: window.navigator.platform,
+      vendor: window.navigator.vendor,
+      userAgent: window.navigator.userAgent,
     })),
   );
 };

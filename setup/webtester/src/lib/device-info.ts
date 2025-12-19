@@ -12,8 +12,8 @@ export const getDeviceInfo = async (): Promise<string> => {
   const deviceInfo = {
     platform: window.navigator.platform,
     vendor: window.navigator.vendor,
-    client_addr_v4: anonymizeIPv4Address(userIPv4Address),
-    client_addr_v6: anonymizeIPv6Address(userIPv6Address),
+    clientIPv4: anonymizeIPv4Address(userIPv4Address),
+    clientIPv6: anonymizeIPv6Address(userIPv6Address),
     other: "",
   };
 

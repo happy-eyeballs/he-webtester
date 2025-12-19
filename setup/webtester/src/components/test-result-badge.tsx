@@ -32,7 +32,7 @@ export const TestResultBadge: React.FC<Props> = ({ result }) => {
       </TooltipTrigger>
       <TooltipContent>
         <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 p-2">
-          <div className="text-muted-foreground text-right dark:text-muted dark:font-semibold">
+          <div className="text-muted text-right font-semibold">
             URL
           </div>
           <a
@@ -44,7 +44,7 @@ export const TestResultBadge: React.FC<Props> = ({ result }) => {
 
           {result.requestDurationMs && (
             <>
-              <div className="text-muted-foreground text-right dark:text-muted dark:font-semibold">
+              <div className="text-muted text-right font-semibold">
                 Request Duration
               </div>
               <div>{result.requestDurationMs.toFixed(2)} ms</div>
@@ -53,7 +53,7 @@ export const TestResultBadge: React.FC<Props> = ({ result }) => {
 
           {result.error && (
             <>
-              <div className="text-muted-foreground text-right dark:text-muted dark:font-semibold">
+              <div className="text-muted text-right font-semibold">
                 Error
               </div>
               <div>{result.error}</div>

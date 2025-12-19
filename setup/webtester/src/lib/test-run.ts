@@ -1,10 +1,11 @@
 import { checkIfIPv4AndIPv6AreAvailable } from "@/lib/client-ip-address.ts";
-import { transmitResults } from "./transmit-results";
+import { transmitResults } from "@/lib/transmit-results.ts";
+import { generateRandomId, sleep } from "@/lib/test-utils.ts";
 
 export const executeTestRun = async (
   settings: TestSettings,
   resultsUrl: string,
-  buildSubtests: (settings: TestSettings) => Promise<Subtest[]>,
+  buildTestParts: (settings: TestSettings) => Promise<TestPart[]>,
   addTestRunToTable: (testRun: TestRun) => void,
   setStatusMessage: (message: string) => void,
   forceTableRerender: () => void,
@@ -31,36 +32,38 @@ export const executeTestRun = async (
         : `Running test...`,
     );
 
-    const subtests = await buildSubtests(settings);
+    const parts = await buildTestParts(settings);
 
     testRun.repetitions.push({
       repetitionNumber: repetition,
       startedAt: new Date(),
-      subtests,
+      parts,
     } satisfies TestRunRepetition);
 
-    for (const subtest of subtests) {
-      subtest.isRunning = true;
-      forceTableRerender();
+    for (const part of parts) {
+      for (const subtest of part.subtests) {
+        subtest.isRunning = true;
+        forceTableRerender();
 
-      subtest.result = await executeTestUrl(subtest.url).catch(
-        (error: Error) =>
-          ({
-            value: SubtestResultValue.Error,
-            url: subtest.url,
-            error: error.message,
-          }) satisfies SubtestResult,
-      );
+        subtest.result = await executeTestUrl(subtest.url).catch(
+          (error: Error) =>
+            ({
+              value: SubtestResultValue.Error,
+              url: subtest.url,
+              error: error.message,
+            }) satisfies SubtestResult,
+        );
 
-      subtest.isRunning = false;
-      forceTableRerender();
-    }
+        subtest.isRunning = false;
+        forceTableRerender();
+      }
 
-    if (repetition < (settings.repetitions ?? 1)) {
-      setStatusMessage(
-        `Waiting for 5 seconds before starting the next repetition...`,
-      );
-      await sleep(5000);
+      if (repetition < (settings.repetitions ?? 1)) {
+        setStatusMessage(
+          `Waiting for 5 seconds before starting the next repetition...`,
+        );
+        await sleep(5000);
+      }
     }
   }
 
@@ -112,6 +115,7 @@ export type TestSettings = {
   repetitions: number | undefined;
   autoTransmitResults: boolean | undefined;
   randomizeDomains: boolean | undefined;
+  resolverAddresses: string | undefined;
   deviceInfo: string | undefined;
 };
 
@@ -125,6 +129,11 @@ export type TestRun = {
 type TestRunRepetition = {
   repetitionNumber: number;
   startedAt: Date;
+  parts: TestPart[];
+};
+
+export type TestPart = {
+  name?: string;
   subtests: Subtest[];
 };
 

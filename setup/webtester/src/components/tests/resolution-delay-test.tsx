@@ -9,9 +9,9 @@ import {
   getHappyEyeballsTestDomain,
   fetchAvailableDelays,
 } from "@/lib/he-configuration.ts";
-import { generateRandomId } from "@/lib/test-utils.ts";
+import { generateRandomId } from "@/lib/test-utils";
 
-export const ConnectionAttemptDelayTest: React.FC = () => {
+export const ResolutionDelayTest: React.FC = () => {
   const [availableDelays, setAvailableDelays] = useState<number[]>([]);
 
   useEffect(() => {
@@ -25,17 +25,26 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
     const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
-    const subtests: Subtest[] = [];
+    const testParts: TestPart[] = [];
 
-    for (let i = 0; i < availableDelays.length; i++) {
-      const id = settings.randomizeDomains ? generateRandomId() : i;
-      const delay = availableDelays[i] ?? 0;
-      const url = `https://id-${id}.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
+    for (const part of [
+      { name: "Delay A", recordType: "a" },
+      { name: "Delay AAAA", recordType: "aaaa" },
+    ]) {
+      const subtests: Subtest[] = [];
 
-      subtests.push({ url } satisfies Subtest);
+      for (let i = 0; i < availableDelays.length; i++) {
+        const id = settings.randomizeDomains ? generateRandomId() : i;
+        const delay = availableDelays[i] ?? 0;
+        const url = `https://v2delay_${part.recordType}-${id}_${delay}.v2.${happyEyeballsTestDomain}/ping`;
+
+        subtests.push({ url } satisfies Subtest);
+      }
+
+      testParts.push({ name: part.name, subtests } satisfies TestPart);
     }
 
-    return [{ subtests }];
+    return testParts;
   };
 
   return (
@@ -48,10 +57,11 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
         },
         autoTransmitResults: true,
         randomizeDomains: true,
+        resolverAddresses: true,
         deviceInfo: true,
       }}
-      testName="ip-v1"
-      resultsUrl="/results/v1"
+      testName="ip-v2"
+      resultsUrl="/results/v2"
       subtestColumnDescription="IPv6 Delay [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />

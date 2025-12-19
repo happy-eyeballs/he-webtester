@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils.ts";
 import { TestResultBadge } from "@/components/test-result-badge.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import type { TestRun } from "@/lib/test-run.ts";
-import { CloudUploadIcon, ShuffleIcon } from "lucide-react";
+import { CloudUploadIcon, ShuffleIcon, type LucideIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +21,12 @@ export const TestResultTable: React.FC<Props> = ({
   columns,
   testRuns,
 }) => {
+  const hasTestPartName = testRuns.some((testRun) =>
+    testRun.repetitions.some((repetition) =>
+      repetition.parts.some((testPart) => testPart.name),
+    ),
+  );
+
   return (
     <div className="relative">
       <div className="overflow-x-auto pb-5">
@@ -33,6 +39,11 @@ export const TestResultTable: React.FC<Props> = ({
               <th className="text-left whitespace-nowrap px-5 pt-5 border-r w-50">
                 Started At
               </th>
+              {hasTestPartName && (
+                <th className="text-left whitespace-nowrap px-5 pt-5 border-r w-50">
+                  Part
+                </th>
+              )}
               <th
                 className="text-left whitespace-nowrap px-5 pt-5 pb-2"
                 colSpan={columns.length}
@@ -43,6 +54,7 @@ export const TestResultTable: React.FC<Props> = ({
             <tr>
               <th className="border-r" />
               <th className="border-r" />
+              {hasTestPartName && <th className="border-r" />}
               {columns.map((column, index) => (
                 <th
                   key={column}
@@ -58,81 +70,83 @@ export const TestResultTable: React.FC<Props> = ({
           </thead>
           <tbody>
             {testRuns.flatMap((testRun, testRunNumber) =>
-              testRun.repetitions.map((repetition) => (
-                <tr
-                  key={`${testRun.testRunId}|${repetition.repetitionNumber}`}
-                  className="border-t"
-                >
-                  <td className="whitespace-nowrap px-5 border-r">
-                    <div className="flex gap-4 items-center font-bold">
-                      <Tooltip>
-                        <TooltipTrigger>
-                          {testRun.settings.repetitions
-                            ? `#${testRunNumber} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
-                            : `#${testRunNumber}`}
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <b>ID:</b> {testRun.testRunId}
-                        </TooltipContent>
-                      </Tooltip>
+              testRun.repetitions.flatMap((repetition) =>
+                repetition.parts.map((testPart, testPartIndex) => (
+                  <tr
+                    key={`${testRun.testRunId}|${repetition.repetitionNumber}|${testPartIndex}`}
+                    className="border-t"
+                  >
+                    {testPartIndex === 0 && (
+                      <>
+                        <td
+                          className="whitespace-nowrap px-5 border-r"
+                          rowSpan={repetition.parts.length}
+                        >
+                          <div className="flex gap-4 items-center font-bold">
+                            <Tooltip>
+                              <TooltipTrigger>
+                                {testRun.settings.repetitions
+                                  ? `#${testRunNumber + 1} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
+                                  : `#${testRunNumber + 1}`}
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <b>ID:</b> {testRun.testRunId}
+                              </TooltipContent>
+                            </Tooltip>
 
-                      {testRun.settings.randomizeDomains && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="size-7 bg-secondary text-secondary-foreground grid place-items-center rounded-md">
-                              <ShuffleIcon className="size-3.5" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>Randomized domains</TooltipContent>
-                        </Tooltip>
-                      )}
+                            {testRun.settings.randomizeDomains && (
+                              <TestRunInfoBadge
+                                icon={ShuffleIcon}
+                                tooltip="Randomized domains"
+                              />
+                            )}
 
-                      {testRun.isTransmitted && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="size-7 bg-secondary text-secondary-foreground grid place-items-center rounded-md">
-                              <CloudUploadIcon className="size-3.5" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>Transmitted</TooltipContent>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </td>
-                  <td className="whitespace-nowrap px-5 border-r">
-                    {repetition.startedAt.toLocaleString()}
-                  </td>
+                            {testRun.isTransmitted && (
+                              <TestRunInfoBadge
+                                icon={CloudUploadIcon}
+                                tooltip="Transmitted"
+                              />
+                            )}
+                          </div>
+                        </td>
 
-                  {repetition.subtests.map((subtest, index) => (
-                    <td
-                      key={index}
-                      className={cn(
-                        "px-5 py-3",
-                        index < columns.length - 1 && "border-r",
-                      )}
-                    >
-                      {subtest.result ? (
-                        <TestResultBadge result={subtest.result} />
-                      ) : subtest.isRunning ? (
-                        <Spinner />
-                      ) : (
-                        <></>
-                      )}
-                    </td>
-                    // <td
-                    //   key={index}
-                    //   className={cn(index < columns.length - 1 && "border-r")}
-                    // >
-                    //   <div
-                    //     style={{ background: result.color }}
-                    //     className="px-5 py-3 text-white"
-                    //   >
-                    //     {result.label}
-                    //   </div>
-                    // </td>
-                  ))}
-                </tr>
-              )),
+                        <td
+                          className="whitespace-nowrap px-5 border-r"
+                          rowSpan={repetition.parts.length}
+                        >
+                          {repetition.startedAt.toLocaleString()}
+                        </td>
+                      </>
+                    )}
+
+                    {hasTestPartName && (
+                      <td className="whitespace-nowrap px-5 py-3 border-r">
+                        {testPart.name}
+                      </td>
+                    )}
+
+                    {testPart.subtests.map((subtest, index) => (
+                      <td
+                        key={index}
+                        className={cn(
+                          "px-5 py-3",
+                          index < columns.length - 1 && "border-r",
+                        )}
+                      >
+                        <div className="grid justify-items-center">
+                          {subtest.result ? (
+                            <TestResultBadge result={subtest.result} />
+                          ) : subtest.isRunning ? (
+                            <Spinner />
+                          ) : (
+                            <></>
+                          )}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                )),
+              ),
             )}
           </tbody>
         </table>
@@ -140,3 +154,17 @@ export const TestResultTable: React.FC<Props> = ({
     </div>
   );
 };
+
+const TestRunInfoBadge: React.FC<{
+  icon: LucideIcon;
+  tooltip: string;
+}> = ({ icon: Icon, tooltip }) => (
+  <Tooltip>
+    <TooltipTrigger>
+      <div className="size-7 bg-secondary text-secondary-foreground grid place-items-center rounded-md">
+        <Icon className="size-3.5" />
+      </div>
+    </TooltipTrigger>
+    <TooltipContent>{tooltip}</TooltipContent>
+  </Tooltip>
+);

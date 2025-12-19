@@ -1,4 +1,4 @@
-import { getHappyEyeballsTestDomain } from "@/lib/he-tests-domain.ts";
+import { getHappyEyeballsTestDomain } from "@/lib/he-configuration.ts";
 
 let clientIPAddress: string[] = [];
 

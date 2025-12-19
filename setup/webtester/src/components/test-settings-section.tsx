@@ -22,11 +22,15 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import type { TestSettings } from "@/lib/test-run.ts";
 import { getDeviceInfo } from "@/lib/device-info.ts";
+import { Input } from "@/components/ui/input.tsx";
+import { Spinner } from "@/components/ui/spinner.tsx";
+import { sleep } from "@/lib/test-utils";
 
 export type EnabledTestSettings = {
   repetitions?: { options: number[]; defaultOption: number };
   autoTransmitResults?: boolean;
   randomizeDomains?: boolean;
+  resolverAddresses?: boolean;
   deviceInfo?: boolean;
 };
 
@@ -55,6 +59,10 @@ export const TestSettingsSection: React.FC<Props> = ({
     boolean | undefined
   >(enabledSettings.autoTransmitResults ? false : undefined);
 
+  const [resolverAddresses, setResolverAddresses] = useState<
+    string | undefined
+  >(enabledSettings.resolverAddresses ? "" : undefined);
+
   const [deviceInfo, setDeviceInfo] = useState<string | undefined>(
     enabledSettings.deviceInfo ? "" : undefined,
   );
@@ -68,6 +76,7 @@ export const TestSettingsSection: React.FC<Props> = ({
           repetitions,
           randomizeDomains,
           autoTransmitResults,
+          resolverAddresses,
           deviceInfo,
         } satisfies TestSettings);
       }}
@@ -119,33 +128,35 @@ export const TestSettingsSection: React.FC<Props> = ({
           </SettingsItem>
         )}
 
+        {enabledSettings.resolverAddresses && (
+          <SettingsItem label="Configured Resolver IP Addresses (optional)">
+            <Input
+              type="text"
+              placeholder="e.g., 8.8.8.8, 8.8.4.4"
+              onChange={(e) => setResolverAddresses(e.target.value)}
+              disabled={disabled}
+              className="max-w-xl"
+            />
+          </SettingsItem>
+        )}
+
         {enabledSettings.deviceInfo && (
           <SettingsItem label="Device and user information for easier debugging (optional)">
             <InputGroup className="max-w-xl">
               <InputGroupInput
                 type="text"
                 placeholder="OS, device, browser, your name, etc."
+                value={deviceInfo}
                 onChange={(e) => setDeviceInfo(e.target.value)}
                 disabled={disabled}
               />
               <InputGroupAddon align="inline-end">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <InputGroupButton
-                      variant="secondary"
+                    <AutofillButton
                       disabled={disabled}
-                      onClick={async () => {
-                        try {
-                          const info = await getDeviceInfo();
-                          setDeviceInfo(info);
-                        } catch (err) {
-                          alert(err);
-                        }
-                      }}
-                    >
-                      <WandSparklesIcon />
-                      Autofill
-                    </InputGroupButton>
+                      setDeviceInfo={setDeviceInfo}
+                    />
                   </TooltipTrigger>
                   <TooltipContent>
                     Automatically detect device information.
@@ -170,16 +181,47 @@ export const TestSettingsSection: React.FC<Props> = ({
   );
 };
 
-type SettingsItemProps = {
+const SettingsItem: React.FC<{
   label: string;
   children?: React.ReactNode;
-};
+}> = ({ label, children }) => (
+  <>
+    <div className="text-sm leading-snug">{label}</div>
+    <div>{children}</div>
+  </>
+);
 
-const SettingsItem: React.FC<SettingsItemProps> = ({ label, children }) => {
+const AutofillButton: React.FC<{
+  disabled: boolean;
+  setDeviceInfo: (deviceInfo: string) => void;
+}> = ({ disabled, setDeviceInfo }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const autofill = async () => {
+    try {
+      setIsLoading(true);
+
+      const info = await getDeviceInfo();
+      await sleep(100);
+
+      if (!disabled) {
+        setDeviceInfo(info);
+      }
+    } catch (err) {
+      alert(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <>
-      <div className="text-sm leading-snug">{label}</div>
-      <div>{children}</div>
-    </>
+    <InputGroupButton
+      variant="secondary"
+      disabled={disabled || isLoading}
+      onClick={autofill}
+    >
+      {isLoading ? <Spinner /> : <WandSparklesIcon />}
+      Autofill
+    </InputGroupButton>
   );
 };
