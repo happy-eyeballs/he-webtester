@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils.ts";
 import { TestResultBadge } from "@/components/test-result-badge.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import type { TestRun } from "@/lib/test-run.ts";
-import { ShuffleIcon } from "lucide-react";
+import { CloudUploadIcon, ShuffleIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -51,27 +51,30 @@ export const TestResultTable: React.FC<Props> = ({
                     index < columns.length - 1 && "border-r",
                   )}
                 >
-                  <div className="whitespace-nowrap rotate-180">
-                    {column}
-                  </div>
+                  <div className="whitespace-nowrap rotate-180">{column}</div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {testRuns.flatMap((testRun) =>
+            {testRuns.flatMap((testRun, testRunNumber) =>
               testRun.repetitions.map((repetition) => (
                 <tr
-                  key={`${testRun.testRunNumber}|${repetition.repetitionNumber}`}
+                  key={`${testRun.testRunId}|${repetition.repetitionNumber}`}
                   className="border-t"
                 >
                   <td className="whitespace-nowrap px-5 border-r">
                     <div className="flex gap-4 items-center font-bold">
-                      <div>
-                        {testRun.settings.repetitions
-                          ? `#${testRun.testRunNumber} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
-                          : `#${testRun.testRunNumber}`}
-                      </div>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          {testRun.settings.repetitions
+                            ? `#${testRunNumber} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
+                            : `#${testRunNumber}`}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <b>ID:</b> {testRun.testRunId}
+                        </TooltipContent>
+                      </Tooltip>
 
                       {testRun.settings.randomizeDomains && (
                         <Tooltip>
@@ -81,6 +84,17 @@ export const TestResultTable: React.FC<Props> = ({
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>Randomized domains</TooltipContent>
+                        </Tooltip>
+                      )}
+
+                      {testRun.isTransmitted && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="size-7 bg-secondary text-secondary-foreground grid place-items-center rounded-md">
+                              <CloudUploadIcon className="size-3.5" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>Transmitted</TooltipContent>
                         </Tooltip>
                       )}
                     </div>

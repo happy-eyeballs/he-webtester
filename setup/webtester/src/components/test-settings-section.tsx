@@ -159,7 +159,7 @@ export const TestSettingsSection: React.FC<Props> = ({
 
       <div className="mt-8 flex gap-8 items-center">
         <Button type="submit" disabled={disabled}>
-          Start test runs
+          Run test
         </Button>
 
         {statusWidget}

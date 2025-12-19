@@ -10,12 +10,15 @@ import {
 } from "@/lib/test-run.ts";
 import { TestResultTable } from "@/components/test-result-table.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import { checkIfIPv4AndIPv6AreAvailable } from "@/lib/client-ip-address";
 import { getHappyEyeballsTestDomain } from "@/lib/he-tests-domain.ts";
+import { downloadResults, transmitResults } from "@/lib/transmit-results.ts";
 
 export const ConnectionAttemptDelayTest: React.FC = () => {
   const [availableDelays, setAvailableDelays] = useState<number[]>([]);
-  const [isTestRunning, setIsTestRunning] = useState<boolean>(false);
+  const [isUserInteractionDisabled, setIsUserInteractionDisabled] =
+    useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [testRuns, setTestRuns] = useState<TestRun[]>([]);
 
@@ -126,26 +129,32 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
     return subtests;
   };
 
-  const startTestRun = async (settings: TestSettings) => {
-    if (availableDelays.length === 0) {
-      alert("Delay list is not available");
-      return;
-    }
-
+  const withDisabledUserInteraction = async (fn: () => Promise<void>) => {
     try {
-      setStatusMessage("Checking if IPv4 and IPv6 are available...");
-      await checkIfIPv4AndIPv6AreAvailable();
+      setIsUserInteractionDisabled(true);
+      setStatusMessage("");
+      await fn();
     } catch (err) {
       alert(err);
-      return;
+    } finally {
+      setStatusMessage("");
+      setIsUserInteractionDisabled(false);
+    }
+  };
+
+  const executeTestRun = async (settings: TestSettings) => {
+    if (availableDelays.length === 0) {
+      throw new Error("Delay list is not available");
     }
 
-    setIsTestRunning(true);
+    setStatusMessage("Checking if IPv4 and IPv6 are available...");
+    await checkIfIPv4AndIPv6AreAvailable();
 
     const testRun: TestRun = {
-      testRunNumber: testRuns.length + 1,
-      repetitions: [],
+      testRunId: generateRandomId(),
       settings,
+      isTransmitted: false,
+      repetitions: [],
     };
     setTestRuns((prev) => [...prev, testRun]);
 
@@ -180,13 +189,19 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
       }
     }
 
-    // TODO: transmit results
-
-    setIsTestRunning(false);
-    setStatusMessage("");
+    if (settings.autoTransmitResults) {
+      await transmitTestResults();
+    }
   };
 
-  const statusWidget = isTestRunning ? (
+  const transmitTestResults = async () => {
+    setStatusMessage("Transmitting results...");
+
+    await transmitResults("/results/v1", testRuns);
+    forceTableRerender();
+  };
+
+  const statusWidget = isUserInteractionDisabled ? (
     <div className="flex items-center gap-2">
       <Spinner />
       {statusMessage && <div className="text-sm">{statusMessage}</div>}
@@ -205,18 +220,47 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
           randomizeDomains: true,
           deviceInfo: true,
         }}
-        onStartTestRun={startTestRun}
-        disabled={isTestRunning}
+        onStartTestRun={(settings) =>
+          withDisabledUserInteraction(() => executeTestRun(settings))
+        }
+        disabled={isUserInteractionDisabled}
         statusWidget={statusWidget}
       />
 
-      <div className="mb-10" />
+      {testRuns.length > 0 && (
+        <>
+          <div className="mb-10" />
 
-      <TestResultTable
-        columnDescription="IPv6 Delay [ms]"
-        columns={availableDelays.map((delay) => delay.toString())}
-        testRuns={testRuns}
-      />
+          <TestResultTable
+            columnDescription="IPv6 Delay [ms]"
+            columns={availableDelays.map((delay) => delay.toString())}
+            testRuns={testRuns}
+          />
+
+          <div className="mt-8 flex gap-4 items-center">
+            <Button
+              variant="default"
+              disabled={
+                isUserInteractionDisabled ||
+                !testRuns.some((testRun) => !testRun.isTransmitted)
+              }
+              onClick={() =>
+                withDisabledUserInteraction(() => transmitTestResults())
+              }
+            >
+              Transmit results
+            </Button>
+
+            <Button
+              variant="secondary"
+              disabled={isUserInteractionDisabled}
+              onClick={() => downloadResults("ip-v1", testRuns)}
+            >
+              Download results
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

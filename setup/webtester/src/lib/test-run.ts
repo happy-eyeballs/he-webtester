@@ -24,9 +24,10 @@ export type TestRunRepetition = {
 };
 
 export type TestRun = {
-  testRunNumber: number;
-  repetitions: TestRunRepetition[];
+  testRunId: number;
   settings: TestSettings;
+  isTransmitted: boolean;
+  repetitions: TestRunRepetition[];
 };
 
 export type TestSettings = {
