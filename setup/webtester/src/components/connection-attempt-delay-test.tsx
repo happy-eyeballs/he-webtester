@@ -10,11 +10,11 @@ import {
 } from "@/lib/test-run.ts";
 import { TestResultTable } from "@/components/test-result-table.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { checkIfIPv4AndIPv6AreAvailable } from "@/lib/client-ip-address";
+import { getHappyEyeballsTestDomain } from "@/lib/he-tests-domain.ts";
 
 export const ConnectionAttemptDelayTest: React.FC = () => {
   const [availableDelays, setAvailableDelays] = useState<number[]>([]);
-  const [happyEyeballsTestDomain, setHappyEyeballsTestDomain] =
-    useState<string>("");
   const [isTestRunning, setIsTestRunning] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [testRuns, setTestRuns] = useState<TestRun[]>([]);
@@ -22,7 +22,6 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
   useEffect(() => {
     const setup = async () => {
       setAvailableDelays(await fetchAvailableDelays());
-      setHappyEyeballsTestDomain(await fetchHappyEyeballsTestDomain());
     };
 
     setup();
@@ -42,38 +41,6 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
       .map((line) => Number(line.trim()));
 
     // TODO: pop last two delays in if not v2 test
-  };
-
-  const fetchHappyEyeballsTestDomain = async (): Promise<string> => {
-    const response = await fetch("/he-test-domain", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error("Failed to fetch the Happy Eyeballs test domain");
-    }
-
-    return (await response.text()).trim();
-  };
-
-  const getClientIPAddress = async (ipVersion: 4 | 6): Promise<string> => {
-    const response = await fetch(
-      `https://ipv${ipVersion}-only.v1.${happyEyeballsTestDomain}/my-ip`,
-      { cache: "no-cache" },
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch the client ${ipVersion} address`);
-    }
-
-    return (await response.text()).trim();
-  };
-
-  const checkIfIPv4AndIPv6AreAvailable = async (): Promise<void> => {
-    await getClientIPAddress(4).catch((_) => {
-      throw new Error("No IPv4 address available");
-    });
-
-    await getClientIPAddress(6).catch((_) => {
-      throw new Error("No IPv6 address available");
-    });
   };
 
   const generateRandomId = (): number => {
@@ -141,7 +108,11 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
     forceTableRerender();
   };
 
-  const buildSubtests = (randomizeDomains: boolean): Subtest[] => {
+  const buildSubtests = async (
+    randomizeDomains: boolean,
+  ): Promise<Subtest[]> => {
+    const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
+
     const subtests: Subtest[] = [];
 
     for (let i = 0; i < availableDelays.length; i++) {
@@ -158,11 +129,6 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
   const startTestRun = async (settings: TestSettings) => {
     if (availableDelays.length === 0) {
       alert("Delay list is not available");
-      return;
-    }
-
-    if (!happyEyeballsTestDomain) {
-      alert("Happy Eyeballs tests domain is not available");
       return;
     }
 
@@ -194,7 +160,7 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
           : `Running test...`,
       );
 
-      const subtests = buildSubtests(settings.randomizeDomains ?? false);
+      const subtests = await buildSubtests(settings.randomizeDomains ?? false);
 
       testRun.repetitions.push({
         repetitionNumber: repetition,

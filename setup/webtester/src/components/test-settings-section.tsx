@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/tooltip.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import type { TestSettings } from "@/lib/test-run.ts";
+import { getDeviceInfo } from "@/lib/device-info.ts";
 
 type Props = {
   enabledSettings: {
@@ -128,7 +129,18 @@ export const TestSettingsSection: React.FC<Props> = ({
               <InputGroupAddon align="inline-end">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <InputGroupButton variant="secondary" disabled={disabled}>
+                    <InputGroupButton
+                      variant="secondary"
+                      disabled={disabled}
+                      onClick={async () => {
+                        try {
+                          const info = await getDeviceInfo();
+                          setDeviceInfo(info);
+                        } catch (err) {
+                          alert(err);
+                        }
+                      }}
+                    >
                       <WandSparklesIcon />
                       Autofill
                     </InputGroupButton>
