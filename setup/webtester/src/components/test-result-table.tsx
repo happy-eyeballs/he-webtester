@@ -47,11 +47,11 @@ export const TestResultTable: React.FC<Props> = ({
                 <th
                   key={column}
                   className={cn(
-                    "content-start p-5",
+                    "text-left p-5 [writing-mode:vertical-lr]",
                     index < columns.length - 1 && "border-r",
                   )}
                 >
-                  <div className="whitespace-nowrap [writing-mode:vertical-lr] rotate-180">
+                  <div className="whitespace-nowrap rotate-180">
                     {column}
                   </div>
                 </th>
@@ -66,7 +66,7 @@ export const TestResultTable: React.FC<Props> = ({
                   className="border-t"
                 >
                   <td className="whitespace-nowrap px-5 border-r">
-                    <div className="flex gap-4 items-center">
+                    <div className="flex gap-4 items-center font-bold">
                       <div>
                         {testRun.settings.repetitions
                           ? `#${testRun.testRunNumber} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
