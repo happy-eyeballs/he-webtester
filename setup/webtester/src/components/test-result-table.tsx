@@ -59,11 +59,11 @@ export const TestResultTable: React.FC<Props> = ({
                 <th
                   key={column}
                   className={cn(
-                    "text-left p-5 [writing-mode:vertical-lr]",
+                    "text-right p-5 [writing-mode:vertical-rl]",
                     index < columns.length - 1 && "border-r",
                   )}
                 >
-                  <div className="whitespace-nowrap rotate-180">{column}</div>
+                  <div className="whitespace-pre rotate-180">{column}</div>
                 </th>
               ))}
             </tr>
@@ -90,7 +90,10 @@ export const TestResultTable: React.FC<Props> = ({
                                   : `#${testRunNumber + 1}`}
                               </TooltipTrigger>
                               <TooltipContent>
-                                <b>ID:</b> {testRun.testRunId}
+                                <span className="font-semibold">
+                                  Test Run ID:
+                                </span>{" "}
+                                {testRun.testRunId}
                               </TooltipContent>
                             </Tooltip>
 
@@ -133,14 +136,13 @@ export const TestResultTable: React.FC<Props> = ({
                           index < columns.length - 1 && "border-r",
                         )}
                       >
-                        <div className="grid justify-items-center">
-                          {subtest.result ? (
-                            <TestResultBadge result={subtest.result} />
-                          ) : subtest.isRunning ? (
-                            <Spinner />
-                          ) : (
-                            <></>
-                          )}
+                        <div className="grid justify-items-center gap-1">
+                          {subtest.results &&
+                            subtest.results.map((result, index) => (
+                              <TestResultBadge result={result} key={index} />
+                            ))}
+
+                          {subtest.isRunning && <Spinner />}
                         </div>
                       </td>
                     ))}

@@ -45,25 +45,38 @@ export const executeTestRun = async (
         subtest.isRunning = true;
         forceTableRerender();
 
-        subtest.result = await executeTestUrl(subtest.url).catch(
-          (error: Error) =>
-            ({
-              value: SubtestResultValue.Error,
-              url: subtest.url,
-              error: error.message,
-            }) satisfies SubtestResult,
-        );
+        subtest.results ??= [];
+
+        const numberOfRequests = subtest.numberOfRequests ?? 1;
+        for (let i = 0; i < numberOfRequests; i++) {
+          const result = await executeSubtest(subtest).catch(
+            (error: Error) =>
+              ({
+                value: "ERR",
+                color: TestRunResultColor.Error,
+                url: subtest.url,
+                error: error.message,
+              }) satisfies SubtestResult,
+          );
+
+          subtest.results.push(result);
+          forceTableRerender();
+
+          if (subtest.sleepBetweenRequests && i < numberOfRequests - 1) {
+            await sleep(subtest.sleepBetweenRequests);
+          }
+        }
 
         subtest.isRunning = false;
         forceTableRerender();
       }
+    }
 
-      if (repetition < (settings.repetitions ?? 1)) {
-        setStatusMessage(
-          `Waiting for 5 seconds before starting the next repetition...`,
-        );
-        await sleep(5000);
-      }
+    if (repetition < (settings.repetitions ?? 1)) {
+      setStatusMessage(
+        `Waiting for 5 seconds before starting the next repetition...`,
+      );
+      await sleep(5000);
     }
   }
 
@@ -75,23 +88,24 @@ export const executeTestRun = async (
   }
 };
 
-const executeTestUrl = async (url: string): Promise<SubtestResult> => {
-  const observer = observeRequestTiming(url);
+const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
+  const observer = observeRequestTiming(subtest.url);
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(subtest.url, { cache: "no-store" });
 
   if (!response.ok) {
     throw new Error(`Response has non-200 status code: ${response.status}`);
   }
 
-  const clientIP = await response.text();
-  const isIPv6 = clientIP.includes(":");
+  const responseHandler = subtest.responseHandler ?? defaultResponseHandler;
+  const result = await responseHandler(response);
 
   const requestDurationMs = await observer;
 
   return {
-    value: isIPv6 ? SubtestResultValue.IPv6 : SubtestResultValue.IPv4,
-    url,
+    value: result.value,
+    color: result.color,
+    url: subtest.url,
     requestDurationMs,
   } satisfies SubtestResult;
 };
@@ -110,6 +124,25 @@ const observeRequestTiming = (url: string): Promise<number> =>
 
     observer.observe({ type: "resource", buffered: false });
   });
+
+const defaultResponseHandler = async (
+  response: Response,
+): Promise<ResponseHandlerResult> => {
+  const clientIP = await response.text();
+  const isIPv6 = clientIP.includes(":");
+
+  if (isIPv6) {
+    return {
+      value: "IPv6",
+      color: TestRunResultColor.Option1,
+    };
+  } else {
+    return {
+      value: "IPv4",
+      color: TestRunResultColor.Option2,
+    };
+  }
+};
 
 export type TestSettings = {
   repetitions: number | undefined;
@@ -140,18 +173,28 @@ export type TestPart = {
 export type Subtest = {
   url: string;
   isRunning?: boolean;
-  result?: SubtestResult;
+  results?: SubtestResult[];
+  responseHandler?: (response: Response) => Promise<ResponseHandlerResult>;
+  numberOfRequests?: number;
+  sleepBetweenRequests?: number;
 };
 
 export type SubtestResult = {
-  value: SubtestResultValue;
+  value: string;
+  color: TestRunResultColor;
   url: string;
   requestDurationMs?: number;
   error?: string;
 };
 
-export const enum SubtestResultValue {
-  Error = "ERR",
-  IPv4 = "IPv4",
-  IPv6 = "IPv6",
+// https://ui.shadcn.com/colors
+export const enum TestRunResultColor {
+  Error = "#b91c1c", // red-700
+  Option1 = "#0e7490", // cyan-700
+  Option2 = "#b45309", // amber-700
 }
+
+export type ResponseHandlerResult = {
+  value: string;
+  color: TestRunResultColor;
+};
