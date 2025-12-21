@@ -5,4 +5,4 @@
   tags: [ 'webtester', 'webtester-certs' ]
 
 - ansible.builtin.import_tasks: webtester.yml
-  tags: [ 'webtester', 'webtester-webtester' ]
+  tags: [ 'webtester', 'webtester-src' ]
