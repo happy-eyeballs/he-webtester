@@ -5,7 +5,7 @@ import {
   TestRunResultColor,
   type TestSettings,
 } from "@/lib/test-run.ts";
-import { HETest } from "@/components/he-test.tsx";
+import { TestSkeleton } from "@/components/test-skeleton.tsx";
 import { getHappyEyeballsTestDomain } from "@/lib/he-configuration.ts";
 import { generateRandomId } from "@/lib/test-utils.ts";
 
@@ -61,7 +61,7 @@ export const HTTP3AvailabilityTest: React.FC = () => {
   };
 
   return (
-    <HETest
+    <TestSkeleton
       buildSubtests={buildSubtests}
       enabledSettings={{
         repetitions: {

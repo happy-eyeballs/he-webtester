@@ -42,6 +42,7 @@
 - name: Copy dist folder to www-root directory
   ansible.builtin.shell:
     cmd: 'cp -rp {{ happy_eyeballs.base_path }}/webtester/dist/. {{ happy_eyeballs.base_path }}/www-root/'
+  notify: restart he-caddy
 
 - name: Copy webtester static files
   ansible.builtin.template:

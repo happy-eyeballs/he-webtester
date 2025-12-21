@@ -8,9 +8,10 @@ import {
 
 type Props = {
   result: SubtestResult;
+  metadata?: { key: string; value: string }[];
 };
 
-export const TestResultBadge: React.FC<Props> = ({ result }) => {
+export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -48,6 +49,13 @@ export const TestResultBadge: React.FC<Props> = ({ result }) => {
               <div>{result.error}</div>
             </>
           )}
+
+          {metadata?.map(({ key, value }) => (
+            <>
+              <div className="text-muted text-right font-semibold">{key}</div>
+              <div>{value}</div>
+            </>
+          ))}
         </div>
       </TooltipContent>
     </Tooltip>

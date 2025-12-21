@@ -13,6 +13,11 @@ import { TestResultTable } from "@/components/test-result-table.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { downloadResults, transmitResults } from "@/lib/transmit-results.ts";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 
 type Props = {
   buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
@@ -23,7 +28,7 @@ type Props = {
   subtestColumnLabels: string[];
 };
 
-export const HETest: React.FC<Props> = ({
+export const TestSkeleton: React.FC<Props> = ({
   buildSubtests,
   enabledSettings,
   testName,
@@ -79,6 +84,10 @@ export const HETest: React.FC<Props> = ({
     </div>
   ) : undefined;
 
+  const allTestRunsTransmitted = testRuns.every(
+    (testRun) => testRun.isTransmitted,
+  );
+
   return (
     <div>
       <TestSettingsSection
@@ -99,16 +108,35 @@ export const HETest: React.FC<Props> = ({
           />
 
           <div className="mt-8 flex gap-4 items-center">
-            <Button
-              variant="default"
-              disabled={
-                isUserInteractionDisabled ||
-                !testRuns.some((testRun) => !testRun.isTransmitted)
-              }
-              onClick={transmitTestResults}
-            >
-              Transmit results
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="default"
+                  disabled={isUserInteractionDisabled || allTestRunsTransmitted}
+                  onClick={transmitTestResults}
+                >
+                  Transmit results
+                </Button>
+              </TooltipTrigger>
+
+              {isUserInteractionDisabled ? (
+                <TooltipContent className="max-w-md">
+                  Please wait until all test repetitions have finished
+                  executing...
+                </TooltipContent>
+              ) : allTestRunsTransmitted ? (
+                <TooltipContent className="max-w-md">
+                  All test runs have been successfully transmitted. Thank you
+                  for your help!
+                </TooltipContent>
+              ) : (
+                <TooltipContent className="max-w-md">
+                  If you want to help us interpret the results, you can describe
+                  your network environment as part of the device and the user
+                  information input field.
+                </TooltipContent>
+              )}
+            </Tooltip>
 
             <Button
               variant="secondary"

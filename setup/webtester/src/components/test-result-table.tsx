@@ -82,9 +82,9 @@ export const TestResultTable: React.FC<Props> = ({
                           className="whitespace-nowrap px-5 border-r"
                           rowSpan={repetition.parts.length}
                         >
-                          <div className="flex gap-4 items-center font-bold">
+                          <div className="flex gap-2 items-center font-bold">
                             <Tooltip>
-                              <TooltipTrigger>
+                              <TooltipTrigger className="mr-2">
                                 {testRun.settings.repetitions
                                   ? `#${testRunNumber + 1} (${repetition.repetitionNumber} / ${testRun.settings.repetitions})`
                                   : `#${testRunNumber + 1}`}
@@ -139,7 +139,20 @@ export const TestResultTable: React.FC<Props> = ({
                         <div className="grid justify-items-center gap-1">
                           {subtest.results &&
                             subtest.results.map((result, index) => (
-                              <TestResultBadge result={result} key={index} />
+                              <TestResultBadge
+                                result={result}
+                                key={index}
+                                metadata={
+                                  subtest.numberOfRequests
+                                    ? [
+                                        {
+                                          key: "Request",
+                                          value: `${index + 1} / ${subtest.numberOfRequests}`,
+                                        },
+                                      ]
+                                    : []
+                                }
+                              />
                             ))}
 
                           {subtest.isRunning && <Spinner />}

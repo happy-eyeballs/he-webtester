@@ -4,7 +4,7 @@ import {
   type TestPart,
   type TestSettings,
 } from "@/lib/test-run.ts";
-import { HETest } from "@/components/he-test.tsx";
+import { TestSkeleton } from "@/components/test-skeleton.tsx";
 import {
   getHappyEyeballsTestDomain,
   fetchAvailableDelays,
@@ -39,7 +39,7 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
   };
 
   return (
-    <HETest
+    <TestSkeleton
       buildSubtests={buildSubtests}
       enabledSettings={{
         repetitions: {
