@@ -42,15 +42,20 @@ const mapTestRunsToResults = (testRuns: TestRun[]) => {
       runCount: testRunRepetition.repetitionNumber,
       timestampStart: testRunRepetition.startedAt,
       settings: testRun.settings,
-      results: testRunRepetition.parts.reduce(
-        (result, testPart) => ({
-          ...result,
-          [testPart.name ?? ""]: testPart.subtests.map(
-            (subtest) => subtest.result,
-          ),
-        }),
-        {},
-      ),
+      results:
+        testRunRepetition.parts.length === 1
+          ? testRunRepetition.parts[0]?.subtests.map(
+              (subtest) => subtest.results,
+            )
+          : testRunRepetition.parts.reduce(
+              (result, testPart, testPartIndex) => ({
+                ...result,
+                [testPart.name ?? `${testPartIndex}`]: testPart.subtests.map(
+                  (subtest) => subtest.results,
+                ),
+              }),
+              {},
+            ),
       platform: window.navigator.platform,
       vendor: window.navigator.vendor,
       userAgent: window.navigator.userAgent,
