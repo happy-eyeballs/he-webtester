@@ -18,6 +18,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
 
 type Props = {
   buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
@@ -89,25 +95,30 @@ export const TestSkeleton: React.FC<Props> = ({
   );
 
   return (
-    <div>
-      <TestSettingsSection
-        enabledSettings={enabledSettings}
-        onStartTestRun={executeTest}
-        disabled={isUserInteractionDisabled}
-        statusWidget={statusWidget}
-      />
+    <div className="py-10 flex flex-col gap-y-10">
+      <Card>
+        <CardHeader>
+          <CardTitle>Settings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TestSettingsSection
+            enabledSettings={enabledSettings}
+            onStartTestRun={executeTest}
+            disabled={isUserInteractionDisabled}
+            statusWidget={statusWidget}
+          />
+        </CardContent>
+      </Card>
 
       {testRuns.length > 0 && (
         <>
-          <div className="mb-10" />
-
           <TestResultTable
             columnDescription={subtestColumnDescription}
             columns={subtestColumnLabels}
             testRuns={testRuns}
           />
 
-          <div className="mt-8 flex gap-4 items-center">
+          <div className="flex gap-4 items-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

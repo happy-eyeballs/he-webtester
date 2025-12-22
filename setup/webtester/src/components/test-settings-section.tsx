@@ -81,12 +81,7 @@ export const TestSettingsSection: React.FC<Props> = ({
         } satisfies TestSettings);
       }}
     >
-      <div className="mb-3">
-        <h2 className="text-lg font-semibold ">Settings</h2>
-        <div className="text-muted-foreground text-sm">Configure the test</div>
-      </div>
-
-      <div className="grid grid-cols-[250px_1fr] gap-x-8 gap-y-3 items-center">
+      <div className="grid gap-y-7 md:gap-y-3">
         {enabledSettings.repetitions && (
           <SettingsItem label="Repetitions">
             <Select
@@ -149,6 +144,7 @@ export const TestSettingsSection: React.FC<Props> = ({
                 value={deviceInfo}
                 onChange={(e) => setDeviceInfo(e.target.value)}
                 disabled={disabled}
+                className="text-sm"
               />
               <InputGroupAddon align="inline-end">
                 <Tooltip>
@@ -185,10 +181,10 @@ const SettingsItem: React.FC<{
   label: string;
   children?: React.ReactNode;
 }> = ({ label, children }) => (
-  <>
+  <div className="grid md:grid-cols-[210px_1fr] md:gap-x-14 gap-y-2 items-center">
     <div className="text-sm leading-snug">{label}</div>
     <div>{children}</div>
-  </>
+  </div>
 );
 
 const AutofillButton: React.FC<{
@@ -219,6 +215,7 @@ const AutofillButton: React.FC<{
       variant="secondary"
       disabled={disabled || isLoading}
       onClick={autofill}
+      className="text-sm"
     >
       {isLoading ? <Spinner /> : <WandSparklesIcon />}
       Autofill

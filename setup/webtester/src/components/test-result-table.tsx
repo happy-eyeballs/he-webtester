@@ -29,7 +29,7 @@ export const TestResultTable: React.FC<Props> = ({
 
   return (
     <div className="relative">
-      <div className="overflow-x-auto pb-5">
+      <div className="overflow-x-auto pb-2">
         <table className="w-full text-sm">
           <thead>
             <tr>

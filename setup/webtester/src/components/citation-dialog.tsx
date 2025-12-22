@@ -20,7 +20,7 @@ export const CitationDialog: React.FC<Props> = ({ children }) => {
           <DialogTitle>Citation</DialogTitle>
         </DialogHeader>
 
-        <code className="whitespace-pre-wrap text-muted-foreground text-xs text-left">
+        <code className="whitespace-pre-wrap text-xs text-left">
           {`@inproceedings{sattler2025happyeyeballs,
   title = {{Lazy Eye Inspection: Capturing the State of Happy Eyeballs Implementations}},
   author = {Sattler, Patrick and Kirstein, Matthias and Wüstrich, Lars and Zirngibl, Johannes and Carle, Georg},
