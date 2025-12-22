@@ -100,24 +100,34 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
   const responseHandler = subtest.responseHandler ?? defaultResponseHandler;
   const result = await responseHandler(response);
 
-  const requestDurationMs = await observer;
+  const requestTiming = await observer;
 
   return {
     value: result.value,
     color: result.color,
     url: subtest.url,
-    requestDurationMs,
+    requestTiming,
   } satisfies SubtestResult;
 };
 
-const observeRequestTiming = (url: string): Promise<number> =>
+const observeRequestTiming = (url: string): Promise<RequestTiming> =>
   new Promise((resolve) => {
     const observer = new PerformanceObserver((list, observer) => {
       const entries = list.getEntriesByType("resource");
 
       const entry = entries.find((entry) => entry.name === url);
       if (entry && entry instanceof PerformanceResourceTiming) {
-        resolve(entry.duration);
+        // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming
+        resolve({
+          totalDurationMs: entry.responseEnd - entry.fetchStart,
+          dnsLookupDurationMs: entry.domainLookupEnd - entry.domainLookupStart,
+          connectionEstablishmentDurationMs:
+            entry.connectEnd - entry.connectStart,
+          tlsNegotiationDurationMs:
+            entry.requestStart - entry.secureConnectionStart,
+          requestDurationMs: entry.responseStart - entry.requestStart,
+        } satisfies RequestTiming);
+
         observer.disconnect();
       }
     });
@@ -183,8 +193,16 @@ export type SubtestResult = {
   value: string;
   color: TestRunResultColor;
   url: string;
-  requestDurationMs?: number;
   error?: string;
+  requestTiming?: RequestTiming;
+};
+
+export type RequestTiming = {
+  totalDurationMs: number;
+  dnsLookupDurationMs: number;
+  connectionEstablishmentDurationMs: number;
+  tlsNegotiationDurationMs: number;
+  requestDurationMs: number;
 };
 
 // https://ui.shadcn.com/colors

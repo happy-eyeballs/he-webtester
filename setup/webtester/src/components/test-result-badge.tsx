@@ -34,14 +34,14 @@ export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
             {result.url}
           </a>
 
-          {result.requestDurationMs && (
+          {metadata?.map(({ key, value }) => (
             <>
-              <div className="text-muted text-right font-semibold">
-                Request Duration
+              <div className="text-muted text-right font-semibold" key={key}>
+                {key}
               </div>
-              <div>{result.requestDurationMs.toFixed(2)} ms</div>
+              <div>{value}</div>
             </>
-          )}
+          ))}
 
           {result.error && (
             <>
@@ -50,12 +50,37 @@ export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
             </>
           )}
 
-          {metadata?.map(({ key, value }) => (
+          {result.requestTiming && (
             <>
-              <div className="text-muted text-right font-semibold">{key}</div>
-              <div>{value}</div>
+              <div className="text-muted text-right font-semibold">
+                Total Fetch Duration
+              </div>
+              <div>{result.requestTiming.totalDurationMs.toFixed(2)} ms</div>
+
+              <div className="text-muted text-right font-semibold">
+                DNS Lookup Duration
+              </div>
+              <div>
+                {result.requestTiming.dnsLookupDurationMs.toFixed(2)} ms
+              </div>
+
+              <div className="text-muted text-right font-semibold">
+                Connect Duration
+              </div>
+              <div>
+                {`${result.requestTiming.connectionEstablishmentDurationMs.toFixed(
+                  2,
+                )} ms (TLS negotiation: ${result.requestTiming.tlsNegotiationDurationMs.toFixed(
+                  2,
+                )} ms)`}
+              </div>
+
+              <div className="text-muted text-right font-semibold">
+                Request Duration
+              </div>
+              <div>{result.requestTiming.requestDurationMs.toFixed(2)} ms</div>
             </>
-          ))}
+          )}
         </div>
       </TooltipContent>
     </Tooltip>
