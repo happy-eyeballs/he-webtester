@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 
 type Props = {
   buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
@@ -83,13 +84,6 @@ export const TestSkeleton: React.FC<Props> = ({
       forceTableRerender();
     });
 
-  const statusWidget = isUserInteractionDisabled ? (
-    <div className="flex items-center gap-2">
-      <Spinner />
-      {statusMessage && <div className="text-sm">{statusMessage}</div>}
-    </div>
-  ) : undefined;
-
   const allTestRunsTransmitted = testRuns.every(
     (testRun) => testRun.isTransmitted,
   );
@@ -105,10 +99,17 @@ export const TestSkeleton: React.FC<Props> = ({
             enabledSettings={enabledSettings}
             onStartTestRun={executeTest}
             disabled={isUserInteractionDisabled}
-            statusWidget={statusWidget}
           />
         </CardContent>
       </Card>
+
+      {isUserInteractionDisabled && (
+        <Alert className="dark">
+          <Spinner />
+          <AlertTitle>Test is running</AlertTitle>
+          <AlertDescription>{statusMessage}</AlertDescription>
+        </Alert>
+      )}
 
       {testRuns.length > 0 && (
         <>
@@ -132,8 +133,7 @@ export const TestSkeleton: React.FC<Props> = ({
 
               {isUserInteractionDisabled ? (
                 <TooltipContent className="max-w-md">
-                  Please wait until all test repetitions have finished
-                  executing...
+                  Please wait until all test repetitions have finished executing
                 </TooltipContent>
               ) : allTestRunsTransmitted ? (
                 <TooltipContent className="max-w-md">

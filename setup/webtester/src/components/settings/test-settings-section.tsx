@@ -25,14 +25,12 @@ type Props = {
   enabledSettings: EnabledTestSettings;
   onStartTestRun: (settings: TestSettings) => void;
   disabled?: boolean;
-  statusWidget?: React.ReactNode;
 };
 
 export const TestSettingsSection: React.FC<Props> = ({
   enabledSettings,
   onStartTestRun,
   disabled = false,
-  statusWidget,
 }) => {
   const [repetitions, setRepetitions] = useState<number | undefined>(
     enabledSettings.repetitions?.defaultOption,
@@ -137,8 +135,6 @@ export const TestSettingsSection: React.FC<Props> = ({
         <Button type="submit" disabled={disabled}>
           Run test
         </Button>
-
-        {statusWidget}
       </div>
     </form>
   );
