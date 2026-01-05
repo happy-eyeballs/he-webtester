@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   type EnabledTestSettings,
   TestSettingsSection,
-} from "@/components/test-settings-section.tsx";
+} from "@/components/settings/test-settings-section.tsx";
 import {
   type TestRun,
   type TestSettings,

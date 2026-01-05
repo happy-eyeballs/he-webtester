@@ -7,24 +7,11 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group.tsx";
-import { WandSparklesIcon } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import type { TestSettings } from "@/lib/test-run.ts";
-import { getDeviceInfo } from "@/lib/device-info.ts";
 import { Input } from "@/components/ui/input.tsx";
-import { Spinner } from "@/components/ui/spinner.tsx";
-import { sleep } from "@/lib/test-utils";
+import { DeviceInfoInput } from "@/components/settings/device-info-input.tsx";
+import { SettingsItem } from "@/components/settings/settings-item";
 
 export type EnabledTestSettings = {
   repetitions?: { options: number[]; defaultOption: number };
@@ -137,31 +124,11 @@ export const TestSettingsSection: React.FC<Props> = ({
 
         {enabledSettings.deviceInfo && (
           <SettingsItem label="Device and user information for easier debugging (optional)">
-            <InputGroup className="max-w-xl">
-              <InputGroupInput
-                type="text"
-                placeholder="OS, device, browser, your name, etc."
-                value={deviceInfo}
-                onChange={(e) => setDeviceInfo(e.target.value)}
-                disabled={disabled}
-                className="text-sm"
-              />
-              <InputGroupAddon align="inline-end">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <AutofillButton
-                      disabled={disabled}
-                      setDeviceInfo={setDeviceInfo}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Automatically detect device information.
-                    <br />
-                    Please update the auto-filled data if incorrect!
-                  </TooltipContent>
-                </Tooltip>
-              </InputGroupAddon>
-            </InputGroup>
+            <DeviceInfoInput
+              deviceInfo={deviceInfo ?? ""}
+              setDeviceInfo={setDeviceInfo}
+              disabled={disabled}
+            />
           </SettingsItem>
         )}
       </div>
@@ -174,51 +141,5 @@ export const TestSettingsSection: React.FC<Props> = ({
         {statusWidget}
       </div>
     </form>
-  );
-};
-
-const SettingsItem: React.FC<{
-  label: string;
-  children?: React.ReactNode;
-}> = ({ label, children }) => (
-  <div className="grid md:grid-cols-[210px_1fr] md:gap-x-14 gap-y-2 items-center">
-    <div className="text-sm leading-snug">{label}</div>
-    <div>{children}</div>
-  </div>
-);
-
-const AutofillButton: React.FC<{
-  disabled: boolean;
-  setDeviceInfo: (deviceInfo: string) => void;
-}> = ({ disabled, setDeviceInfo }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const autofill = async () => {
-    try {
-      setIsLoading(true);
-
-      const info = await getDeviceInfo();
-      await sleep(100);
-
-      if (!disabled) {
-        setDeviceInfo(info);
-      }
-    } catch (err) {
-      alert(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <InputGroupButton
-      variant="secondary"
-      disabled={disabled || isLoading}
-      onClick={autofill}
-      className="text-sm"
-    >
-      {isLoading ? <Spinner /> : <WandSparklesIcon />}
-      Autofill
-    </InputGroupButton>
   );
 };

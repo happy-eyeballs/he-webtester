@@ -23,14 +23,13 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
   }, []);
 
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
-    const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
-
     const subtests: Subtest[] = [];
 
     for (let i = 0; i < availableDelays.length; i++) {
-      const id = settings.randomizeDomains ? generateRandomId() : i;
-      const delay = availableDelays[i] ?? 0;
-      const url = `https://id-${id}.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
+      const url = await generateConnectAttemptDelayUrl(
+        settings.randomizeDomains ?? false,
+        availableDelays[i] ?? 0,
+      );
 
       subtests.push({ url } satisfies Subtest);
     }
@@ -56,4 +55,17 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />
   );
+};
+
+export const generateConnectAttemptDelayUrl = async (
+  randomizeDomain: boolean,
+  delay: number,
+): Promise<string> => {
+  const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
+
+  if (randomizeDomain) {
+    return `https://id-${generateRandomId()}.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
+  }
+
+  return `https://delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
 };

@@ -23,20 +23,20 @@ export const ResolutionDelayTest: React.FC = () => {
   }, []);
 
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
-    const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
-
     const testParts: TestPart[] = [];
 
     for (const part of [
-      { name: "Delay A", recordType: "a" },
-      { name: "Delay AAAA", recordType: "aaaa" },
+      { name: "Delay A", dnsRecordType: "a" as const },
+      { name: "Delay AAAA", dnsRecordType: "aaaa" as const },
     ]) {
       const subtests: Subtest[] = [];
 
       for (let i = 0; i < availableDelays.length; i++) {
-        const id = settings.randomizeDomains ? generateRandomId() : i;
-        const delay = availableDelays[i] ?? 0;
-        const url = `https://v2delay_${part.recordType}-${id}_${delay}.v2.${happyEyeballsTestDomain}/ping`;
+        const url = await generateResolutionDelayUrl(
+          settings.randomizeDomains ?? false,
+          availableDelays[i] ?? 0,
+          part.dnsRecordType,
+        );
 
         subtests.push({ url } satisfies Subtest);
       }
@@ -66,4 +66,16 @@ export const ResolutionDelayTest: React.FC = () => {
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />
   );
+};
+
+export const generateResolutionDelayUrl = async (
+  randomizeDomain: boolean,
+  dnsDelay: number,
+  dnsRecordType: "a" | "aaaa",
+): Promise<string> => {
+  const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
+
+  const id = randomizeDomain ? generateRandomId() : 0;
+
+  return `https://v2delay_${dnsRecordType}-${id}_${dnsDelay}.v2.${happyEyeballsTestDomain}/ping`;
 };
