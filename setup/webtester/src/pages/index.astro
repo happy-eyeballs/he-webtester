@@ -67,9 +67,10 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
       <h2 class="text-xl font-semibold mb-6">Other Tests & Tools</h2>
       <div class="grid gap-6 items-start lg:grid-cols-2">
         <TestCard
-          title="Resolver CAD Test"
+          title="[DISABLED] Resolver CAD Test"
           href="tests/resolver-connection-attempt-delay"
           secondary={true}
+          disabled={true}
         >
           This test does not test your device, OS, or browser, but targets your
           recursive resolver. It uses a more complex DNS setup to infer if your
@@ -84,6 +85,14 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
           Only our authoritative name server observes the requests and analyzes
           the results. As we have not yet implemented a way to live feed the
           results back to your browser session, we cannot currently show these.
+
+          <br>
+          <br>
+
+          <b>
+            Note: This test is currently disabled.
+            Please contact us if you are interested.
+          </b>
         </TestCard>
 
         <TestCard
