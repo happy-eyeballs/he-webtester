@@ -1,0 +1,68 @@
+---
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import { Card, CardContent } from "@/components/ui/card.tsx";
+import { Button } from "@/components/ui/button.tsx";
+
+type TeamMember = {
+  name: string;
+  github: string;
+  website?: string;
+};
+
+const teamMembers: TeamMember[] = [
+  {
+    name: "Patrick Sattler",
+    github: "https://github.com/sattler",
+    website: "https://www.patricksattler.com",
+  },
+  {
+    name: "Matthias Kirstein",
+    github: "https://github.com/TwentyFiveSoftware",
+  },
+  {
+    name: "Tim Betzer",
+    github: "https://github.com/timbetzer",
+    website: "https://net.in.tum.de/~betzer",
+  },
+  {
+    name: "Johannes Zirngibl",
+    github: "https://github.com/zirngibl",
+    website: "https://zirngibl.github.io",
+  },
+];
+---
+
+<PageLayout title="Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs Webtester" titleLine2="Development Team" />
+
+  <div class="grid gap-6 items-start md:grid-cols-2 lg:grid-cols-4 mt-10">
+    {
+      teamMembers.map((member) => (
+        <Card key={member.name}>
+          <CardContent>
+            <div class="flex flex-col items-center gap-5">
+              <h2 class="text-xl font-semibold text-center">{member.name}</h2>
+
+              <div class="flex gap-2 w-full">
+                {member.website && (
+                  <a href={member.website} class="flex items-center flex-1">
+                    <Button variant="outline" className="w-full">
+                      Website
+                    </Button>
+                  </a>
+                )}
+
+                <a href={member.github} class="flex items-center flex-1">
+                  <Button variant="outline" className="w-full">
+                    GitHub
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))
+    }
+  </div>
+</PageLayout>
