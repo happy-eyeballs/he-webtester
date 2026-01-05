@@ -91,7 +91,7 @@ export const MeasurementDomainBuilderTool: React.FC = () => {
           >
             <a
               href={url}
-              className="text-accent hover:text-accent-muted inline-block hover:underline underline-offset-3 cursor-pointer w-max"
+              className="underline underline-offset-4 cursor-pointer w-max hover:opacity-80"
             >
               {url}
             </a>

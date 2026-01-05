@@ -45,7 +45,7 @@ export const CopyToClipboardButton: React.FC<{
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        {hasCopied ? "Copied!" : "Copy to Clipboard"}
+        {hasCopied ? "Copied!" : "Copy to clipboard"}
       </TooltipContent>
     </Tooltip>
   );

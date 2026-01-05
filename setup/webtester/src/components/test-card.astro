@@ -12,7 +12,6 @@ import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"a"> & {
   title: string;
-  secondary?: boolean;
   actionText?: string;
   disabled?: boolean;
 };
@@ -20,7 +19,6 @@ type Props = HTMLAttributes<"a"> & {
 const {
   title,
   href,
-  secondary = false,
   actionText = "Run test",
   disabled = false,
   ...attributes
@@ -34,15 +32,12 @@ const {
 >
   <Card
     className={cn(
-      "bg-transparent gap-2 transition-all duration-200",
-      secondary ? "hover:border-accent-secondary" : "hover:border-accent",
-      disabled ? "pointer-events-none" : "",
+      "transition-all duration-200 hover:border-primary",
+      disabled && "pointer-events-none opacity-50",
     )}
   >
     <CardHeader>
-      <CardTitle
-        className={cn(secondary ? "text-accent-secondary" : "text-accent")}
-      >
+      <CardTitle>
         {title}
       </CardTitle>
     </CardHeader>
@@ -53,20 +48,15 @@ const {
       </p>
     </CardContent>
 
-    <CardFooter className="pt-2">
-      <div
-        class={cn(
-          "flex items-center gap-2 text-sm font-medium transition-colors duration-200",
-          secondary
-            ? "text-accent-secondary-muted group-hover:text-accent-secondary"
-            : "text-accent-muted group-hover:text-accent",
-        )}
-      >
-        {actionText}
-        <ArrowRightIcon
-          className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-        />
-      </div>
-    </CardFooter>
+    {
+      !disabled && (
+        <CardFooter>
+          <div class="flex items-center gap-2 text-sm font-medium transition-colors duration-200 underline-offset-4 group-hover:underline">
+            {actionText}
+            <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          </div>
+        </CardFooter>
+      )
+    }
   </Card>
 </a>

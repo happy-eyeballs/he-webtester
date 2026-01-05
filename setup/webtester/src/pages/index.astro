@@ -14,7 +14,7 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
     </p>
     <p>
       See our
-      <Link href="development-team"> development team</Link>
+      <Link href="/contributors"> development team</Link>
       and
       <Link href="https://github.com/happy-eyeballs/he-webtester">
         source code on GitHub
@@ -52,24 +52,35 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
         not only your client but also the configured resolver and any forwarder in
         the resolution chain can impact the result.
       </TestCard>
-
-      <TestCard
-        title="[BETA] HTTP/3 Availability Test"
-        href="tests/http3-availability"
-      >
-        The test checks how your browser establishes connections when HTTP/3 is
-        available. We simulate various scenarios where HTTP/3 can be discovered
-        via Alt-Svc headers or HTTPS DNS records.
-      </TestCard>
     </div>
 
     <div class="mt-20">
       <h2 class="text-xl font-semibold mb-6">Other Tests & Tools</h2>
       <div class="grid gap-6 items-start lg:grid-cols-2">
         <TestCard
+          title="[BETA] HTTP/3 Availability Test"
+          href="tests/http3-availability"
+        >
+          The test checks how your browser establishes connections when HTTP/3
+          is available. We simulate various scenarios where HTTP/3 can be
+          discovered via Alt-Svc headers or HTTPS DNS records.
+        </TestCard>
+
+        <TestCard
+          title="Manually Create Measurement Domains"
+          href="tools/measurement-domain-builder"
+          actionText="Create"
+        >
+          This is a tool to generate a specific domain for a selected test
+          configuration. The domain can then be used with any client to test its
+          HE behavior. The server always returns the IP address at which it was
+          contacted. This enables you to easily know if your client used IPv4 or
+          IPv6.
+        </TestCard>
+
+        <TestCard
           title="[DISABLED] Resolver CAD Test"
           href="tests/resolver-connection-attempt-delay"
-          secondary={true}
           disabled={true}
         >
           This test does not test your device, OS, or browser, but targets your
@@ -86,26 +97,13 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
           the results. As we have not yet implemented a way to live feed the
           results back to your browser session, we cannot currently show these.
 
-          <br>
-          <br>
+          <br />
+          <br />
 
           <b>
-            Note: This test is currently disabled.
-            Please contact us if you are interested.
+            Note: This test is currently disabled. Please contact us if you are
+            interested.
           </b>
-        </TestCard>
-
-        <TestCard
-          title="Manually Create Measurement Domains"
-          href="tools/measurement-domain-builder"
-          secondary={true}
-          actionText="Create"
-        >
-          This is a tool to generate a specific domain for a selected test
-          configuration. The domain can then be used with any client to test its
-          HE behavior. The server always returns the IP address at which it was
-          contacted. This enables you to easily know if your client used IPv4 or
-          IPv6.
         </TestCard>
       </div>
     </div>

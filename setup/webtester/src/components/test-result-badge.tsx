@@ -29,7 +29,7 @@ export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
           <div className="text-muted text-right font-semibold">URL</div>
           <a
             href={result.url}
-            className="text-accent-muted dark:text-accent hover:underline underline-offset-3 cursor-pointer"
+            className="underline underline-offset-4 cursor-pointer hover:opacity-80"
           >
             {result.url}
           </a>
