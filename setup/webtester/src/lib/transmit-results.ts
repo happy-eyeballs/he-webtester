@@ -25,12 +25,9 @@ export const transmitResults = async (
   }
 };
 
-export const downloadResults = async (
-  testName: string,
-  testRuns: TestRun[],
-): Promise<void> => {
+export const downloadResults = async (testRuns: TestRun[]): Promise<void> => {
   downloadJSONData(
-    `${testName}-${Math.floor(Date.now() / 1000)}.json`,
+    `${Math.floor(Date.now() / 1000)}.json`,
     JSON.stringify(mapTestRunsToResults(testRuns)),
   );
 };

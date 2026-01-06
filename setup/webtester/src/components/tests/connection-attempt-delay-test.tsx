@@ -49,8 +49,7 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
         randomizeDomains: true,
         deviceInfo: true,
       }}
-      testName="ip-v1"
-      resultsUrl="/results/v1"
+      resultsUrl="/results/connection-attempt-delay"
       subtestColumnDescription="IPv6 Delay [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />

@@ -60,8 +60,7 @@ export const ResolutionDelayTest: React.FC = () => {
         resolverAddresses: true,
         deviceInfo: true,
       }}
-      testName="ip-v2"
-      resultsUrl="/results/v2"
+      resultsUrl="/results/resolution-delay"
       subtestColumnDescription="IPv6 Delay [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />

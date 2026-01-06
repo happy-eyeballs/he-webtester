@@ -29,7 +29,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 type Props = {
   buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
   enabledSettings: EnabledTestSettings;
-  testName: string;
   resultsUrl: string;
   subtestColumnDescription: string;
   subtestColumnLabels: string[];
@@ -38,7 +37,6 @@ type Props = {
 export const TestSkeleton: React.FC<Props> = ({
   buildSubtests,
   enabledSettings,
-  testName,
   resultsUrl,
   subtestColumnDescription,
   subtestColumnLabels,
@@ -152,7 +150,7 @@ export const TestSkeleton: React.FC<Props> = ({
             <Button
               variant="secondary"
               disabled={isUserInteractionDisabled}
-              onClick={() => downloadResults(testName, testRuns)}
+              onClick={() => downloadResults(testRuns)}
             >
               Download results
             </Button>

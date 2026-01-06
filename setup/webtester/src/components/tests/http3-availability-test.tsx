@@ -72,8 +72,7 @@ export const HTTP3AvailabilityTest: React.FC = () => {
         randomizeDomains: true,
         deviceInfo: true,
       }}
-      testName="http3"
-      resultsUrl="/results/http3"
+      resultsUrl="/results/http3-availability"
       subtestColumnDescription="Scenario"
       subtestColumnLabels={[
         "HTTP/3",
