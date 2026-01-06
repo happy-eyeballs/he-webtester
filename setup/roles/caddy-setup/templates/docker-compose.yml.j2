@@ -1,7 +1,9 @@
 services:
   he-caddy:
     container_name: he-caddy
-    image: caddy:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     command: 'caddy run --config /etc/caddy/Caddyfile'
     network_mode: host
