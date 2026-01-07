@@ -40,6 +40,7 @@
     - 'v2.zone'
     - 'v1-rdns.zone'
     - 'v3-quic.zone'
+    - 'http3.zone'
   register: zone_result
 
 - name: Remove zone file
@@ -55,6 +56,7 @@
     - 'v2.zone'
     - 'v1-rdns.zone'
     - 'v3-quic.zone'
+    - 'http3.zone'
   changed_when: zone_result.changed
 
 - name: Create output directory

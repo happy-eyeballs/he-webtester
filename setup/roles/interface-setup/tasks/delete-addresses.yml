@@ -6,7 +6,7 @@
     - '{{ happy_eyeballs.webserver.delays | map(attribute="ipv4") | list }}'
     - '{{ happy_eyeballs.webserver.ipv4 }}'
     - '{{ happy_eyeballs.webserver.http3.ipv4 }}'
-    - '{{ happy_eyeballs.webserver.http3_only.ipv4 }}'
+    - '{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}'
 
 - name: Delete IPv6 addresses from webserver interface
   ansible.builtin.shell:
@@ -16,7 +16,7 @@
     - '{{ happy_eyeballs.webserver.delays | map(attribute="ipv6") | list }}'
     - '{{ happy_eyeballs.webserver.ipv6 }}'
     - '{{ happy_eyeballs.webserver.http3.ipv6 }}'
-    - '{{ happy_eyeballs.webserver.http3_only.ipv6 }}'
+    - '{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}'
 
 - name: Delete IPv4 addresses from nameserver interface
   ansible.builtin.shell:

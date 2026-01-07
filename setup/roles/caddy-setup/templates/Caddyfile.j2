@@ -1,6 +1,8 @@
 ### GLOBAL
 
 {
+	debug # TODO
+
     admin off
 
     servers {{ happy_eyeballs.webserver.ipv4 }}:443 {
@@ -18,6 +20,91 @@
         protocols h1
     }
     {% endfor %}
+
+    servers {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443 {
+        timeouts {
+			idle 100ms # TODO: adjust
+        }
+    }
+    servers [{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443 {
+        timeouts {
+			idle 100ms # TODO: adjust
+        }
+    }
+
+    layer4 {
+        udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
+            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
+            @quic-delay-{{ delay }} quic sni *.quic-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
+            route @quic-delay-{{ delay }} {
+                throttle {
+                    latency {{ delay }}ms
+                }
+
+                proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
+            }
+            {% endfor %}
+
+            @quic-other quic
+            route @quic-other {
+                proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
+            }
+        }
+
+        udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
+            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
+            @quic-delay-{{ delay }} quic sni *.quic-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
+            route @quic-delay-{{ delay }} {
+                throttle {
+                    latency {{ delay }}ms
+                }
+
+                proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
+            }
+            {% endfor %}
+
+            @quic-other quic
+            route @quic-other {
+                proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
+            }
+        }
+
+        tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
+            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
+            @tls-delay-{{ delay }} tls sni *.tls-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
+            route @tls-delay-{{ delay }} {
+                throttle {
+                    latency {{ delay }}ms
+                }
+
+                 proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
+            }
+            {% endfor %}
+
+            @tls-other tls
+            route @tls-other {
+                proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
+            }
+        }
+
+        tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
+            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
+            @tls-delay-{{ delay }} tls sni *.tls-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
+            route @tls-delay-{{ delay }} {
+                throttle {
+                    latency {{ delay }}ms
+                }
+
+                proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
+            }
+            {% endfor %}
+
+            @tls-other tls
+            route @tls-other {
+                proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
+            }
+        }
+    }
 }
 
 ### SNIPPETS
@@ -103,11 +190,24 @@
     import respond_with_server_ip
 }
 
-*.http3.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https.v3-quic.{{ happy_eyeballs.nameserver.base_domain }} {
+{{ happy_eyeballs_domains.v3_quic.quic_delay | map('regex_replace', '$', ':8443') | join(', ') }},
+{{ happy_eyeballs_domains.v3_quic.tls_delay | map('regex_replace', '$', ':8443') | join(', ') }} {
+    bind {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }} {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
+
+    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.quic_delay | first | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.quic_delay | first | replace('*.', '') }}/privkey.pem
+    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.tls_delay | first | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.tls_delay | first | replace('*.', '') }}/privkey.pem
+
+    header Alt-Svc `h3=":443"; ma=600`
+
+    import cors
+    import respond_with_json
+}
+
+*.http3.http3.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https.http3.{{ happy_eyeballs.nameserver.base_domain }} {
     bind {{ happy_eyeballs.webserver.http3.ipv4 }} {{ happy_eyeballs.webserver.http3.ipv6 }}
 
-    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3 | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3 | replace('*.', '') }}/privkey.pem
-    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3_https | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3_https | replace('*.', '') }}/privkey.pem
+    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3 | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3 | replace('*.', '') }}/privkey.pem
+    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3_https | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3_https | replace('*.', '') }}/privkey.pem
 
     header -Alt-Svc
 
@@ -115,13 +215,13 @@
     import respond_with_json
 }
 
-*.http3-altsvc.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https-altsvc.v3-quic.{{ happy_eyeballs.nameserver.base_domain }} {
+*.http3-altsvc.http3.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https-altsvc.http3.{{ happy_eyeballs.nameserver.base_domain }} {
     bind {{ happy_eyeballs.webserver.http3.ipv4 }} {{ happy_eyeballs.webserver.http3.ipv6 }}
 
-    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3_altsvc | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3_altsvc | replace('*.', '') }}/privkey.pem
-    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3_https_altsvc | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v3_quic.http3_https_altsvc | replace('*.', '') }}/privkey.pem
+    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3_altsvc | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3_altsvc | replace('*.', '') }}/privkey.pem
+    tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3_https_altsvc | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.http3.http3_https_altsvc | replace('*.', '') }}/privkey.pem
 
-    header Alt-Svc `h3=":443"; ma=60`
+    header Alt-Svc `h3=":443"; ma=600`
 
     import cors
     import respond_with_json

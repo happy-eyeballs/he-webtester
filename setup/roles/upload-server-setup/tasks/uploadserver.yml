@@ -44,4 +44,5 @@
     - '{{ happy_eyeballs.uploadserver.results_directory.v1_rdns }}'
     - '{{ happy_eyeballs.uploadserver.results_directory.v2 }}'
     - '{{ happy_eyeballs.uploadserver.results_directory.v3_quic }}'
+    - '{{ happy_eyeballs.uploadserver.results_directory.http3 }}'
   notify: restart he-upload-server

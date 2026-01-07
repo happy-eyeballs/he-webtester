@@ -16,7 +16,7 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
 
   useEffect(() => {
     const setup = async () => {
-      setAvailableDelays(await fetchAvailableDelays());
+      setAvailableDelays((await fetchAvailableDelays()).v1_delays);
     };
 
     setup();

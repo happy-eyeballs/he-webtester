@@ -36,21 +36,21 @@ export const HTTP3AvailabilityTest: React.FC = () => {
       {
         subtests: [
           {
-            url: `https://id-${id()}.http3.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
           },
           {
-            url: `https://id-${id()}.http3-https.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-https.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
           },
           {
-            url: `https://id-${id()}.http3-altsvc.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-altsvc.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
             sleepBetweenRequests: 500,
           },
           {
-            url: `https://id-${id()}.http3-https-altsvc.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-https-altsvc.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
             sleepBetweenRequests: 500,

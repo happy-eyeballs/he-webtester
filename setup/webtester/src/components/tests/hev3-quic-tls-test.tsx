@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
+  type ResponseHandlerResult,
   type Subtest,
   type TestPart,
+  TestRunResultColor,
   type TestSettings,
 } from "@/lib/test-run.ts";
 import { TestSkeleton } from "@/components/test-skeleton.tsx";
@@ -11,34 +13,55 @@ import {
 } from "@/lib/he-configuration.ts";
 import { generateRandomId } from "@/lib/test-utils";
 
-export const ResolutionDelayTest: React.FC = () => {
+export const HEv3QuicTlsTest: React.FC = () => {
   const [availableDelays, setAvailableDelays] = useState<number[]>([]);
 
   useEffect(() => {
     const setup = async () => {
-      setAvailableDelays((await fetchAvailableDelays()).v2_delays);
+      setAvailableDelays((await fetchAvailableDelays()).v3_quic_delays);
     };
 
     setup();
   }, []);
 
+  const responseHandler = async (
+    response: Response,
+  ): Promise<ResponseHandlerResult> => {
+    const { protocol } = (await response.json()) as {
+      protocol: string;
+    };
+
+    const isHTTP3 = protocol === "HTTP/3.0";
+
+    return {
+      value: protocol,
+      color: isHTTP3 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
+    };
+  };
+
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
     for (const part of [
-      { name: "Delay A", dnsRecordType: "a" as const },
-      { name: "Delay AAAA", dnsRecordType: "aaaa" as const },
+      {
+        name: "Delay QUIC",
+        protocol: "quic" as const,
+      },
+      {
+        name: "Delay TLS",
+        protocol: "tls" as const,
+      },
     ]) {
       const subtests: Subtest[] = [];
 
       for (let i = 0; i < availableDelays.length; i++) {
-        const url = await generateResolutionDelayUrl(
+        const url = await generateQuicTlsDelayUrl(
           settings.randomizeDomains ?? false,
           availableDelays[i] ?? 0,
-          part.dnsRecordType,
+          part.protocol,
         );
 
-        subtests.push({ url } satisfies Subtest);
+        subtests.push({ url, responseHandler } satisfies Subtest);
       }
 
       testParts.push({ name: part.name, subtests } satisfies TestPart);
@@ -57,24 +80,23 @@ export const ResolutionDelayTest: React.FC = () => {
         },
         autoTransmitResults: true,
         randomizeDomains: true,
-        resolverAddresses: true,
         deviceInfo: true,
       }}
-      resultsUrl="/results/resolution-delay"
-      subtestColumnDescription="IPv6 Delay [ms]"
+      resultsUrl="/results/hev3-quic-tls" // TODO
+      subtestColumnDescription="Delay before initial read on connection [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />
   );
 };
 
-export const generateResolutionDelayUrl = async (
+export const generateQuicTlsDelayUrl = async (
   randomizeDomain: boolean,
-  dnsDelay: number,
-  dnsRecordType: "a" | "aaaa",
+  delay: number,
+  protocol: "quic" | "tls",
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
   const id = randomizeDomain ? generateRandomId() : 0;
 
-  return `https://v2delay_${dnsRecordType}-${id}_${dnsDelay}.v2.${happyEyeballsTestDomain}/ping`;
+  return `https://id-${id}.${protocol}-delay-${delay}.v3-quic.${happyEyeballsTestDomain}/ping`;
 };

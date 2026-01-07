@@ -1,0 +1,13 @@
+---
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import { HEv3QuicTlsTest } from "@/components/tests/hev3-quic-tls-test";
+---
+
+<PageLayout title="HEv3 QUIC vs. TLS Test | Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs" titleLine2="QUIC vs. TLS Test">
+    <!--<p>TODO</p>-->
+  </Header>
+
+  <HEv3QuicTlsTest client:load />
+</PageLayout>

@@ -8,24 +8,12 @@ $ORIGIN v3-quic.{{ happy_eyeballs.nameserver.base_domain }}.
 
 $TTL 300
 
-id-*.http3               IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3               IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+{% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
+id-*.quic-delay-{{ delay }}  IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
+id-*.quic-delay-{{ delay }}  IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
+id-*.quic-delay-{{ delay }}  IN  HTTPS  1  . alpn=h3,h2
 
-id-*.http3-https         IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3-https         IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
-id-*.http3-https         IN  HTTPS  1  . alpn=h3,h2
-
-id-*.http3-altsvc        IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3-altsvc        IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
-
-id-*.http3-https-altsvc  IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3-https-altsvc  IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
-id-*.http3-https-altsvc  IN  HTTPS  1  . alpn=h3,h2
-
-id-*.http3-only          IN  A         {{ happy_eyeballs.webserver.http3_only.ipv4 }}
-id-*.http3-only          IN  AAAA      {{ happy_eyeballs.webserver.http3_only.ipv6 }}
-
-id-*.http3-only-https    IN  A         {{ happy_eyeballs.webserver.http3_only.ipv4 }}
-id-*.http3-only-https    IN  AAAA      {{ happy_eyeballs.webserver.http3_only.ipv6 }}
-id-*.http3-only-https    IN  HTTPS  1  . alpn=h3
-
+id-*.tls-delay-{{ delay }}   IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
+id-*.tls-delay-{{ delay }}   IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
+id-*.tls-delay-{{ delay }}   IN  HTTPS  1  . alpn=h3,h2
+{% endfor %}

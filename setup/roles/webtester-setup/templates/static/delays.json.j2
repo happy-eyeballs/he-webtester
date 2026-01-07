@@ -1,0 +1,5 @@
+{
+    "v1_delays": {{ (happy_eyeballs.webserver.delays | map(attribute="delay") | unique | sort)[:-2] | to_json }},
+    "v2_delays": {{ happy_eyeballs.webserver.delays | map(attribute="delay") | unique | sort | to_json }},
+    "v3_quic_delays": {{ happy_eyeballs.webserver.he_v3_quic.delays | unique | sort | to_json }}
+}
