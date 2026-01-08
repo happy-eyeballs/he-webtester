@@ -26,12 +26,6 @@ export const executeTestRun = async (
     repetition <= (settings.repetitions ?? 1);
     repetition++
   ) {
-    setStatusMessage(
-      settings.repetitions
-        ? `Running test repetition ${repetition} / ${settings.repetitions}...`
-        : `Running test...`,
-    );
-
     const parts = await buildTestParts(settings);
 
     testRun.repetitions.push({
@@ -42,6 +36,12 @@ export const executeTestRun = async (
 
     for (const part of parts) {
       for (const subtest of part.subtests) {
+        setStatusMessage(
+          settings.repetitions
+            ? `Running tests in repetition ${repetition} / ${settings.repetitions}...`
+            : `Running tests...`,
+        );
+
         subtest.isRunning = true;
         forceTableRerender();
 
@@ -69,6 +69,13 @@ export const executeTestRun = async (
 
         subtest.isRunning = false;
         forceTableRerender();
+
+        if (subtest.sleepAfterSubtest) {
+          setStatusMessage(
+            `Waiting for ${subtest.sleepAfterSubtest} ms before continuing...`,
+          );
+          await sleep(subtest.sleepAfterSubtest);
+        }
       }
     }
 
@@ -187,6 +194,7 @@ export type Subtest = {
   responseHandler?: (response: Response) => Promise<ResponseHandlerResult>;
   numberOfRequests?: number;
   sleepBetweenRequests?: number;
+  sleepAfterSubtest?: number;
 };
 
 export type SubtestResult = {

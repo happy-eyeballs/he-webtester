@@ -61,7 +61,11 @@ export const HEv3QuicTlsTest: React.FC = () => {
           part.protocol,
         );
 
-        subtests.push({ url, responseHandler } satisfies Subtest);
+        subtests.push({
+          url,
+          responseHandler,
+          sleepAfterSubtest: 2000,
+        } satisfies Subtest);
       }
 
       testParts.push({ name: part.name, subtests } satisfies TestPart);

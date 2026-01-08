@@ -23,12 +23,12 @@
 
     servers {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443 {
         timeouts {
-			idle 100ms # TODO: adjust
+			idle 1000ms # TODO: adjust
         }
     }
     servers [{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443 {
         timeouts {
-			idle 100ms # TODO: adjust
+			idle 1000ms # TODO: adjust
         }
     }
 
