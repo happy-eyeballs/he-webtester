@@ -8,10 +8,13 @@ import {
 
 type Props = {
   result: SubtestResult;
-  metadata?: { key: string; value: string }[];
+  testRunMetadata?: { key: string; value: string }[];
 };
 
-export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
+export const TestResultBadge: React.FC<Props> = ({
+  result,
+  testRunMetadata,
+}) => {
   const [isTooltipOpen, setTooltipOpen] = useState(false);
 
   return (
@@ -31,68 +34,97 @@ export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <ResultBadgeTooltipContent result={result} metadata={metadata ?? []} />
+        <ResultBadgeTooltipContent
+          result={result}
+          testRunMetadata={testRunMetadata ?? []}
+        />
       </TooltipContent>
     </Tooltip>
   );
 };
 
-const ResultBadgeTooltipContent: React.FC<Props> = ({ result, metadata }) => {
+const ResultBadgeTooltipContent: React.FC<Props> = ({
+  result,
+  testRunMetadata,
+}) => {
   return (
-    <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 p-2">
-      <div className="text-muted text-right font-semibold">URL</div>
-      <a
-        href={result.url}
-        className="underline underline-offset-4 cursor-pointer hover:opacity-80"
-      >
-        {result.url}
-      </a>
+    <>
+      <KeyValueTable>
+        <KeyValueTableRow name="URL">
+          <a
+            href={result.url}
+            className="underline underline-offset-4 cursor-pointer hover:opacity-80"
+          >
+            {result.url}
+          </a>
+        </KeyValueTableRow>
 
-      {metadata?.map(({ key, value }) => (
-        <>
-          <div className="text-muted text-right font-semibold" key={key}>
-            {key}
-          </div>
-          <div>{value}</div>
-        </>
-      ))}
+        {testRunMetadata?.map(({ key, value }) => (
+          <KeyValueTableRow name={key} key={key}>
+            {value}
+          </KeyValueTableRow>
+        ))}
 
-      {result.error && (
-        <>
-          <div className="text-muted text-right font-semibold">Error</div>
-          <div>{result.error}</div>
-        </>
+        {result.error && (
+          <KeyValueTableRow name="Error">{result.error}</KeyValueTableRow>
+        )}
+      </KeyValueTable>
+
+      {result.additionalMetadata && (
+        <KeyValueTable>
+          {Object.entries(result.additionalMetadata).map(([key, value]) => (
+            <KeyValueTableRow name={key} key={key}>
+              {value}
+            </KeyValueTableRow>
+          ))}
+        </KeyValueTable>
       )}
 
       {result.requestTiming && (
-        <>
-          <div className="text-muted text-right font-semibold">
-            Total Fetch Duration
-          </div>
-          <div>{result.requestTiming.totalDurationMs.toFixed(2)} ms</div>
+        <KeyValueTable>
+          <KeyValueTableRow name="Total Fetch Duration">
+            {result.requestTiming.totalDurationMs.toFixed(2)} ms
+          </KeyValueTableRow>
 
-          <div className="text-muted text-right font-semibold">
-            DNS Lookup Duration
-          </div>
-          <div>{result.requestTiming.dnsLookupDurationMs.toFixed(2)} ms</div>
+          <KeyValueTableRow name="DNS Lookup Duration">
+            {result.requestTiming.dnsLookupDurationMs.toFixed(2)} ms
+          </KeyValueTableRow>
 
-          <div className="text-muted text-right font-semibold">
-            Connect Duration
-          </div>
-          <div>
+          <KeyValueTableRow name="Connect Duration">
             {`${result.requestTiming.connectionEstablishmentDurationMs.toFixed(
               2,
             )} ms (TLS negotiation: ${result.requestTiming.tlsNegotiationDurationMs.toFixed(
               2,
             )} ms)`}
-          </div>
+          </KeyValueTableRow>
 
-          <div className="text-muted text-right font-semibold">
-            Request Duration
-          </div>
-          <div>{result.requestTiming.requestDurationMs.toFixed(2)} ms</div>
-        </>
+          <KeyValueTableRow name="Request Duration">
+            {result.requestTiming.requestDurationMs.toFixed(2)} ms
+          </KeyValueTableRow>
+        </KeyValueTable>
       )}
+    </>
+  );
+};
+
+const KeyValueTable: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <div className="grid grid-cols-[minmax(11em,auto)_1fr] gap-x-4 gap-y-1.5 p-2">
+      {children}
     </div>
+  );
+};
+
+const KeyValueTableRow: React.FC<{
+  name: string;
+  children?: React.ReactNode | string;
+}> = ({ name, children }) => {
+  return (
+    <>
+      <div className="text-muted text-right font-semibold">{name}</div>
+      <div>{children}</div>
+    </>
   );
 };

@@ -33,19 +33,19 @@ export const TestResultTable: React.FC<Props> = ({
         <table className="w-full text-sm">
           <thead>
             <tr>
-              <th className="text-left whitespace-nowrap px-5 pt-5 border-r w-30">
+              <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-30">
                 Test Run #
               </th>
-              <th className="text-left whitespace-nowrap px-5 pt-5 border-r w-50">
+              <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-50">
                 Started At
               </th>
               {hasTestPartName && (
-                <th className="text-left whitespace-nowrap px-5 pt-5 border-r w-50">
+                <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-50">
                   Part
                 </th>
               )}
               <th
-                className="text-left whitespace-nowrap px-5 pt-5 pb-2"
+                className="text-left whitespace-nowrap px-3 pt-5 pb-2"
                 colSpan={columns.length}
               >
                 {columnDescription}
@@ -59,7 +59,7 @@ export const TestResultTable: React.FC<Props> = ({
                 <th
                   key={column}
                   className={cn(
-                    "p-5 align-top",
+                    "px-3 py-5 align-top",
                     index < columns.length - 1 && "border-r",
                   )}
                 >
@@ -81,7 +81,7 @@ export const TestResultTable: React.FC<Props> = ({
                     {testPartIndex === 0 && (
                       <>
                         <td
-                          className="whitespace-nowrap px-5 border-r"
+                          className="whitespace-nowrap px-3 border-r"
                           rowSpan={repetition.parts.length}
                         >
                           <div className="flex gap-2 items-center font-bold">
@@ -116,7 +116,7 @@ export const TestResultTable: React.FC<Props> = ({
                         </td>
 
                         <td
-                          className="whitespace-nowrap px-5 border-r"
+                          className="whitespace-nowrap px-3 border-r"
                           rowSpan={repetition.parts.length}
                         >
                           {repetition.startedAt.toLocaleString()}
@@ -125,7 +125,7 @@ export const TestResultTable: React.FC<Props> = ({
                     )}
 
                     {hasTestPartName && (
-                      <td className="whitespace-nowrap px-5 py-3 border-r">
+                      <td className="whitespace-nowrap p-3 border-r">
                         {testPart.name}
                       </td>
                     )}
@@ -134,7 +134,7 @@ export const TestResultTable: React.FC<Props> = ({
                       <td
                         key={index}
                         className={cn(
-                          "px-5 py-3",
+                          "p-3",
                           index < columns.length - 1 && "border-r",
                         )}
                       >
@@ -144,7 +144,7 @@ export const TestResultTable: React.FC<Props> = ({
                               <TestResultBadge
                                 result={result}
                                 key={index}
-                                metadata={
+                                testRunMetadata={
                                   subtest.numberOfRequests
                                     ? [
                                         {

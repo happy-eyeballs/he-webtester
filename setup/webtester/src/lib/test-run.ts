@@ -114,6 +114,7 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
     color: result.color,
     url: subtest.url,
     requestTiming,
+    additionalMetadata: result.metadata ?? {},
   } satisfies SubtestResult;
 };
 
@@ -203,6 +204,7 @@ export type SubtestResult = {
   url: string;
   error?: string;
   requestTiming?: RequestTiming;
+  additionalMetadata?: SubtestResultMetadata;
 };
 
 export type RequestTiming = {
@@ -220,7 +222,10 @@ export const enum TestRunResultColor {
   Option2 = "#b45309", // amber-700
 }
 
+export type SubtestResultMetadata = Record<string, string>;
+
 export type ResponseHandlerResult = {
   value: string;
   color: TestRunResultColor;
+  metadata?: SubtestResultMetadata;
 };

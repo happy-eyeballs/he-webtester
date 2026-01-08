@@ -27,16 +27,23 @@ export const HEv3QuicTlsTest: React.FC = () => {
   const responseHandler = async (
     response: Response,
   ): Promise<ResponseHandlerResult> => {
-    const { protocol } = (await response.json()) as {
+    const { protocol, server_ip } = (await response.json()) as {
       protocol: string;
+      server_ip: string;
     };
 
     const isHTTP3 = protocol === "HTTP/3.0";
+    const protocolShorthand =
+      { "HTTP/3.0": "h3", "HTTP/2.0": "h2" }[protocol] ?? protocol;
 
     return {
-      value: protocol,
+      value: protocolShorthand,
       color: isHTTP3 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
-    };
+      metadata: {
+        Protocol: protocol,
+        "Address Family": server_ip.includes(":") ? "IPv6" : "IPv4",
+      },
+    } satisfies ResponseHandlerResult;
   };
 
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
