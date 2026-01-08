@@ -59,11 +59,13 @@ export const TestResultTable: React.FC<Props> = ({
                 <th
                   key={column}
                   className={cn(
-                    "text-right p-5 [writing-mode:vertical-rl]",
+                    "p-5 align-top",
                     index < columns.length - 1 && "border-r",
                   )}
                 >
-                  <div className="whitespace-pre rotate-180">{column}</div>
+                  <div className="[writing-mode:vertical-rl] rotate-180 text-right whitespace-pre m-auto">
+                    {column}
+                  </div>
                 </th>
               ))}
             </tr>
