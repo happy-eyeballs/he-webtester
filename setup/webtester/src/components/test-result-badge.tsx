@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { type SubtestResult } from "@/lib/test-run.ts";
-import { ClickableTooltip } from "@/components/clickable-tooltip.tsx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 
 type Props = {
   result: SubtestResult;
@@ -8,21 +12,28 @@ type Props = {
 };
 
 export const TestResultBadge: React.FC<Props> = ({ result, metadata }) => {
+  const [isTooltipOpen, setTooltipOpen] = useState(false);
+
   return (
-    <ClickableTooltip
-      trigger={
+    <Tooltip open={isTooltipOpen} onOpenChange={setTooltipOpen}>
+      <TooltipTrigger asChild={true}>
         <div
           style={{
             background: result.color,
           }}
           className="w-max px-4 py-1 rounded-full text-white"
+          onClick={(event) => {
+            event.preventDefault();
+            setTooltipOpen((open) => !open);
+          }}
         >
           {result.value}
         </div>
-      }
-    >
-      <ResultBadgeTooltipContent result={result} metadata={metadata ?? []} />
-    </ClickableTooltip>
+      </TooltipTrigger>
+      <TooltipContent>
+        <ResultBadgeTooltipContent result={result} metadata={metadata ?? []} />
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
