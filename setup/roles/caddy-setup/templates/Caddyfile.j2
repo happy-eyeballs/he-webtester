@@ -129,21 +129,18 @@
 }
 
 (respond_with_server_ip) {
-    templates {
-        between (( ))
-        mime text/plain
-    }
     header Content-Type text/plain
-    respond `((ph "http.request.local.host"))`
+    respond `{http.request.local.host}`
 }
 
 (respond_with_json) {
-    templates {
-        between (( ))
-        mime application/json
-    }
     header Content-Type application/json
-    respond `{"server_ip": "((ph "http.request.local.host"))", "client_ip": "((ph "http.request.remote.host"))", "protocol": "((ph "http.request.proto"))"}`
+    respond `{"server_ip": "{http.request.local.host}", "client_ip": "{http.request.remote.host}", "protocol": "{http.request.proto}"}`
+}
+
+(respond_with_json_layer4) {
+    header Content-Type application/json
+    respond `{"server_ip": "{http.request.local.host}", "protocol": "{http.request.proto}"}`
 }
 
 ### SERVERS
@@ -200,7 +197,7 @@
     header Alt-Svc `h3=":443"; ma=600`
 
     import cors
-    import respond_with_json
+    import respond_with_json_layer4
 }
 
 *.http3.http3.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https.http3.{{ happy_eyeballs.nameserver.base_domain }} {
