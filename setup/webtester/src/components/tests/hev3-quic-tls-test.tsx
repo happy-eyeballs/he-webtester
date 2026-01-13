@@ -33,11 +33,9 @@ export const HEv3QuicTlsTest: React.FC = () => {
     };
 
     const isHTTP3 = protocol === "HTTP/3.0";
-    const protocolShorthand =
-      { "HTTP/3.0": "h3", "HTTP/2.0": "h2" }[protocol] ?? protocol;
 
     return {
-      value: protocolShorthand,
+      value: isHTTP3 ? "QUIC" : "TLS",
       color: isHTTP3 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
       metadata: {
         Protocol: protocol,
