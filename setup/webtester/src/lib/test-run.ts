@@ -164,6 +164,7 @@ const defaultResponseHandler = async (
 
 export type TestSettings = {
   repetitions: number | undefined;
+  addressFamily: string | undefined;
   autoTransmitResults: boolean | undefined;
   randomizeDomains: boolean | undefined;
   resolverAddresses: string | undefined;

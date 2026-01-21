@@ -54,9 +54,9 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
         the resolution chain can impact the result.
       </TestCard>
 
-      <TestCard title="[BETA] QUIC vs. TLS Test" href="tests/hev3-quic-tls">
+      <TestCard title="[BETA] QUIC vs. TLS/TCP Test" href="tests/hev3-quic-tls">
         Happy Eyeballs version 3 extends connection racing to the application
-        layer, specifically racing QUIC against TCP/TLS. Browsers implementing
+        layer, specifically racing QUIC against TLS/TCP. Browsers implementing
         this version should fall back to the alternative protocol if one is
         unresponsive to avoid blocking. We test this by varying the handshake
         delay to determine if and when your client decides to switch protocols.

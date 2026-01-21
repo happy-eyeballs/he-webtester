@@ -5,8 +5,8 @@ import { HEv3QuicTlsTest } from "@/components/tests/hev3-quic-tls-test";
 import Link from "@/components/link.astro";
 ---
 
-<PageLayout title="HEv3 QUIC vs. TLS Test | Happy Eyeballs Webtester">
-  <Header titleLine1="Happy Eyeballs" titleLine2="QUIC vs. TLS Test">
+<PageLayout title="HEv3 QUIC vs. TLS/TCP Test | Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs" titleLine2="QUIC vs. TLS/TCP Test">
     <p>
       We operate a specialized web server capable of introducing artificial
       delays during the initial connection handshake based on the TLS SNI. The
@@ -21,7 +21,7 @@ import Link from "@/components/link.astro";
       <Link href="/tests/http3-availability">HTTP/3 availability tester</Link>.
     </p>
     <p>
-      We simulate a range of handshake delays for both QUIC and TLS. Your
+      We simulate a range of handshake delays for both QUIC and TLS/TCP. Your
       browser will attempt connections for each delay, allowing us to observe if
       it handles the Happy Eyeballs version 3 race between both application
       layer protocols.

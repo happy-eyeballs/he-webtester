@@ -64,6 +64,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
           settings.randomizeDomains ?? false,
           availableDelays[i] ?? 0,
           part.protocol,
+          (settings.addressFamily as AddressFamily) ?? AddressFamily.Both,
         );
 
         subtests.push({
@@ -87,6 +88,10 @@ export const HEv3QuicTlsTest: React.FC = () => {
           options: [1, 5, 10, 20, 30, 40, 50],
           defaultOption: 10,
         },
+        addressFamily: {
+          options: [AddressFamily.Both, AddressFamily.IPv4, AddressFamily.IPv6],
+          defaultOption: AddressFamily.Both,
+        },
         autoTransmitResults: true,
         randomizeDomains: true,
         deviceInfo: true,
@@ -102,10 +107,24 @@ export const generateQuicTlsDelayUrl = async (
   randomizeDomain: boolean,
   delay: number,
   protocol: "quic" | "tls",
+  addressFamily: AddressFamily,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
   const id = randomizeDomain ? generateRandomId() : 0;
 
-  return `https://id-${id}.${protocol}-delay-${delay}.v3-quic.${happyEyeballsTestDomain}/ping`;
+  const addressFamilyPrefix =
+    addressFamily === AddressFamily.IPv4
+      ? "ipv4-"
+      : addressFamily === AddressFamily.IPv6
+        ? "ipv6-"
+        : "";
+
+  return `https://${addressFamilyPrefix}id-${id}.${protocol}-delay-${delay}.v3-quic.${happyEyeballsTestDomain}/ping`;
 };
+
+const enum AddressFamily {
+  IPv4 = "IPv4",
+  IPv6 = "IPv6",
+  Both = "IPv4 & IPv6",
+}

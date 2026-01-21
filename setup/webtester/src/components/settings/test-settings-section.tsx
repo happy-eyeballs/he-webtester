@@ -15,6 +15,7 @@ import { SettingsItem } from "@/components/settings/settings-item";
 
 export type EnabledTestSettings = {
   repetitions?: { options: number[]; defaultOption: number };
+  addressFamily?: { options: string[]; defaultOption: string };
   autoTransmitResults?: boolean;
   randomizeDomains?: boolean;
   resolverAddresses?: boolean;
@@ -34,6 +35,10 @@ export const TestSettingsSection: React.FC<Props> = ({
 }) => {
   const [repetitions, setRepetitions] = useState<number | undefined>(
     enabledSettings.repetitions?.defaultOption,
+  );
+
+  const [addressFamily, setAddressFamily] = useState<string | undefined>(
+    enabledSettings.addressFamily?.defaultOption,
   );
 
   const [randomizeDomains, setRandomizeDomains] = useState<boolean | undefined>(
@@ -59,6 +64,7 @@ export const TestSettingsSection: React.FC<Props> = ({
 
         onStartTestRun({
           repetitions,
+          addressFamily,
           randomizeDomains,
           autoTransmitResults,
           resolverAddresses,
@@ -80,6 +86,27 @@ export const TestSettingsSection: React.FC<Props> = ({
               <SelectContent>
                 {enabledSettings.repetitions.options.map((value) => (
                   <SelectItem value={value.toString()} key={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </SettingsItem>
+        )}
+
+        {enabledSettings.addressFamily && (
+          <SettingsItem label="Address Family">
+            <Select
+              defaultValue={enabledSettings.addressFamily.defaultOption}
+              onValueChange={(value) => setAddressFamily(value)}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue>{addressFamily}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {enabledSettings.addressFamily.options.map((value) => (
+                  <SelectItem value={value} key={value}>
                     {value}
                   </SelectItem>
                 ))}
