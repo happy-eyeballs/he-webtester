@@ -64,7 +64,8 @@ export const HEv3QuicTlsTest: React.FC = () => {
           settings.randomizeDomains ?? false,
           availableDelays[i] ?? 0,
           part.protocol,
-          (settings.addressFamily as AddressFamily) ?? AddressFamily.Both,
+          (settings.httpsRecordContent as HTTPSRecordContent) ??
+            HTTPSRecordContent.H3H2,
         );
 
         subtests.push({
@@ -88,9 +89,15 @@ export const HEv3QuicTlsTest: React.FC = () => {
           options: [1, 5, 10, 20, 30, 40, 50],
           defaultOption: 10,
         },
-        addressFamily: {
-          options: [AddressFamily.Both, AddressFamily.IPv4, AddressFamily.IPv6],
-          defaultOption: AddressFamily.Both,
+        httpsRecordContent: {
+          options: [
+            HTTPSRecordContent.H3H2,
+            HTTPSRecordContent.H2H3,
+            HTTPSRecordContent.H3,
+            HTTPSRecordContent.H2,
+            HTTPSRecordContent.None,
+          ],
+          defaultOption: HTTPSRecordContent.H3H2,
         },
         autoTransmitResults: true,
         randomizeDomains: true,
@@ -107,24 +114,30 @@ export const generateQuicTlsDelayUrl = async (
   randomizeDomain: boolean,
   delay: number,
   protocol: "quic" | "tls",
-  addressFamily: AddressFamily,
+  httpsRecordContent: HTTPSRecordContent,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
   const id = randomizeDomain ? generateRandomId() : 0;
 
-  const addressFamilyPrefix =
-    addressFamily === AddressFamily.IPv4
-      ? "ipv4-"
-      : addressFamily === AddressFamily.IPv6
-        ? "ipv6-"
-        : "";
+  const httpsRR: string = {
+    [HTTPSRecordContent.H3H2]: "h3h2",
+    [HTTPSRecordContent.H2H3]: "h2h3",
+    [HTTPSRecordContent.H3]: "h3",
+    [HTTPSRecordContent.H2]: "h2",
+    [HTTPSRecordContent.None]: "none",
+  }[httpsRecordContent];
 
-  return `https://${addressFamilyPrefix}id-${id}.${protocol}-delay-${delay}.v3-quic.${happyEyeballsTestDomain}/ping`;
+  const quicDelay = protocol === "quic" ? delay : 0;
+  const tlsDelay = protocol === "tls" ? delay : 0;
+
+  return `https://https-${httpsRR}_ipv4-0_ipv6-0_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/ping`;
 };
 
-const enum AddressFamily {
-  IPv4 = "IPv4",
-  IPv6 = "IPv6",
-  Both = "IPv4 & IPv6",
+const enum HTTPSRecordContent {
+  H3H2 = "alpn=h3,h2",
+  H2H3 = "alpn=h2,h3",
+  H3 = "alpn=h3",
+  H2 = "alpn=h2",
+  None = "NONE",
 }

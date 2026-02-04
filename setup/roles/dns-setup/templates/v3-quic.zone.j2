@@ -7,27 +7,10 @@ $ORIGIN v3-quic.{{ happy_eyeballs.nameserver.base_domain }}.
 
 
 $TTL 300
+*             IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
+*             IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
 
-{% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
-# QUIC delay
-id-*.quic-delay-{{ delay }}  IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
-id-*.quic-delay-{{ delay }}  IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
-id-*.quic-delay-{{ delay }}  IN  HTTPS  1  . alpn=h3,h2
-
-ipv4-id-*.quic-delay-{{ delay }}  IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
-ipv4-id-*.quic-delay-{{ delay }}  IN  HTTPS  1  . alpn=h3,h2
-
-ipv6-id-*.quic-delay-{{ delay }}  IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
-ipv6-id-*.quic-delay-{{ delay }}  IN  HTTPS  1  . alpn=h3,h2
-
-# TLS delay
-id-*.tls-delay-{{ delay }}   IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
-id-*.tls-delay-{{ delay }}   IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
-id-*.tls-delay-{{ delay }}   IN  HTTPS  1  . alpn=h3,h2
-
-ipv4-id-*.tls-delay-{{ delay }}   IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
-ipv4-id-*.tls-delay-{{ delay }}   IN  HTTPS  1  . alpn=h3,h2
-
-ipv6-id-*.tls-delay-{{ delay }}   IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
-ipv6-id-*.tls-delay-{{ delay }}   IN  HTTPS  1  . alpn=h3,h2
-{% endfor %}
+https-h3h2_*  IN  HTTPS  1  . alpn=h3,h2
+https-h2h3_*  IN  HTTPS  1  . alpn=h2,h3
+https-h3_*    IN  HTTPS  1  . alpn=h3
+https-h2_*    IN  HTTPS  1  . alpn=h2

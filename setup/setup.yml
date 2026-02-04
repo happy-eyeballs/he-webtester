@@ -15,9 +15,7 @@
       v1_ipv6_only: 'ipv6-only.v1.{{ happy_eyeballs.nameserver.base_domain }}'
       v1_ipv4_only: 'ipv4-only.v1.{{ happy_eyeballs.nameserver.base_domain }}'
       v2: '*.v2.{{ happy_eyeballs.nameserver.base_domain }}'
-      v3_quic:
-        quic_delay: '{{ happy_eyeballs.webserver.he_v3_quic.delays | map("string") | map("regex_replace", "(.+)", "*.quic-delay-\1.v3-quic." ~ happy_eyeballs.nameserver.base_domain) | unique | list }}'
-        tls_delay: '{{ happy_eyeballs.webserver.he_v3_quic.delays | map("string") | map("regex_replace", "(.+)", "*.tls-delay-\1.v3-quic." ~ happy_eyeballs.nameserver.base_domain) | unique | list }}'
+      v3_quic: '*.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}'
       http3:
         http3: '*.http3.http3.{{ happy_eyeballs.nameserver.base_domain }}'
         http3_https: '*.http3-https.http3.{{ happy_eyeballs.nameserver.base_domain }}'

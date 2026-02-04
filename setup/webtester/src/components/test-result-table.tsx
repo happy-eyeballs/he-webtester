@@ -144,16 +144,25 @@ export const TestResultTable: React.FC<Props> = ({
                               <TestResultBadge
                                 result={result}
                                 key={index}
-                                testRunMetadata={
-                                  subtest.numberOfRequests
+                                testRunMetadata={[
+                                  ...(subtest.numberOfRequests
                                     ? [
                                         {
                                           key: "Request",
                                           value: `${index + 1} / ${subtest.numberOfRequests}`,
                                         },
                                       ]
-                                    : []
-                                }
+                                    : []),
+                                  ...(testRun.settings.httpsRecordContent
+                                    ? [
+                                        {
+                                          key: "HTTPS RR Content",
+                                          value:
+                                            testRun.settings.httpsRecordContent,
+                                        },
+                                      ]
+                                    : []),
+                                ]}
                               />
                             ))}
 

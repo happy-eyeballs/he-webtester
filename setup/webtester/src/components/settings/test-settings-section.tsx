@@ -15,7 +15,7 @@ import { SettingsItem } from "@/components/settings/settings-item";
 
 export type EnabledTestSettings = {
   repetitions?: { options: number[]; defaultOption: number };
-  addressFamily?: { options: string[]; defaultOption: string };
+  httpsRecordContent?: { options: string[]; defaultOption: string };
   autoTransmitResults?: boolean;
   randomizeDomains?: boolean;
   resolverAddresses?: boolean;
@@ -37,9 +37,9 @@ export const TestSettingsSection: React.FC<Props> = ({
     enabledSettings.repetitions?.defaultOption,
   );
 
-  const [addressFamily, setAddressFamily] = useState<string | undefined>(
-    enabledSettings.addressFamily?.defaultOption,
-  );
+  const [httpsRecordContent, setHttpsRecordContent] = useState<
+    string | undefined
+  >(enabledSettings.httpsRecordContent?.defaultOption);
 
   const [randomizeDomains, setRandomizeDomains] = useState<boolean | undefined>(
     enabledSettings.randomizeDomains ? true : undefined,
@@ -64,7 +64,7 @@ export const TestSettingsSection: React.FC<Props> = ({
 
         onStartTestRun({
           repetitions,
-          addressFamily,
+          httpsRecordContent,
           randomizeDomains,
           autoTransmitResults,
           resolverAddresses,
@@ -94,18 +94,18 @@ export const TestSettingsSection: React.FC<Props> = ({
           </SettingsItem>
         )}
 
-        {enabledSettings.addressFamily && (
-          <SettingsItem label="Address Family">
+        {enabledSettings.httpsRecordContent && (
+          <SettingsItem label="HTTPS RR Content">
             <Select
-              defaultValue={enabledSettings.addressFamily.defaultOption}
-              onValueChange={(value) => setAddressFamily(value)}
+              defaultValue={enabledSettings.httpsRecordContent.defaultOption}
+              onValueChange={(value) => setHttpsRecordContent(value)}
               disabled={disabled}
             >
               <SelectTrigger className="w-40">
-                <SelectValue>{addressFamily}</SelectValue>
+                <SelectValue>{httpsRecordContent}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {enabledSettings.addressFamily.options.map((value) => (
+                {enabledSettings.httpsRecordContent.options.map((value) => (
                   <SelectItem value={value} key={value}>
                     {value}
                   </SelectItem>
