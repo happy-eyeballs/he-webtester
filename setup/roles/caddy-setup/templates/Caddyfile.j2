@@ -34,73 +34,53 @@
 
     layer4 {
         udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
-            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
-            @quic-delay-{{ delay }} quic sni *.quic-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
-            route @quic-delay-{{ delay }} {
-                throttle {
-                    latency {{ delay }}ms
-                }
-
+            @quic-delay quic sni_regexp ^[^.]+\.quic-delay-([0-9]+)\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            route @quic-delay {
+                throttle_var {tls.regexp.1}ms
                 proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
             }
-            {% endfor %}
 
-            @quic-other quic
-            route @quic-other {
+            @quic-no-delay quic
+            route @quic-no-delay {
                 proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
             }
         }
 
         udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
-            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
-            @quic-delay-{{ delay }} quic sni *.quic-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
-            route @quic-delay-{{ delay }} {
-                throttle {
-                    latency {{ delay }}ms
-                }
-
+            @quic-delay quic sni_regexp ^[^.]+\.quic-delay-([0-9]+)\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            route @quic-delay {
+                throttle_var {tls.regexp.1}ms
                 proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
             }
-            {% endfor %}
 
-            @quic-other quic
-            route @quic-other {
+            @quic-no-delay quic
+            route @quic-no-delay {
                 proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
             }
         }
 
         tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
-            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
-            @tls-delay-{{ delay }} tls sni *.tls-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
-            route @tls-delay-{{ delay }} {
-                throttle {
-                    latency {{ delay }}ms
-                }
-
-                 proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
+            @tls-delay tls sni_regexp ^[^.]+\.tls-delay-([0-9]+)\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            route @tls-delay {
+                throttle_var {tls.regexp.1}ms
+                proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
             }
-            {% endfor %}
 
-            @tls-other tls
-            route @tls-other {
+            @tls-no-delay tls
+            route @tls-no-delay {
                 proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
             }
         }
 
         tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
-            {% for delay in happy_eyeballs.webserver.he_v3_quic.delays %}
-            @tls-delay-{{ delay }} tls sni *.tls-delay-{{ delay }}.v3-quic.{{ happy_eyeballs.nameserver.base_domain }}
-            route @tls-delay-{{ delay }} {
-                throttle {
-                    latency {{ delay }}ms
-                }
-
+            @tls-delay tls sni_regexp ^[^.]+\.tls-delay-([0-9]+)\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            route @tls-delay {
+                throttle_var {tls.regexp.1}ms
                 proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
             }
-            {% endfor %}
 
-            @tls-other tls
-            route @tls-other {
+            @tls-no-delay tls
+            route @tls-no-delay {
                 proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
             }
         }

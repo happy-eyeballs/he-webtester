@@ -1,7 +1,10 @@
 FROM caddy:2-builder-alpine AS builder
 
+ADD custom-caddy-module /custom-caddy-module/
+
 RUN xcaddy build \
-    --with github.com/mholt/caddy-l4@master
+    --with github.com/mholt/caddy-l4@master \
+    --with happy-eyeballs-webtester-module=/custom-caddy-module
 
 FROM caddy:latest
 

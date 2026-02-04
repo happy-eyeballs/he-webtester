@@ -41,6 +41,13 @@
     mode: '0644'
   notify: restart he-caddy
 
+- name: Copy custom caddy module src
+  ansible.posix.synchronize:
+    src: 'custom-caddy-module/'
+    dest: '{{ happy_eyeballs.base_path }}/caddy/custom-caddy-module/'
+    owner: false
+    group: false
+
 - name: Copy caddy systemd service file
   ansible.builtin.template:
     src: 'he-caddy.service.j2'
