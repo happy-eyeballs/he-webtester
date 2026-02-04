@@ -47,6 +47,7 @@
     dest: '{{ happy_eyeballs.base_path }}/caddy/custom-caddy-module/'
     owner: false
     group: false
+  notify: restart he-caddy
 
 - name: Copy caddy systemd service file
   ansible.builtin.template:

@@ -226,7 +226,7 @@ export const enum TestRunResultColor {
   Option1 = "#0e7490", // cyan-700
   Option2 = "#b45309", // amber-700
   Option3 = "#6d28d9", // violet-700
-  Option4 = "#65a30d", // lime-600
+  Option4 = "#4d7c0f", // lime-700
 }
 
 export type SubtestResultMetadata = Record<string, string>;

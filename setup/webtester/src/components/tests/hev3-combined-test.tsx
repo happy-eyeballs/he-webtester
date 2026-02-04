@@ -30,7 +30,7 @@ export const HEv3CombinedTest: React.FC = () => {
     const protocol = isQUIC ? "QUIC" : "TLS";
 
     return {
-      value: `${ipVersion}, ${protocol}`,
+      value: `${protocol}/${ipVersion}`,
       color: isIPv6
         ? isQUIC
           ? TestRunResultColor.Option1
@@ -44,10 +44,10 @@ export const HEv3CombinedTest: React.FC = () => {
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
-    for (const protocolDelay of delays) {
+    for (const ipDelay of delays) {
       const subtests: Subtest[] = [];
 
-      for (const ipDelay of delays) {
+      for (const protocolDelay of delays) {
         const url = await generateHEv3TestUrl(
           settings.randomizeDomains ?? false,
           settings.delayedIPVersion === IPVersion.IPv4 ? ipDelay : 0,
@@ -65,7 +65,7 @@ export const HEv3CombinedTest: React.FC = () => {
       }
 
       testParts.push({
-        name: protocolDelay.toString(),
+        name: ipDelay.toString(),
         subtests,
       } satisfies TestPart);
     }

@@ -11,7 +11,7 @@ OnFailure=status-email@%n.service
 Type=oneshot
 RemainAfterExit=true
 WorkingDirectory={{ happy_eyeballs.base_path }}/caddy
-ExecStart=/usr/bin/docker compose up -d --remove-orphans
+ExecStart=/usr/bin/docker compose up -d --remove-orphans --build
 ExecStop=/usr/bin/docker compose down
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Environment=DOCKER_HOST=unix:///run/user/{{ happy_eyeballs.user.uid }}/podman/podman.sock

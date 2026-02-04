@@ -41,11 +41,6 @@
 
                 proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
             }
-
-            @quic-no-delay quic
-            route @quic-no-delay {
-                proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
-            }
         }
 
         udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
@@ -54,11 +49,6 @@
                 throttle_var {tls.regexp.2}ms  # IPv6
                 throttle_var {tls.regexp.3}ms  # QUIC
 
-                proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
-            }
-
-            @quic-no-delay quic
-            route @quic-no-delay {
                 proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
             }
         }
@@ -71,11 +61,6 @@
 
                 proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
             }
-
-            @tls-no-delay tls
-            route @tls-no-delay {
-                proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
-            }
         }
 
         tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
@@ -84,11 +69,6 @@
                 throttle_var {tls.regexp.2}ms  # IPv6
                 throttle_var {tls.regexp.4}ms  # TLS
 
-                proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
-            }
-
-            @tls-no-delay tls
-            route @tls-no-delay {
                 proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
             }
         }
