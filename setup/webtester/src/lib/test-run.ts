@@ -164,7 +164,11 @@ const defaultResponseHandler = async (
 
 export type TestSettings = {
   repetitions: number | undefined;
-  httpsRecord: string | undefined;
+
+  httpsRecord: HTTPSRecord | undefined;
+  delayedIPVersion: IPVersion | undefined;
+  delayedProtocol: Protocol | undefined;
+
   autoTransmitResults: boolean | undefined;
   randomizeDomains: boolean | undefined;
   resolverAddresses: string | undefined;
@@ -221,6 +225,8 @@ export const enum TestRunResultColor {
   Error = "#b91c1c", // red-700
   Option1 = "#0e7490", // cyan-700
   Option2 = "#b45309", // amber-700
+  Option3 = "#6d28d9", // violet-700
+  Option4 = "#65a30d", // lime-600
 }
 
 export type SubtestResultMetadata = Record<string, string>;
@@ -230,3 +236,20 @@ export type ResponseHandlerResult = {
   color: TestRunResultColor;
   metadata?: SubtestResultMetadata;
 };
+
+export const enum IPVersion {
+  IPv4 = "IPv4",
+  IPv6 = "IPv6",
+}
+export const enum Protocol {
+  QUIC = "QUIC",
+  TLS = "TLS/TCP",
+}
+
+export const enum HTTPSRecord {
+  H3H2 = "alpn=h3,h2",
+  H2H3 = "alpn=h2,h3",
+  H3 = "alpn=h3",
+  H2 = "alpn=h2",
+  None = "NONE",
+}

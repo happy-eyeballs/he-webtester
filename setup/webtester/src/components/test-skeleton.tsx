@@ -32,6 +32,7 @@ type Props = {
   resultsUrl: string;
   subtestColumnDescription: string;
   subtestColumnLabels: string[];
+  subtestRowDescription?: string;
 };
 
 export const TestSkeleton: React.FC<Props> = ({
@@ -39,6 +40,7 @@ export const TestSkeleton: React.FC<Props> = ({
   enabledSettings,
   resultsUrl,
   subtestColumnDescription,
+  subtestRowDescription,
   subtestColumnLabels,
 }) => {
   const [testRuns, setTestRuns] = useState<TestRun[]>([]);
@@ -114,6 +116,7 @@ export const TestSkeleton: React.FC<Props> = ({
           <TestResultTable
             columnDescription={subtestColumnDescription}
             columns={subtestColumnLabels}
+            testPartDescription={subtestRowDescription}
             testRuns={testRuns}
           />
 

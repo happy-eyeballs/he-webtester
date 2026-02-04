@@ -13,12 +13,14 @@ import {
 type Props = {
   columnDescription: string;
   columns: string[];
+  testPartDescription: string | undefined;
   testRuns: TestRun[];
 };
 
 export const TestResultTable: React.FC<Props> = ({
   columnDescription,
   columns,
+  testPartDescription,
   testRuns,
 }) => {
   const hasTestPartName = testRuns.some((testRun) =>
@@ -41,7 +43,7 @@ export const TestResultTable: React.FC<Props> = ({
               </th>
               {hasTestPartName && (
                 <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-50">
-                  Part
+                  {testPartDescription ?? "Part"}
                 </th>
               )}
               <th

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   HTTPSRecord,
+  IPVersion,
   Protocol,
   type ResponseHandlerResult,
   type Subtest,
@@ -9,62 +10,50 @@ import {
   type TestSettings,
 } from "@/lib/test-run.ts";
 import { TestSkeleton } from "@/components/test-skeleton.tsx";
-import { fetchAvailableDelays } from "@/lib/he-configuration.ts";
 import { generateHEv3TestUrl } from "@/lib/test-utils";
 
-export const HEv3QuicTlsTest: React.FC = () => {
-  const [delays, setDelays] = useState<number[]>([]);
-
-  useEffect(() => {
-    const setup = async () => {
-      setDelays((await fetchAvailableDelays()).v3_quic_delays);
-    };
-
-    setup();
-  }, []);
+export const HEv3CombinedTest: React.FC = () => {
+  const delays = [0, 100, 200, 300, 400, 500];
 
   const responseHandler = async (
     response: Response,
   ): Promise<ResponseHandlerResult> => {
-    const { protocol, server_ip } = (await response.json()) as {
+    const { protocol: httpProtocol, server_ip } = (await response.json()) as {
       protocol: string;
       server_ip: string;
     };
 
-    const isHTTP3 = protocol === "HTTP/3.0";
+    const isQUIC = httpProtocol === "HTTP/3.0";
+    const isIPv6 = server_ip.includes(":");
+
+    const ipVersion = isIPv6 ? "IPv6" : "IPv4";
+    const protocol = isQUIC ? "QUIC" : "TLS";
 
     return {
-      value: isHTTP3 ? "QUIC" : "TLS",
-      color: isHTTP3 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
-      metadata: {
-        Protocol: protocol,
-        "Address Family": server_ip.includes(":") ? "IPv6" : "IPv4",
-      },
+      value: `${ipVersion}, ${protocol}`,
+      color: isIPv6
+        ? isQUIC
+          ? TestRunResultColor.Option1
+          : TestRunResultColor.Option2
+        : isQUIC
+          ? TestRunResultColor.Option3
+          : TestRunResultColor.Option4,
     } satisfies ResponseHandlerResult;
   };
 
   const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
-    for (const part of [
-      {
-        name: "Delay QUIC",
-        protocol: Protocol.QUIC,
-      },
-      {
-        name: "Delay TLS/TCP",
-        protocol: Protocol.TLS,
-      },
-    ]) {
+    for (const protocolDelay of delays) {
       const subtests: Subtest[] = [];
 
-      for (const delay of delays) {
+      for (const ipDelay of delays) {
         const url = await generateHEv3TestUrl(
           settings.randomizeDomains ?? false,
-          0,
-          0,
-          part.protocol === Protocol.QUIC ? delay : 0,
-          part.protocol === Protocol.TLS ? delay : 0,
+          settings.delayedIPVersion === IPVersion.IPv4 ? ipDelay : 0,
+          settings.delayedIPVersion === IPVersion.IPv6 ? ipDelay : 0,
+          settings.delayedProtocol === Protocol.QUIC ? protocolDelay : 0,
+          settings.delayedProtocol === Protocol.TLS ? protocolDelay : 0,
           (settings.httpsRecord as HTTPSRecord) ?? HTTPSRecord.H3H2,
         );
 
@@ -75,7 +64,10 @@ export const HEv3QuicTlsTest: React.FC = () => {
         } satisfies Subtest);
       }
 
-      testParts.push({ name: part.name, subtests } satisfies TestPart);
+      testParts.push({
+        name: protocolDelay.toString(),
+        subtests,
+      } satisfies TestPart);
     }
 
     return testParts;
@@ -99,13 +91,22 @@ export const HEv3QuicTlsTest: React.FC = () => {
           ],
           defaultOption: HTTPSRecord.H3H2,
         },
+        delayedIPVersion: {
+          options: [IPVersion.IPv4, IPVersion.IPv6],
+          defaultOption: IPVersion.IPv6,
+        },
+        delayedProtocol: {
+          options: [Protocol.QUIC, Protocol.TLS],
+          defaultOption: Protocol.QUIC,
+        },
         autoTransmitResults: true,
         randomizeDomains: true,
         deviceInfo: true,
       }}
-      resultsUrl="/results/hev3-quic-tls" // TODO
-      subtestColumnDescription="Delay before initial read on connection [ms]"
+      resultsUrl="/results/hev3-combined" // TODO
+      subtestColumnDescription="Protocol Delay [ms]"
       subtestColumnLabels={delays.map((delay) => delay.toString())}
+      subtestRowDescription="IP Delay [ms]"
     />
   );
 };

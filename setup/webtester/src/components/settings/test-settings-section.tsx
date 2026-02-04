@@ -8,14 +8,21 @@ import {
 } from "@/components/ui/select.tsx";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import type { TestSettings } from "@/lib/test-run.ts";
+import {
+  HTTPSRecord,
+  IPVersion,
+  Protocol,
+  type TestSettings,
+} from "@/lib/test-run.ts";
 import { Input } from "@/components/ui/input.tsx";
 import { DeviceInfoInput } from "@/components/settings/device-info-input.tsx";
 import { SettingsItem } from "@/components/settings/settings-item";
 
 export type EnabledTestSettings = {
   repetitions?: { options: number[]; defaultOption: number };
-  httpsRecord?: { options: string[]; defaultOption: string };
+  httpsRecord?: { options: HTTPSRecord[]; defaultOption: HTTPSRecord };
+  delayedIPVersion?: { options: IPVersion[]; defaultOption: IPVersion };
+  delayedProtocol?: { options: Protocol[]; defaultOption: Protocol };
   autoTransmitResults?: boolean;
   randomizeDomains?: boolean;
   resolverAddresses?: boolean;
@@ -37,8 +44,16 @@ export const TestSettingsSection: React.FC<Props> = ({
     enabledSettings.repetitions?.defaultOption,
   );
 
-  const [httpsRecord, setHttpsRecord] = useState<string | undefined>(
+  const [httpsRecord, setHttpsRecord] = useState<HTTPSRecord | undefined>(
     enabledSettings.httpsRecord?.defaultOption,
+  );
+
+  const [delayedIPVersion, setDelayedIPVersion] = useState<
+    IPVersion | undefined
+  >(enabledSettings.delayedIPVersion?.defaultOption);
+
+  const [delayedProtocol, setDelayedProtocol] = useState<Protocol | undefined>(
+    enabledSettings.delayedProtocol?.defaultOption,
   );
 
   const [randomizeDomains, setRandomizeDomains] = useState<boolean | undefined>(
@@ -65,6 +80,8 @@ export const TestSettingsSection: React.FC<Props> = ({
         onStartTestRun({
           repetitions,
           httpsRecord,
+          delayedIPVersion,
+          delayedProtocol,
           randomizeDomains,
           autoTransmitResults,
           resolverAddresses,
@@ -98,7 +115,7 @@ export const TestSettingsSection: React.FC<Props> = ({
           <SettingsItem label="HTTPS RR">
             <Select
               defaultValue={enabledSettings.httpsRecord.defaultOption}
-              onValueChange={(value) => setHttpsRecord(value)}
+              onValueChange={(value) => setHttpsRecord(value as HTTPSRecord)}
               disabled={disabled}
             >
               <SelectTrigger className="w-40">
@@ -106,6 +123,48 @@ export const TestSettingsSection: React.FC<Props> = ({
               </SelectTrigger>
               <SelectContent>
                 {enabledSettings.httpsRecord.options.map((value) => (
+                  <SelectItem value={value} key={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </SettingsItem>
+        )}
+
+        {enabledSettings.delayedIPVersion && (
+          <SettingsItem label="Delayed IP Version">
+            <Select
+              defaultValue={enabledSettings.delayedIPVersion.defaultOption}
+              onValueChange={(value) => setDelayedIPVersion(value as IPVersion)}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue>{delayedIPVersion}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {enabledSettings.delayedIPVersion.options.map((value) => (
+                  <SelectItem value={value} key={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </SettingsItem>
+        )}
+
+        {enabledSettings.delayedProtocol && (
+          <SettingsItem label="Delayed Protocol">
+            <Select
+              defaultValue={enabledSettings.delayedProtocol.defaultOption}
+              onValueChange={(value) => setDelayedProtocol(value as Protocol)}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue>{delayedProtocol}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {enabledSettings.delayedProtocol.options.map((value) => (
                   <SelectItem value={value} key={value}>
                     {value}
                   </SelectItem>

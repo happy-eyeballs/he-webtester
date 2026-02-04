@@ -1,0 +1,11 @@
+---
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import { HEv3CombinedTest } from "@/components/tests/hev3-combined-test";
+---
+
+<PageLayout title="HEv3 Combined Test | Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs Version 3" titleLine2="Combined Test" />
+
+  <HEv3CombinedTest client:load />
+</PageLayout>
