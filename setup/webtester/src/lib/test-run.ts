@@ -164,7 +164,7 @@ const defaultResponseHandler = async (
 
 export type TestSettings = {
   repetitions: number | undefined;
-  httpsRecordContent: string | undefined;
+  httpsRecord: string | undefined;
   autoTransmitResults: boolean | undefined;
   randomizeDomains: boolean | undefined;
   resolverAddresses: string | undefined;

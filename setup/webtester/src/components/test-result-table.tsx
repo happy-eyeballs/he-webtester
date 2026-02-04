@@ -153,12 +153,11 @@ export const TestResultTable: React.FC<Props> = ({
                                         },
                                       ]
                                     : []),
-                                  ...(testRun.settings.httpsRecordContent
+                                  ...(testRun.settings.httpsRecord
                                     ? [
                                         {
-                                          key: "HTTPS RR Content",
-                                          value:
-                                            testRun.settings.httpsRecordContent,
+                                          key: "HTTPS RR",
+                                          value: testRun.settings.httpsRecord,
                                         },
                                       ]
                                     : []),

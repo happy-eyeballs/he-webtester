@@ -15,7 +15,7 @@ import { SettingsItem } from "@/components/settings/settings-item";
 
 export type EnabledTestSettings = {
   repetitions?: { options: number[]; defaultOption: number };
-  httpsRecordContent?: { options: string[]; defaultOption: string };
+  httpsRecord?: { options: string[]; defaultOption: string };
   autoTransmitResults?: boolean;
   randomizeDomains?: boolean;
   resolverAddresses?: boolean;
@@ -37,9 +37,9 @@ export const TestSettingsSection: React.FC<Props> = ({
     enabledSettings.repetitions?.defaultOption,
   );
 
-  const [httpsRecordContent, setHttpsRecordContent] = useState<
-    string | undefined
-  >(enabledSettings.httpsRecordContent?.defaultOption);
+  const [httpsRecord, setHttpsRecord] = useState<string | undefined>(
+    enabledSettings.httpsRecord?.defaultOption,
+  );
 
   const [randomizeDomains, setRandomizeDomains] = useState<boolean | undefined>(
     enabledSettings.randomizeDomains ? true : undefined,
@@ -64,7 +64,7 @@ export const TestSettingsSection: React.FC<Props> = ({
 
         onStartTestRun({
           repetitions,
-          httpsRecordContent,
+          httpsRecord,
           randomizeDomains,
           autoTransmitResults,
           resolverAddresses,
@@ -94,18 +94,18 @@ export const TestSettingsSection: React.FC<Props> = ({
           </SettingsItem>
         )}
 
-        {enabledSettings.httpsRecordContent && (
-          <SettingsItem label="HTTPS RR Content">
+        {enabledSettings.httpsRecord && (
+          <SettingsItem label="HTTPS RR">
             <Select
-              defaultValue={enabledSettings.httpsRecordContent.defaultOption}
-              onValueChange={(value) => setHttpsRecordContent(value)}
+              defaultValue={enabledSettings.httpsRecord.defaultOption}
+              onValueChange={(value) => setHttpsRecord(value)}
               disabled={disabled}
             >
               <SelectTrigger className="w-40">
-                <SelectValue>{httpsRecordContent}</SelectValue>
+                <SelectValue>{httpsRecord}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {enabledSettings.httpsRecordContent.options.map((value) => (
+                {enabledSettings.httpsRecord.options.map((value) => (
                   <SelectItem value={value} key={value}>
                     {value}
                   </SelectItem>

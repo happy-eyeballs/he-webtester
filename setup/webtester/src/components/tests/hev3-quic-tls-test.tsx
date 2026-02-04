@@ -50,11 +50,11 @@ export const HEv3QuicTlsTest: React.FC = () => {
     for (const part of [
       {
         name: "Delay QUIC",
-        protocol: "quic" as const,
+        protocol: Protocol.QUIC,
       },
       {
-        name: "Delay TLS",
-        protocol: "tls" as const,
+        name: "Delay TLS/TCP",
+        protocol: Protocol.TLS,
       },
     ]) {
       const subtests: Subtest[] = [];
@@ -64,8 +64,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
           settings.randomizeDomains ?? false,
           availableDelays[i] ?? 0,
           part.protocol,
-          (settings.httpsRecordContent as HTTPSRecordContent) ??
-            HTTPSRecordContent.H3H2,
+          (settings.httpsRecord as HTTPSRecord) ?? HTTPSRecord.H3H2,
         );
 
         subtests.push({
@@ -89,15 +88,15 @@ export const HEv3QuicTlsTest: React.FC = () => {
           options: [1, 5, 10, 20, 30, 40, 50],
           defaultOption: 10,
         },
-        httpsRecordContent: {
+        httpsRecord: {
           options: [
-            HTTPSRecordContent.H3H2,
-            HTTPSRecordContent.H2H3,
-            HTTPSRecordContent.H3,
-            HTTPSRecordContent.H2,
-            HTTPSRecordContent.None,
+            HTTPSRecord.H3H2,
+            HTTPSRecord.H2H3,
+            HTTPSRecord.H3,
+            HTTPSRecord.H2,
+            HTTPSRecord.None,
           ],
-          defaultOption: HTTPSRecordContent.H3H2,
+          defaultOption: HTTPSRecord.H3H2,
         },
         autoTransmitResults: true,
         randomizeDomains: true,
@@ -113,28 +112,33 @@ export const HEv3QuicTlsTest: React.FC = () => {
 export const generateQuicTlsDelayUrl = async (
   randomizeDomain: boolean,
   delay: number,
-  protocol: "quic" | "tls",
-  httpsRecordContent: HTTPSRecordContent,
+  protocol: Protocol,
+  httpsRecord: HTTPSRecord,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
   const id = randomizeDomain ? generateRandomId() : 0;
 
   const httpsRR: string = {
-    [HTTPSRecordContent.H3H2]: "h3h2",
-    [HTTPSRecordContent.H2H3]: "h2h3",
-    [HTTPSRecordContent.H3]: "h3",
-    [HTTPSRecordContent.H2]: "h2",
-    [HTTPSRecordContent.None]: "none",
-  }[httpsRecordContent];
+    [HTTPSRecord.H3H2]: "h3h2",
+    [HTTPSRecord.H2H3]: "h2h3",
+    [HTTPSRecord.H3]: "h3",
+    [HTTPSRecord.H2]: "h2",
+    [HTTPSRecord.None]: "none",
+  }[httpsRecord];
 
-  const quicDelay = protocol === "quic" ? delay : 0;
-  const tlsDelay = protocol === "tls" ? delay : 0;
+  const quicDelay = protocol === Protocol.QUIC ? delay : 0;
+  const tlsDelay = protocol === Protocol.TLS ? delay : 0;
 
   return `https://https-${httpsRR}_ipv4-0_ipv6-0_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/ping`;
 };
 
-const enum HTTPSRecordContent {
+const enum Protocol {
+  QUIC = "quic",
+  TLS = "tls",
+}
+
+const enum HTTPSRecord {
   H3H2 = "alpn=h3,h2",
   H2H3 = "alpn=h2,h3",
   H3 = "alpn=h3",
