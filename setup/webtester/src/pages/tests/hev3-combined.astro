@@ -5,15 +5,7 @@ import { HEv3CombinedTest } from "@/components/tests/hev3-combined-test";
 ---
 
 <PageLayout title="HEv3 Combined Test | Happy Eyeballs Webtester">
-  <Header titleLine1="Happy Eyeballs Version 3" titleLine2="Combined Test">
-    <p>
-      Note: In this test, the IP delay for TLS/TCP connections is only added
-      after the TCP handshake completed and the TLS Client Hello packet has been
-      parsed at the server. If the browser uses a successful TCP handshake as a
-      signal for successful connection establishment, the TLS handshake delay
-      won't affect the IP version choice.
-    </p>
-  </Header>
+  <Header titleLine1="Happy Eyeballs Version 3" titleLine2="Combined Test" />
 
   <HEv3CombinedTest client:load />
 </PageLayout>
