@@ -11,6 +11,6 @@ FROM caddy:latest
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
 RUN apk add --no-cache bash bind-tools
-COPY caddy.json /etc/caddy
+COPY Caddyfile /etc/caddy
 
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
