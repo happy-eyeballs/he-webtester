@@ -118,7 +118,7 @@ export const TestSettingsSection: React.FC<Props> = ({
               onValueChange={(value) => setHttpsRecord(value as HTTPSRecord)}
               disabled={disabled}
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-60">
                 <SelectValue>{httpsRecord}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -139,7 +139,7 @@ export const TestSettingsSection: React.FC<Props> = ({
               onValueChange={(value) => setDelayedIPVersion(value as IPVersion)}
               disabled={disabled}
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-30">
                 <SelectValue>{delayedIPVersion}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -160,7 +160,7 @@ export const TestSettingsSection: React.FC<Props> = ({
               onValueChange={(value) => setDelayedProtocol(value as Protocol)}
               disabled={disabled}
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-30">
                 <SelectValue>{delayedProtocol}</SelectValue>
               </SelectTrigger>
               <SelectContent>

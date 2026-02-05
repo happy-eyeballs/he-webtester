@@ -30,7 +30,7 @@ export const HEv3CombinedTest: React.FC = () => {
     const protocol = isQUIC ? "QUIC" : "TLS";
 
     return {
-      value: `${protocol}/${ipVersion}`,
+      value: `${protocol} / ${ipVersion}`,
       color: isIPv6
         ? isQUIC
           ? TestRunResultColor.Option1
@@ -38,6 +38,9 @@ export const HEv3CombinedTest: React.FC = () => {
         : isQUIC
           ? TestRunResultColor.Option3
           : TestRunResultColor.Option4,
+      metadata: {
+        "HTTP Protocol": httpProtocol,
+      },
     } satisfies ResponseHandlerResult;
   };
 
@@ -78,14 +81,15 @@ export const HEv3CombinedTest: React.FC = () => {
       buildSubtests={buildSubtests}
       enabledSettings={{
         repetitions: {
-          options: [1, 5, 10, 20, 30, 40, 50],
-          defaultOption: 10,
+          options: [1, 2, 5, 10],
+          defaultOption: 1,
         },
         httpsRecord: {
           options: [
             HTTPSRecord.H3H2,
             HTTPSRecord.H2H3,
             HTTPSRecord.H3,
+            HTTPSRecord.H3NoDefault,
             HTTPSRecord.H2,
             HTTPSRecord.None,
           ],

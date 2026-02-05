@@ -27,6 +27,7 @@ export const generateHEv3TestUrl = async (
     [HTTPSRecord.H3H2]: "h3h2",
     [HTTPSRecord.H2H3]: "h2h3",
     [HTTPSRecord.H3]: "h3",
+    [HTTPSRecord.H3NoDefault]: "h3-no-default",
     [HTTPSRecord.H2]: "h2",
     [HTTPSRecord.None]: "none",
   }[httpsRecord];

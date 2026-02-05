@@ -250,6 +250,7 @@ export const enum HTTPSRecord {
   H3H2 = "alpn=h3,h2",
   H2H3 = "alpn=h2,h3",
   H3 = "alpn=h3",
+  H3NoDefault = "alpn=h3 no-default-alpn",
   H2 = "alpn=h2",
   None = "NONE",
 }

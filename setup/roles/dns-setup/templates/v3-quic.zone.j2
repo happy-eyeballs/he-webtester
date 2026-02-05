@@ -7,10 +7,11 @@ $ORIGIN v3-quic.{{ happy_eyeballs.nameserver.base_domain }}.
 
 
 $TTL 300
-*             IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
-*             IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
+*                      IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
+*                      IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
 
-https-h3h2_*  IN  HTTPS  1  . alpn=h3,h2
-https-h2h3_*  IN  HTTPS  1  . alpn=h2,h3
-https-h3_*    IN  HTTPS  1  . alpn=h3
-https-h2_*    IN  HTTPS  1  . alpn=h2
+https-h3h2_*           IN  HTTPS  1  . alpn=h3,h2
+https-h2h3_*           IN  HTTPS  1  . alpn=h2,h3
+https-h3_*             IN  HTTPS  1  . alpn=h3
+https-h3-no-default_*  IN  HTTPS  1  . alpn=h3 no-default-alpn
+https-h2_*             IN  HTTPS  1  . alpn=h2

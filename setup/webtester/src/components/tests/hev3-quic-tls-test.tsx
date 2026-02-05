@@ -94,6 +94,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
             HTTPSRecord.H3H2,
             HTTPSRecord.H2H3,
             HTTPSRecord.H3,
+            HTTPSRecord.H3NoDefault,
             HTTPSRecord.H2,
             HTTPSRecord.None,
           ],

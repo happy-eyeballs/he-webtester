@@ -34,7 +34,7 @@
 
     layer4 {
         udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
-            @quic-delay quic sni_regexp ^https-[a-z0-9]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            @quic-delay quic sni_regexp ^https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
             route @quic-delay {
                 throttle_var {tls.regexp.1}ms  # IPv4
                 throttle_var {tls.regexp.3}ms  # QUIC
@@ -44,7 +44,7 @@
         }
 
         udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
-            @quic-delay quic sni_regexp ^https-[a-z0-9]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            @quic-delay quic sni_regexp ^https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
             route @quic-delay {
                 throttle_var {tls.regexp.2}ms  # IPv6
                 throttle_var {tls.regexp.3}ms  # QUIC
@@ -54,7 +54,7 @@
         }
 
         tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
-            @tls-delay tls sni_regexp ^https-[a-z0-9]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            @tls-delay tls sni_regexp ^https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
             route @tls-delay {
                 throttle_var {tls.regexp.1}ms  # IPv4
                 throttle_var {tls.regexp.4}ms  # TLS
@@ -64,7 +64,7 @@
         }
 
         tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
-            @tls-delay tls sni_regexp ^https-[a-z0-9]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
+            @tls-delay tls sni_regexp ^https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
             route @tls-delay {
                 throttle_var {tls.regexp.2}ms  # IPv6
                 throttle_var {tls.regexp.4}ms  # TLS
