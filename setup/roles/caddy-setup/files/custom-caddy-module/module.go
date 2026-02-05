@@ -1,7 +1,7 @@
 package happy_eyeballs_webtester_module
 
 import (
-	"net"
+	"context"
 	"time"
 
 	"github.com/caddyserver/caddy/v2"
@@ -50,10 +50,16 @@ func (h *Layer4ThrottleVarHandler) Handle(connection *layer4.Connection, next la
 		return next.Handle(connection)
 	}
 
-	h.logger.Debug("wrapping connection with latency", zap.Duration("latency", latency))
+	h.logger.Debug("applying latency", zap.Duration("latency", latency))
 
-	wrappedConnection := connection.Wrap(&ConnectionWithLatency{Conn: connection.Conn, latency: latency})
-	return next.Handle(wrappedConnection)
+	timer := time.NewTimer(latency)
+	select {
+	case <-timer.C:
+	case <-connection.Context.Done():
+		return context.Canceled
+	}
+
+	return next.Handle(connection)
 }
 
 func (h *Layer4ThrottleVarHandler) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
@@ -67,21 +73,6 @@ func (h *Layer4ThrottleVarHandler) UnmarshalCaddyfile(d *caddyfile.Dispenser) er
 	h.Latency = d.Val()
 
 	return nil
-}
-
-type ConnectionWithLatency struct {
-	net.Conn
-	latency time.Duration
-}
-
-func (c *ConnectionWithLatency) Read(b []byte) (n int, err error) {
-	time.Sleep(c.latency)
-	return c.Conn.Read(b)
-}
-
-func (c *ConnectionWithLatency) Write(b []byte) (n int, err error) {
-	time.Sleep(c.latency)
-	return c.Conn.Write(b)
 }
 
 var (
