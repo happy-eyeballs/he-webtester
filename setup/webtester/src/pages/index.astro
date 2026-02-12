@@ -55,7 +55,7 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
       </TestCard>
 
       <TestCard
-        title="[BETA] V3 QUIC vs. TLS/TCP Test"
+        title="[BETA] Happy Eyeballs v3 QUIC vs. TLS/TCP Test"
         href="tests/hev3-quic-tls"
       >
         Happy Eyeballs version 3 extends connection racing to the application
@@ -65,7 +65,10 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
         delay to determine if and when your client decides to switch protocols.
       </TestCard>
 
-      <TestCard title="[BETA] V3 Combined Test" href="tests/hev3-combined">
+      <TestCard
+        title="[BETA] Happy Eyeballs v3 Combined Test"
+        href="tests/hev3-combined"
+      >
         Happy Eyeballs version 3 extends connection racing to the application
         layer. Browsers implementing this version should fall back between IP
         versions and protocols to avoid blocking if one is unresponsive.

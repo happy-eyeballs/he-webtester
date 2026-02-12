@@ -18,8 +18,9 @@ import { ConnectionAttemptDelayTest } from "@/components/tests/connection-attemp
     </p>
     <p>
       We randomize domains to prevent caching effects on the browser's side. The
-      measurement without randomization shows us if the browser does any caching
-      or uses performance measurements to select IP versions.
+      measurement without randomization shows whether the browser caches or uses
+      performance measurements to select IP versions. The web server only offers
+      HTTP/1.1 to prevent connection reuse between tests.
     </p>
   </Header>
 

@@ -14,7 +14,8 @@ import { ResolutionDelayTest } from "@/components/tests/resolution-delay-test.ts
     </p>
     <p>
       We randomize domain names to prevent caching effects on both the browser
-      and resolver.
+      and resolver. Additionally, the web server only offers HTTP/1.1 to prevent
+      connection reuse between tests.
     </p>
   </Header>
 
