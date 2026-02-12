@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
+  IPDelayType,
   HTTPSRecord,
   Protocol,
   type ResponseHandlerResult,
@@ -9,19 +10,16 @@ import {
   type TestSettings,
 } from "@/lib/test-run.ts";
 import { TestSkeleton } from "@/components/test-skeleton.tsx";
-import { fetchAvailableDelays } from "@/lib/he-configuration.ts";
 import { generateHEv3TestUrl } from "@/lib/test-utils";
+import {
+  buildInitialSettingsFromEnabledSettings,
+  type EnabledTestSettings,
+} from "@/lib/settings.ts";
 
 export const HEv3QuicTlsTest: React.FC = () => {
-  const [delays, setDelays] = useState<number[]>([]);
-
-  useEffect(() => {
-    const setup = async () => {
-      setDelays((await fetchAvailableDelays()).v3_quic_delays);
-    };
-
-    setup();
-  }, []);
+  const [settings, setSettings] = useState<TestSettings>(
+    buildInitialSettingsFromEnabledSettings(enabledSettings),
+  );
 
   const responseHandler = async (
     response: Response,
@@ -43,7 +41,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
     } satisfies ResponseHandlerResult;
   };
 
-  const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
+  const buildSubtests = async (): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
     for (const part of [
@@ -58,14 +56,15 @@ export const HEv3QuicTlsTest: React.FC = () => {
     ]) {
       const subtests: Subtest[] = [];
 
-      for (const delay of delays) {
+      for (const delay of handshakeDelays) {
         const url = await generateHEv3TestUrl(
-          settings.randomizeDomains ?? false,
+          settings.randomizeDomains,
           0,
           0,
           part.protocol === Protocol.QUIC ? delay : 0,
           part.protocol === Protocol.TLS ? delay : 0,
           (settings.httpsRecord as HTTPSRecord) ?? HTTPSRecord.H3H2,
+          IPDelayType.Handshake,
         );
 
         subtests.push({
@@ -83,30 +82,36 @@ export const HEv3QuicTlsTest: React.FC = () => {
 
   return (
     <TestSkeleton
+      enabledSettings={enabledSettings}
+      settings={settings}
+      setSettings={setSettings}
       buildSubtests={buildSubtests}
-      enabledSettings={{
-        repetitions: {
-          options: [1, 5, 10, 20, 30, 40, 50],
-          defaultOption: 10,
-        },
-        httpsRecord: {
-          options: [
-            HTTPSRecord.H3H2,
-            HTTPSRecord.H2H3,
-            HTTPSRecord.H3,
-            HTTPSRecord.H3NoDefault,
-            HTTPSRecord.H2,
-            HTTPSRecord.None,
-          ],
-          defaultOption: HTTPSRecord.H3H2,
-        },
-        autoTransmitResults: true,
-        randomizeDomains: true,
-        deviceInfo: true,
-      }}
       resultsUrl="/results/hev3-quic-tls" // TODO
-      subtestColumnDescription="Delay before initial read on connection [ms]"
-      subtestColumnLabels={delays.map((delay) => delay.toString())}
+      subtestColumnDescription="Protocol Handshake Delay [ms]"
+      subtestColumnLabels={handshakeDelays.map((delay) => delay.toString())}
     />
   );
+};
+
+const handshakeDelays = [0, 100, 200, 300, 400, 500];
+
+const enabledSettings: EnabledTestSettings = {
+  repetitions: {
+    options: [1, 5, 10, 20, 30, 40, 50],
+    defaultOption: 5,
+  },
+  httpsRecord: {
+    options: [
+      HTTPSRecord.H3H2,
+      HTTPSRecord.H2H3,
+      HTTPSRecord.H3,
+      HTTPSRecord.H3NoDefault,
+      HTTPSRecord.H2,
+      HTTPSRecord.None,
+    ],
+    defaultOption: HTTPSRecord.H3H2,
+  },
+  randomizeDomains: true,
+  autoTransmitResults: false,
+  deviceInfo: {},
 };

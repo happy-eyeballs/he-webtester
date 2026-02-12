@@ -27,5 +27,4 @@ export const fetchAvailableDelays = async (): Promise<Delays> => {
 export type Delays = {
   v1_delays: number[];
   v2_delays: number[];
-  v3_quic_delays: number[];
 };

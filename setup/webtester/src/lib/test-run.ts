@@ -163,16 +163,17 @@ const defaultResponseHandler = async (
 };
 
 export type TestSettings = {
-  repetitions: number | undefined;
+  repetitions: number;
 
-  httpsRecord: HTTPSRecord | undefined;
-  delayedIPVersion: IPVersion | undefined;
-  delayedProtocol: Protocol | undefined;
+  httpsRecord: HTTPSRecord;
+  ipDelayType: IPDelayType;
+  delayedIPVersion: IPVersion;
+  delayedProtocol: Protocol;
 
-  autoTransmitResults: boolean | undefined;
-  randomizeDomains: boolean | undefined;
-  resolverAddresses: string | undefined;
-  deviceInfo: string | undefined;
+  autoTransmitResults: boolean;
+  randomizeDomains: boolean;
+  resolverAddresses: string;
+  deviceInfo: string;
 };
 
 export type TestRun = {
@@ -244,6 +245,11 @@ export const enum IPVersion {
 export const enum Protocol {
   QUIC = "QUIC",
   TLS = "TLS/TCP",
+}
+
+export const enum IPDelayType {
+  Handshake = "Handshake (introduced once during QUIC or TLS handshake)",
+  Network = "Network latency (introduced for every packet)",
 }
 
 export const enum HTTPSRecord {

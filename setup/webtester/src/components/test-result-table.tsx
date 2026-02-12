@@ -2,8 +2,8 @@ import React from "react";
 import { cn } from "@/lib/utils.ts";
 import { TestResultBadge } from "@/components/test-result-badge.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
-import type { TestRun } from "@/lib/test-run.ts";
-import { CloudUploadIcon, ShuffleIcon, type LucideIcon } from "lucide-react";
+import { HTTPSRecord, type TestRun } from "@/lib/test-run.ts";
+import { CloudUploadIcon, type LucideIcon, ShuffleIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -38,11 +38,11 @@ export const TestResultTable: React.FC<Props> = ({
               <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-30">
                 Test Run #
               </th>
-              <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-50">
+              <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-30">
                 Started At
               </th>
               {hasTestPartName && (
-                <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-50">
+                <th className="text-left whitespace-nowrap px-3 pt-5 border-r w-30">
                   {testPartDescription ?? "Part"}
                 </th>
               )}
@@ -118,7 +118,7 @@ export const TestResultTable: React.FC<Props> = ({
                         </td>
 
                         <td
-                          className="whitespace-nowrap px-3 border-r"
+                          className="whitespace-break-spaces px-3 border-r"
                           rowSpan={repetition.parts.length}
                         >
                           {repetition.startedAt.toLocaleString()}
@@ -155,7 +155,8 @@ export const TestResultTable: React.FC<Props> = ({
                                         },
                                       ]
                                     : []),
-                                  ...(testRun.settings.httpsRecord
+                                  ...(testRun.settings.httpsRecord !==
+                                  HTTPSRecord.None
                                     ? [
                                         {
                                           key: "HTTPS RR",

@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-  type EnabledTestSettings,
-  TestSettingsSection,
-} from "@/components/settings/test-settings-section.tsx";
+import { TestSettingsSection } from "@/components/settings/test-settings-section.tsx";
 import {
   type TestRun,
   type TestSettings,
@@ -25,10 +22,13 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
+import type { EnabledTestSettings } from "@/lib/settings.ts";
 
 type Props = {
-  buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
   enabledSettings: EnabledTestSettings;
+  settings: TestSettings;
+  setSettings: (settings: TestSettings) => void;
+  buildSubtests: () => Promise<TestPart[]>;
   resultsUrl: string;
   subtestColumnDescription: string;
   subtestColumnLabels: string[];
@@ -38,6 +38,8 @@ type Props = {
 export const TestSkeleton: React.FC<Props> = ({
   buildSubtests,
   enabledSettings,
+  settings,
+  setSettings,
   resultsUrl,
   subtestColumnDescription,
   subtestRowDescription,
@@ -64,7 +66,7 @@ export const TestSkeleton: React.FC<Props> = ({
     }
   };
 
-  const executeTest = (settings: TestSettings) =>
+  const executeTest = () =>
     withDisabledUserInteraction(async () => {
       await executeTestRun(
         settings,
@@ -97,7 +99,9 @@ export const TestSkeleton: React.FC<Props> = ({
         <CardContent>
           <TestSettingsSection
             enabledSettings={enabledSettings}
-            onStartTestRun={executeTest}
+            settings={settings}
+            setSettings={setSettings}
+            startTestRun={executeTest}
             disabled={isUserInteractionDisabled}
           />
         </CardContent>

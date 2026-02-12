@@ -1,4 +1,4 @@
-import { HTTPSRecord } from "@/lib/test-run.ts";
+import { IPDelayType, HTTPSRecord } from "@/lib/test-run.ts";
 import { getHappyEyeballsTestDomain } from "@/lib/he-configuration.ts";
 
 export const generateRandomId = (): number => {
@@ -18,6 +18,7 @@ export const generateHEv3TestUrl = async (
   quicDelay: number,
   tlsDelay: number,
   httpsRecord: HTTPSRecord,
+  delayType: IPDelayType,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
@@ -32,5 +33,10 @@ export const generateHEv3TestUrl = async (
     [HTTPSRecord.None]: "none",
   }[httpsRecord];
 
-  return `https://https-${httpsRR}_ipv4-${ipv4Delay}_ipv6-${ipv6Delay}_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/ping`;
+  const layer: string = {
+    [IPDelayType.Handshake]: "l4",
+    [IPDelayType.Network]: "l3",
+  }[delayType];
+
+  return `https://${layer}_https-${httpsRR}_ipv4-${ipv4Delay}_ipv6-${ipv6Delay}_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/ping`;
 };

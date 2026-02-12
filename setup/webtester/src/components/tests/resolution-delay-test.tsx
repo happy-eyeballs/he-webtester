@@ -10,19 +10,24 @@ import {
   fetchAvailableDelays,
 } from "@/lib/he-configuration.ts";
 import { generateRandomId } from "@/lib/test-utils";
+import {
+  buildInitialSettingsFromEnabledSettings,
+  type EnabledTestSettings,
+} from "@/lib/settings.ts";
 
 export const ResolutionDelayTest: React.FC = () => {
+  const [settings, setSettings] = useState<TestSettings>(
+    buildInitialSettingsFromEnabledSettings(enabledSettings),
+  );
   const [availableDelays, setAvailableDelays] = useState<number[]>([]);
 
   useEffect(() => {
-    const setup = async () => {
-      setAvailableDelays((await fetchAvailableDelays()).v2_delays);
-    };
-
-    setup();
+    fetchAvailableDelays().then((delays) =>
+      setAvailableDelays(delays.v2_delays),
+    );
   }, []);
 
-  const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
+  const buildSubtests = async (): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
     for (const part of [
@@ -33,7 +38,7 @@ export const ResolutionDelayTest: React.FC = () => {
 
       for (let i = 0; i < availableDelays.length; i++) {
         const url = await generateResolutionDelayUrl(
-          settings.randomizeDomains ?? false,
+          settings.randomizeDomains,
           availableDelays[i] ?? 0,
           part.dnsRecordType,
         );
@@ -49,22 +54,26 @@ export const ResolutionDelayTest: React.FC = () => {
 
   return (
     <TestSkeleton
+      enabledSettings={enabledSettings}
+      settings={settings}
+      setSettings={setSettings}
       buildSubtests={buildSubtests}
-      enabledSettings={{
-        repetitions: {
-          options: [1, 5, 10, 20, 30, 40, 50],
-          defaultOption: 10,
-        },
-        autoTransmitResults: true,
-        randomizeDomains: true,
-        resolverAddresses: true,
-        deviceInfo: true,
-      }}
       resultsUrl="/results/resolution-delay"
       subtestColumnDescription="IPv6 Delay [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />
   );
+};
+
+const enabledSettings: EnabledTestSettings = {
+  repetitions: {
+    options: [1, 5, 10, 20, 30, 40, 50],
+    defaultOption: 5,
+  },
+  randomizeDomains: true,
+  autoTransmitResults: false,
+  resolverAddresses: {},
+  deviceInfo: {},
 };
 
 export const generateResolutionDelayUrl = async (
