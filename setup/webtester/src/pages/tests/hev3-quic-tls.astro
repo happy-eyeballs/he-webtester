@@ -6,31 +6,38 @@ import Link from "@/components/link.astro";
 ---
 
 <PageLayout title="HEv3 QUIC vs. TLS/TCP Test | Happy Eyeballs Webtester">
-  <Header titleLine1="Happy Eyeballs Version 3" titleLine2="QUIC vs. TLS/TCP Test">
+  <Header
+    titleLine1="Happy Eyeballs Version 3"
+    titleLine2="QUIC vs. TLS/TCP Test"
+  >
     <p>
-      We operate a specialized web server capable of introducing artificial
-      delays during the initial connection handshake based on the TLS SNI. The
-      server listens for both TCP and UDP connections and responds with the
-      negotiated HTTP protocol version (HTTP/3 or HTTP/2).
+      Our specialized web server introduces targeted, artificial delays during
+      the transport-layer protocol handshake (based on the TLS SNI). This
+      capability allows us to selectively delay either the TLS/TCP or the QUIC
+      handshake.
     </p>
     <p>
-      Our DNS nameserver responds with HTTPS resource records for all test
-      domains to signal HTTP/3 (QUIC) availability. For this test to function,
-      your browser must query and respect these records. You can verify this
-      using our
-      <Link href="/tests/http3-availability">HTTP/3 availability tester</Link>.
+      To signal HTTP/3 (QUIC) availability, our DNS nameserver responds with
+      HTTPS resource records for all test domains. The specific contents of
+      these HTTPS records can be customized in the settings.
     </p>
     <p>
-      We simulate a range of handshake delays for both QUIC and TLS/TCP. Your
-      browser will attempt connections for each delay, allowing us to observe if
-      it handles the Happy Eyeballs version 3 race between both application
-      layer protocols.
+      Note: For the test to function properly, your browser must query and
+      respect these records. You can verify your browser's compatibility using
+      our <Link href="/tests/http3-availability">
+        HTTP/3 availability test
+      </Link>.
+    </p>
+    <p>
+      During the test, the browser establishes connections for a range of
+      transport-layer delays. This allows you to observe if and how the browser
+      handles the Happy Eyeballs version 3 race between TLS/TCP and QUIC.
     </p>
     <p>
       We randomize domains to try to prevent caching effects on the browser's
       side as much as possible. Furthermore, we aggressively close connections
       on the server side after every request, forcing the browser to perform a
-      new handshake for each test.
+      fresh handshake for each new test.
     </p>
   </Header>
 
