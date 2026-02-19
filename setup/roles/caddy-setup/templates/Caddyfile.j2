@@ -35,13 +35,9 @@
     layer4 {
         udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @quic-delay quic sni_regexp ^l4_https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @quic-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.1}ms  # IPv4
                         throttle_var {tls.regexp.3}ms  # QUIC
 
@@ -53,13 +49,9 @@
 
         udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @quic-delay quic sni_regexp ^l4_https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @quic-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.2}ms  # IPv6
                         throttle_var {tls.regexp.3}ms  # QUIC
 
@@ -71,13 +63,9 @@
 
         tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @tls-delay tls sni_regexp ^l4_https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @tls-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.1}ms  # IPv4
                         throttle_var {tls.regexp.4}ms  # TLS
 
@@ -89,13 +77,9 @@
 
         tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @tls-delay tls sni_regexp ^l4_https-[a-z0-9-]+_ipv4-([0-9]+)_ipv6-([0-9]+)_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @tls-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.2}ms  # IPv6
                         throttle_var {tls.regexp.4}ms  # TLS
 
@@ -111,13 +95,9 @@
         # exclusive to HEv3 test
         udp/{{ item.ipv4 }}:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @quic-delay quic sni_regexp ^.*_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @quic-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.1}ms  # QUIC
 
                         proxy udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
@@ -129,13 +109,9 @@
         # exclusive to HEv3 test
         udp/[{{ item.ipv6 }}]:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @quic-delay quic sni_regexp ^.*_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @quic-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.1}ms  # QUIC
 
                         proxy udp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
@@ -147,13 +123,9 @@
         # shared between CAD and HEv3 tests
         tcp/{{ item.ipv4 }}:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @tls-delay tls sni_regexp ^.*_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @tls-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.2}ms  # TLS
 
                         proxy tcp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443
@@ -170,13 +142,9 @@
         # shared between CAD and HEv3 tests
         tcp/[{{ item.ipv6 }}]:443 {
             route {
-                begin_processing_delay_equalization
-
                 subroute {
                     @tls-delay tls sni_regexp ^.*_quic-([0-9]+)_tls-([0-9]+)_id-[0-9]+\.v3-quic\.{{ happy_eyeballs.nameserver.base_domain | replace('.', '\\.') }}$
                     route @tls-delay {
-                        processing_delay_equalization 200ms
-
                         throttle_var {tls.regexp.2}ms  # TLS
 
                         proxy tcp/[{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443
