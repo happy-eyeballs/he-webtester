@@ -34,12 +34,12 @@ func run() error {
 		return errors.New("PACKET_CAPTURE_PIPE_PATH environment variable is not set")
 	}
 
-	_, err := correlation.NewCorrelationService(packetCapturePipePath)
+	correlationService, err := correlation.NewCorrelationService(packetCapturePipePath)
 	if err != nil {
 		return fmt.Errorf("error starting correlation service: %w", err)
 	}
 
-	httpServer := server.NewHTTPServer(":8080")
+	httpServer := server.NewHTTPServer(":8080", correlationService)
 
 	go func() {
 		err := httpServer.ListenAndServe()
