@@ -10,7 +10,7 @@ import {
   type TestSettings,
 } from "@/lib/test-run.ts";
 import { TestSkeleton } from "@/components/test-skeleton.tsx";
-import { generateHEv3TestUrl } from "@/lib/test-utils";
+import { generateHEv3TestUrl, generateRange } from "@/lib/test-utils";
 import {
   buildInitialSettingsFromEnabledSettings,
   type EnabledTestSettings,
@@ -19,6 +19,12 @@ import {
 export const HEv3QuicTlsTest: React.FC = () => {
   const [settings, setSettings] = useState<TestSettings>(
     buildInitialSettingsFromEnabledSettings(enabledSettings),
+  );
+
+  const handshakeDelays = generateRange(
+    settings.protocolHandshakeDelayRange.from,
+    settings.protocolHandshakeDelayRange.to,
+    settings.protocolHandshakeDelayRange.step,
   );
 
   const responseHandler = async (
@@ -93,8 +99,6 @@ export const HEv3QuicTlsTest: React.FC = () => {
   );
 };
 
-const handshakeDelays = [0, 100, 200, 300, 400, 500];
-
 const enabledSettings: EnabledTestSettings = {
   repetitions: {
     options: [1, 5, 10, 20, 30, 40, 50],
@@ -110,6 +114,11 @@ const enabledSettings: EnabledTestSettings = {
       HTTPSRecord.None,
     ],
     defaultOption: HTTPSRecord.H3H2,
+  },
+  protocolHandshakeDelayRange: {
+    from: 0,
+    to: 500,
+    step: 100,
   },
   randomizeDomains: true,
   autoTransmitResults: false,

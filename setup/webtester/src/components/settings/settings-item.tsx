@@ -9,3 +9,7 @@ export const SettingsItem: React.FC<{
     <div className="min-w-0">{children}</div>
   </div>
 );
+
+export const SettingsDivider: React.FC = () => (
+  <div className="border-t my-4" />
+);

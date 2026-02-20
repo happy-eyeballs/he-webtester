@@ -11,7 +11,7 @@ import {
   type TestSettings,
 } from "@/lib/test-run.ts";
 import { TestSkeleton } from "@/components/test-skeleton.tsx";
-import { generateHEv3TestUrl } from "@/lib/test-utils";
+import { generateHEv3TestUrl, generateRange } from "@/lib/test-utils";
 import {
   buildInitialSettingsFromEnabledSettings,
   type EnabledTestSettings,
@@ -24,6 +24,18 @@ export const HEv3CombinedTest: React.FC = () => {
   );
   const [networkDelays, setNetworkDelays] = useState<number[]>([]);
 
+  const protocolHandshakeDelays = generateRange(
+    settings.protocolHandshakeDelayRange.from,
+    settings.protocolHandshakeDelayRange.to,
+    settings.protocolHandshakeDelayRange.step,
+  );
+
+  const ipHandshakeDelays = generateRange(
+    settings.ipHandshakeDelayRange.from,
+    settings.ipHandshakeDelayRange.to,
+    settings.ipHandshakeDelayRange.step,
+  );
+
   useEffect(() => {
     fetchAvailableDelays().then((delays) => setNetworkDelays(delays.v1_delays));
   }, []);
@@ -34,12 +46,12 @@ export const HEv3CombinedTest: React.FC = () => {
     const ipDelays =
       settings.ipDelayType === IPDelayType.Network
         ? networkDelays
-        : handshakeDelays;
+        : ipHandshakeDelays;
 
     for (const ipDelay of ipDelays) {
       const subtests: Subtest[] = [];
 
-      for (const protocolDelay of handshakeDelays) {
+      for (const protocolDelay of protocolHandshakeDelays) {
         const url =
           settings.ipDelayType === IPDelayType.Handshake
             ? await generateHEv3TestUrl(
@@ -79,9 +91,13 @@ export const HEv3CombinedTest: React.FC = () => {
 
   const buildEnabledSettings = (): EnabledTestSettings => {
     if (settings.ipDelayType === IPDelayType.Network) {
-      // disable the "delayed ip version" setting when the delay type is network
-      // (only IPv6 delay is configured)
-      const { delayedIPVersion, ...remainingEnabledSettings } = enabledSettings;
+      // disable the "delayed ip version" and "ip delays" settings when the
+      // delay type is network (only IPv6 delay is configured)
+      const {
+        delayedIPVersion,
+        ipHandshakeDelayRange,
+        ...remainingEnabledSettings
+      } = enabledSettings;
       return remainingEnabledSettings;
     }
 
@@ -94,15 +110,16 @@ export const HEv3CombinedTest: React.FC = () => {
       settings={settings}
       setSettings={setSettings}
       buildSubtests={buildSubtests}
+      showSettingsDividers={true}
       resultsUrl="/results/hev3-combined" // TODO
       subtestColumnDescription="Protocol Handshake Delay [ms]"
-      subtestColumnLabels={handshakeDelays.map((delay) => delay.toString())}
+      subtestColumnLabels={protocolHandshakeDelays.map((delay) =>
+        delay.toString(),
+      )}
       subtestRowDescription="IP Delay [ms]"
     />
   );
 };
-
-const handshakeDelays = [0, 100, 200, 300, 400, 500];
 
 const enabledSettings: EnabledTestSettings = {
   repetitions: {
@@ -128,9 +145,19 @@ const enabledSettings: EnabledTestSettings = {
     options: [IPVersion.IPv4, IPVersion.IPv6],
     defaultOption: IPVersion.IPv6,
   },
+  ipHandshakeDelayRange: {
+    from: 0,
+    to: 500,
+    step: 100,
+  },
   delayedProtocol: {
     options: [Protocol.QUIC, Protocol.TLS],
     defaultOption: Protocol.QUIC,
+  },
+  protocolHandshakeDelayRange: {
+    from: 0,
+    to: 500,
+    step: 100,
   },
   randomizeDomains: true,
   autoTransmitResults: false,

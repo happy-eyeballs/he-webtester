@@ -169,6 +169,8 @@ export type TestSettings = {
   ipDelayType: IPDelayType;
   delayedIPVersion: IPVersion;
   delayedProtocol: Protocol;
+  protocolHandshakeDelayRange: DelayRange;
+  ipHandshakeDelayRange: DelayRange;
 
   autoTransmitResults: boolean;
   randomizeDomains: boolean;
@@ -236,6 +238,12 @@ export type ResponseHandlerResult = {
   value: string;
   color: TestRunResultColor;
   metadata?: SubtestResultMetadata;
+};
+
+export type DelayRange = {
+  from: number;
+  to: number;
+  step: number;
 };
 
 export const enum IPVersion {

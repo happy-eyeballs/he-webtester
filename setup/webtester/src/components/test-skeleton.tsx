@@ -28,6 +28,7 @@ type Props = {
   enabledSettings: EnabledTestSettings;
   settings: TestSettings;
   setSettings: (settings: TestSettings) => void;
+  showSettingsDividers?: boolean;
   buildSubtests: () => Promise<TestPart[]>;
   resultsUrl: string;
   subtestColumnDescription: string;
@@ -40,6 +41,7 @@ export const TestSkeleton: React.FC<Props> = ({
   enabledSettings,
   settings,
   setSettings,
+  showSettingsDividers = false,
   resultsUrl,
   subtestColumnDescription,
   subtestRowDescription,
@@ -102,7 +104,9 @@ export const TestSkeleton: React.FC<Props> = ({
             settings={settings}
             setSettings={setSettings}
             startTestRun={executeTest}
+            showDividers={showSettingsDividers}
             disabled={isUserInteractionDisabled}
+            disableProtocolHandshakeDelayRangeSetting={testRuns.length > 0}
           />
         </CardContent>
       </Card>

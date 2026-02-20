@@ -4,6 +4,7 @@ import {
   IPVersion,
   Protocol,
   type TestSettings,
+  type DelayRange,
 } from "@/lib/test-run.ts";
 
 export type EnabledTestSettings = {
@@ -12,6 +13,8 @@ export type EnabledTestSettings = {
   ipDelayType?: { options: IPDelayType[]; defaultOption: IPDelayType };
   delayedIPVersion?: { options: IPVersion[]; defaultOption: IPVersion };
   delayedProtocol?: { options: Protocol[]; defaultOption: Protocol };
+  protocolHandshakeDelayRange?: DelayRange;
+  ipHandshakeDelayRange?: DelayRange;
   autoTransmitResults?: boolean;
   randomizeDomains?: boolean;
   resolverAddresses?: {};
@@ -29,6 +32,16 @@ export const buildInitialSettingsFromEnabledSettings = (
     enabledSettings.delayedIPVersion?.defaultOption ?? IPVersion.IPv6,
   delayedProtocol:
     enabledSettings.delayedProtocol?.defaultOption ?? Protocol.QUIC,
+  protocolHandshakeDelayRange: enabledSettings.protocolHandshakeDelayRange ?? {
+    from: 0,
+    to: 500,
+    step: 100,
+  },
+  ipHandshakeDelayRange: enabledSettings.ipHandshakeDelayRange ?? {
+    from: 0,
+    to: 500,
+    step: 100,
+  },
   randomizeDomains: enabledSettings.randomizeDomains ?? true,
   autoTransmitResults: enabledSettings.autoTransmitResults ?? false,
   resolverAddresses: "",

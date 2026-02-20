@@ -9,23 +9,29 @@ import {
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
-  IPDelayType,
   HTTPSRecord,
+  IPDelayType,
   IPVersion,
   Protocol,
   type TestSettings,
 } from "@/lib/test-run.ts";
 import { Input } from "@/components/ui/input.tsx";
 import { DeviceInfoInput } from "@/components/settings/device-info-input.tsx";
-import { SettingsItem } from "@/components/settings/settings-item";
+import {
+  SettingsDivider,
+  SettingsItem,
+} from "@/components/settings/settings-item";
 import type { EnabledTestSettings } from "@/lib/settings.ts";
+import { DelayRangeInput } from "@/components/settings/delay-range-input.tsx";
 
 type Props = {
   enabledSettings: EnabledTestSettings;
   settings: TestSettings;
   setSettings: (settings: TestSettings) => void;
   startTestRun: () => void;
+  showDividers?: boolean;
   disabled?: boolean;
+  disableProtocolHandshakeDelayRangeSetting?: boolean;
 };
 
 export const TestSettingsSection: React.FC<Props> = ({
@@ -33,7 +39,9 @@ export const TestSettingsSection: React.FC<Props> = ({
   settings,
   setSettings,
   startTestRun,
+  showDividers = false,
   disabled = false,
+  disableProtocolHandshakeDelayRangeSetting = false,
 }) => {
   return (
     <form
@@ -89,6 +97,8 @@ export const TestSettingsSection: React.FC<Props> = ({
           </SettingsItem>
         )}
 
+        {showDividers && <SettingsDivider />}
+
         {enabledSettings.ipDelayType !== undefined && (
           <SettingsItem label="IP delay type">
             <Select
@@ -102,7 +112,7 @@ export const TestSettingsSection: React.FC<Props> = ({
               disabled={disabled}
             >
               <SelectTrigger className="w-full max-w-120">
-                  <SelectValue>{settings.ipDelayType}</SelectValue>
+                <SelectValue>{settings.ipDelayType}</SelectValue>
               </SelectTrigger>
               <SelectContent align="start">
                 {enabledSettings.ipDelayType.options.map((value) => (
@@ -141,6 +151,23 @@ export const TestSettingsSection: React.FC<Props> = ({
           </SettingsItem>
         )}
 
+        {enabledSettings.ipHandshakeDelayRange !== undefined && (
+          <SettingsItem label="IP delays">
+            <DelayRangeInput
+              delayRange={settings.ipHandshakeDelayRange}
+              setDelayRange={(delayRange) =>
+                setSettings({
+                  ...settings,
+                  ipHandshakeDelayRange: delayRange,
+                })
+              }
+              disabled={disabled}
+            />
+          </SettingsItem>
+        )}
+
+        {showDividers && <SettingsDivider />}
+
         {enabledSettings.delayedProtocol !== undefined && (
           <SettingsItem label="Delayed protocol">
             <Select
@@ -163,6 +190,23 @@ export const TestSettingsSection: React.FC<Props> = ({
             </Select>
           </SettingsItem>
         )}
+
+        {enabledSettings.protocolHandshakeDelayRange !== undefined && (
+          <SettingsItem label="Protocol handshake delays">
+            <DelayRangeInput
+              delayRange={settings.protocolHandshakeDelayRange}
+              setDelayRange={(delayRange) =>
+                setSettings({
+                  ...settings,
+                  protocolHandshakeDelayRange: delayRange,
+                })
+              }
+              disabled={disabled || disableProtocolHandshakeDelayRangeSetting}
+            />
+          </SettingsItem>
+        )}
+
+        {showDividers && <SettingsDivider />}
 
         {enabledSettings.randomizeDomains !== undefined && (
           <SettingsItem label="Randomize domains">

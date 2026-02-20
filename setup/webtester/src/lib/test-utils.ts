@@ -40,3 +40,21 @@ export const generateHEv3TestUrl = async (
 
   return `https://${layer}_https-${httpsRR}_ipv4-${ipv4Delay}_ipv6-${ipv6Delay}_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/ping`;
 };
+
+export const generateRange = (
+  start: number,
+  end: number,
+  step: number,
+): number[] => {
+  const range: number[] = [];
+
+  for (let i = start; i <= end; i += step) {
+    range.push(i);
+  }
+
+  if (range.length === 0) {
+    range.push(start);
+  }
+
+  return range;
+};
