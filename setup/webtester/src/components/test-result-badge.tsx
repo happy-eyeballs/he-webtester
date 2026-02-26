@@ -150,7 +150,7 @@ const ConnectionAttemptTraceVisualization: React.FC<{
 
   return (
     <div className="grid grid-cols-[max-content_max-content_max-content_max-content] gap-x-4 gap-y-1.5">
-      <div className="text-right">Time</div>
+      <div className="text-right">Relative Time</div>
       <div>Protocol</div>
       <div>IP Version</div>
       <div>Source Address/Port</div>

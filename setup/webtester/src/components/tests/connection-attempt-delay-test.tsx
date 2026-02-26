@@ -27,16 +27,17 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
     );
   }, []);
 
-  const buildSubtests = async (): Promise<TestPart[]> => {
+  const buildSubtests = async (testRunId: number): Promise<TestPart[]> => {
     const subtests: Subtest[] = [];
 
     for (let i = 0; i < availableDelays.length; i++) {
       const url = await generateConnectAttemptDelayUrl(
         settings.randomizeDomains,
         availableDelays[i] ?? 0,
+        testRunId,
       );
 
-      subtests.push({ url } satisfies Subtest);
+      subtests.push({ url, sleepAfterSubtest: 500 } satisfies Subtest);
     }
 
     return [{ subtests }];
@@ -68,12 +69,13 @@ const enabledSettings: EnabledTestSettings = {
 export const generateConnectAttemptDelayUrl = async (
   randomizeDomain: boolean,
   delay: number,
+  testRunId: number = 0,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
   if (randomizeDomain) {
-    return `https://id-${generateRandomId()}.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
+    return `https://id-${generateRandomId()}.delay-${delay}.v1.${happyEyeballsTestDomain}/trace`;
   }
 
-  return `https://id-0.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
+  return `https://id-${testRunId ?? 0}.delay-${delay}.v1.${happyEyeballsTestDomain}/trace`;
 };

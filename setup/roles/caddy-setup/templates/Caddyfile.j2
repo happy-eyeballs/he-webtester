@@ -32,6 +32,19 @@
         }
     }
 
+    servers {{ happy_eyeballs.webserver.http3.ipv4 }}:443 {
+        timeouts {
+            idle 1000ms # TODO: adjust
+        }
+    }
+    servers [{{ happy_eyeballs.webserver.http3.ipv6 }}]:443 {
+        timeouts {
+            idle 1000ms # TODO: adjust
+        }
+    }
+
+    ### Caddy Layer 4 Proxy
+
     layer4 {
         udp/{{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:443 {
             route {
@@ -190,12 +203,16 @@
 
 (respond_with_json) {
     header Content-Type application/json
-    respond `{"server_ip": "{http.request.local.host}", "client_ip": "{http.request.remote.host}", "protocol": "{http.request.proto}"}`
+    respond `{"server_ip": "{http.request.local.host}", "protocol": "{http.request.proto}"}`
 }
 
-(respond_with_json_layer4) {
-    header Content-Type application/json
-    respond `{"server_ip": "{http.request.local.host}", "protocol": "{http.request.proto}"}`
+(handle_trace) {
+    reverse_proxy {{ happy_eyeballs.packet_capture.service.host }}:{{ happy_eyeballs.packet_capture.service.port }} {
+        header_up X-SNI {host}
+
+        header_down X-Protocol {http.request.proto}
+        header_down X-Server-IP {http.request.local.host}
+    }
 }
 
 ### SERVERS
@@ -230,7 +247,14 @@
     tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v1 | first | replace('*.', '') }}/privkey.pem
 
     import cors
-    import respond_with_server_ip
+
+    handle /trace {
+        import handle_trace
+    }
+
+    handle {
+        import respond_with_server_ip
+    }
 }
 
 {{ happy_eyeballs_domains.v2 }} {
@@ -239,7 +263,14 @@
     tls /etc/letsencrypt/live/{{ happy_eyeballs_domains.v2 | replace('*.', '') }}/fullchain.pem /etc/letsencrypt/live/{{ happy_eyeballs_domains.v2 | replace('*.', '') }}/privkey.pem
 
     import cors
-    import respond_with_server_ip
+
+    handle /trace {
+        import handle_trace
+    }
+
+    handle {
+        import respond_with_server_ip
+    }
 }
 
 {{ happy_eyeballs_domains.v3_quic }}:8443 {
@@ -252,16 +283,11 @@
     import cors
 
     handle /trace {
-        reverse_proxy {{ happy_eyeballs.packet_capture.service.host }}:{{ happy_eyeballs.packet_capture.service.port }} {
-            header_up X-SNI {host}
-
-            header_down X-Protocol {http.request.proto}
-            header_down X-Server-IP {http.request.local.host}
-        }
+        import handle_trace
     }
 
     handle {
-        import respond_with_json_layer4
+        import respond_with_json
     }
 }
 
@@ -274,7 +300,14 @@
     header -Alt-Svc
 
     import cors
-    import respond_with_json
+
+    handle /trace {
+        import handle_trace
+    }
+
+    handle {
+        import respond_with_json
+    }
 }
 
 *.http3-altsvc.http3.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https-altsvc.http3.{{ happy_eyeballs.nameserver.base_domain }} {
@@ -286,5 +319,12 @@
     header Alt-Svc `h3=":443"; ma=600`
 
     import cors
-    import respond_with_json
+
+    handle /trace {
+        import handle_trace
+    }
+
+    handle {
+        import respond_with_json
+    }
 }

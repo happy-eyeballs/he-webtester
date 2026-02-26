@@ -27,7 +27,7 @@ export const ResolutionDelayTest: React.FC = () => {
     );
   }, []);
 
-  const buildSubtests = async (): Promise<TestPart[]> => {
+  const buildSubtests = async (testRunId: number): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
     for (const part of [
@@ -41,6 +41,7 @@ export const ResolutionDelayTest: React.FC = () => {
           settings.randomizeDomains,
           availableDelays[i] ?? 0,
           part.dnsRecordType,
+          testRunId,
         );
 
         subtests.push({ url } satisfies Subtest);
@@ -80,10 +81,11 @@ export const generateResolutionDelayUrl = async (
   randomizeDomain: boolean,
   dnsDelay: number,
   dnsRecordType: "a" | "aaaa",
+  testRunId: number = 0,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
-  const id = randomizeDomain ? generateRandomId() : 0;
+  const id = randomizeDomain ? generateRandomId() : testRunId;
 
-  return `https://v2delay_${dnsRecordType}-${id}_${dnsDelay}.v2.${happyEyeballsTestDomain}/ping`;
+  return `https://v2delay_${dnsRecordType}-${id}_${dnsDelay}.v2.${happyEyeballsTestDomain}/trace`;
 };

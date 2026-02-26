@@ -19,10 +19,11 @@ export const generateHEv3TestUrl = async (
   tlsDelay: number,
   httpsRecord: HTTPSRecord,
   delayType: IPDelayType,
+  testRunId: number = 0,
 ): Promise<string> => {
   const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
-  const id = randomizeDomain ? generateRandomId() : 0;
+  const id = randomizeDomain ? generateRandomId() : testRunId;
 
   const httpsRR: string = {
     [HTTPSRecord.H3H2]: "h3h2",

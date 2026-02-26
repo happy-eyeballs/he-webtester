@@ -29,7 +29,7 @@ type Props = {
   settings: TestSettings;
   setSettings: (settings: TestSettings) => void;
   showSettingsDividers?: boolean;
-  buildSubtests: () => Promise<TestPart[]>;
+  buildSubtests: (testRunId: number) => Promise<TestPart[]>;
   resultsUrl: string;
   subtestColumnDescription: string;
   subtestColumnLabels: string[];

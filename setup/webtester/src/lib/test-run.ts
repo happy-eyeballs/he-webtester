@@ -5,7 +5,7 @@ import { generateRandomId, sleep } from "@/lib/test-utils.ts";
 export const executeTestRun = async (
   settings: TestSettings,
   resultsUrl: string,
-  buildTestParts: (settings: TestSettings) => Promise<TestPart[]>,
+  buildSubtests: (testRunId: number) => Promise<TestPart[]>,
   addTestRunToTable: (testRun: TestRun) => void,
   setStatusMessage: (message: string) => void,
   forceTableRerender: () => void,
@@ -26,7 +26,7 @@ export const executeTestRun = async (
     repetition <= (settings.repetitions ?? 1);
     repetition++
   ) {
-    const parts = await buildTestParts(settings);
+    const parts = await buildSubtests(testRun.testRunId);
 
     testRun.repetitions.push({
       repetitionNumber: repetition,
@@ -101,7 +101,7 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
   const response = await fetch(subtest.url, { cache: "no-store" });
 
   if (!response.ok) {
-    throw new Error(`Response has non-200 status code: ${response.status}`);
+    throw new Error(`Response has status code: ${response.status} ${response.statusText}`);
   }
 
   const responseHandler = subtest.responseHandler ?? defaultResponseHandler;
@@ -147,20 +147,24 @@ const observeRequestTiming = (url: string): Promise<RequestTiming> =>
 const defaultResponseHandler = async (
   response: Response,
 ): Promise<ResponseHandlerResult> => {
-  const clientIP = await response.text();
-  const isIPv6 = clientIP.includes(":");
-
-  if (isIPv6) {
-    return {
-      value: "IPv6",
-      color: TestRunResultColor.Option1,
-    };
-  } else {
-    return {
-      value: "IPv4",
-      color: TestRunResultColor.Option2,
-    };
+  const serverIP = response.headers.get("X-Server-IP");
+  const protocol = response.headers.get("X-Protocol");
+  if (!serverIP || !protocol) {
+    throw new Error('X-Server-IP" or X-Protocol header not present in response');
   }
+
+  const trace = await response.json();
+
+  const isIPv6 = serverIP.includes(":");
+
+  return {
+    value: isIPv6 ? "IPv6" : "IPv4",
+    color: isIPv6 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
+    connectionAttemptTrace: trace,
+    metadata: {
+      Protocol: protocol,
+    },
+  };
 };
 
 export type TestSettings = {

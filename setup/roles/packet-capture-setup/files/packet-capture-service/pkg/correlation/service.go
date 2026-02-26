@@ -42,7 +42,7 @@ func (s *CorrelationService) GetCorrelatingPacketsForSNI(sni string) ([]*netpack
 
 	correlation, ok := s.correlationsBySNI[sni]
 	if !ok {
-		return nil, false
+		return []*netpacket.Packet{}, false
 	}
 
 	return correlation.packets, true

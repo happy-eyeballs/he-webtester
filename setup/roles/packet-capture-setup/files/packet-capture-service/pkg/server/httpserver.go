@@ -30,6 +30,7 @@ func connectionAttemptTraceHandler(correlationService *correlation.CorrelationSe
 
 		// allow some time to process the last packet of this connection
 		time.Sleep(200 * time.Millisecond)
+
 		slog.Info("connection attempt trace request", "sni", sni)
 
 		correlatingPackets, found := correlationService.GetCorrelatingPacketsForSNI(sni)
