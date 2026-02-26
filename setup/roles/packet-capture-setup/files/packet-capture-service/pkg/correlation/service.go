@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"time"
 
 	"packet-capture-service/pkg/capture"
 	"packet-capture-service/pkg/netpacket"
@@ -29,9 +30,8 @@ func NewCorrelationService(packetCapturePipePath string) (*CorrelationService, e
 		correlationsBySNI:    make(map[string]*packetCorrelation),
 	}
 
-	go s.start()
-	// TODO: add goroutine that removes old uncorrelated packets
-	// TODO: cleanup old correlations (that were never queried and deleted)
+	go s.startProcessingCapturedPackets()
+	go s.startCleanup()
 
 	return s, nil
 }
@@ -52,11 +52,9 @@ func (s *CorrelationService) DeleteCorrelation(sni string) {
 	s.mutex.Lock()
 	delete(s.correlationsBySNI, sni)
 	s.mutex.Unlock()
-
-	slog.Info("deleted correlation", "sni", sni)
 }
 
-func (s *CorrelationService) start() {
+func (s *CorrelationService) startProcessingCapturedPackets() {
 	for packet := range s.packetCaptureChannel {
 		slog.Info("packet captured", "packet", fmt.Sprintf("%+v", packet))
 
@@ -76,7 +74,6 @@ func (s *CorrelationService) processPacket(packet *netpacket.Packet) {
 		if ok {
 			correlation.addPacket(packet)
 			s.moveAllUncorrelatedPacketsToCorrelation(correlation)
-			slog.Info("added packet to correlation with same SNI")
 			return
 		}
 
@@ -85,17 +82,15 @@ func (s *CorrelationService) processPacket(packet *netpacket.Packet) {
 		correlation = &packetCorrelation{packets: []*netpacket.Packet{packet}}
 		s.moveAllUncorrelatedPacketsToCorrelation(correlation)
 		s.correlationsBySNI[packet.SNI] = correlation
-		slog.Info("new correlation created", "sni", packet.SNI)
 		return
 	}
 
 	// if there is no SNI set, search all correlations for packets with the same IP address that do correlate
 	// (e.g., an IPv6 TCP SYN packet following an IPv6 QUIC packet)
-	for correlationSNI, correlation := range s.correlationsBySNI {
+	for _, correlation := range s.correlationsBySNI {
 		if correlation.doesPacketCorrelate(packet) {
 			correlation.addPacket(packet)
 			s.moveAllUncorrelatedPacketsToCorrelation(correlation)
-			slog.Info("added packet to existing correlation", "correlation_sni", correlationSNI)
 			return
 		}
 	}
@@ -103,7 +98,6 @@ func (s *CorrelationService) processPacket(packet *netpacket.Packet) {
 	// if there was no matching correlation and the packet has no SNI, we cannot correlate it yet
 	// (e.g., an IPv4 TCP SYN packet)
 	s.uncorrelatedPackets = append(s.uncorrelatedPackets, packet)
-	slog.Info("added packet to uncorrelated packets list")
 	return
 }
 
@@ -132,4 +126,33 @@ func (s *CorrelationService) moveOneUncorrelatedPacketToCorrelation(correlation 
 	}
 
 	return false
+}
+
+func (s *CorrelationService) startCleanup() {
+	for range time.Tick(time.Minute * 10) {
+		slog.Info("starting cleanup")
+
+		s.mutex.Lock()
+
+		cutoffTime := time.Now().Add(-time.Minute * 10)
+
+		// remove uncorrelated packets that are older than 10 minutes
+		recentUncorrelatedPackets := make([]*netpacket.Packet, 0, len(s.uncorrelatedPackets))
+		for _, packet := range s.uncorrelatedPackets {
+			if packet.Timestamp.After(cutoffTime) {
+				recentUncorrelatedPackets = append(recentUncorrelatedPackets, packet)
+			}
+		}
+		s.uncorrelatedPackets = recentUncorrelatedPackets
+
+		// clean up correlations that are older than 10 minutes
+		for sni, correlation := range s.correlationsBySNI {
+			if len(correlation.packets) == 0 || correlation.packets[len(correlation.packets)-1].Timestamp.Before(cutoffTime) {
+				delete(s.correlationsBySNI, sni)
+			}
+		}
+
+		s.mutex.Unlock()
+		slog.Info("post-cleanup stats", "correlations", len(s.correlationsBySNI), "uncorrelated packets", len(s.uncorrelatedPackets))
+	}
 }

@@ -12,7 +12,7 @@ import (
 func NewHTTPServer(address string, correlationService *correlation.CorrelationService) *http.Server {
 	mux := http.NewServeMux()
 
-	mux.Handle("/", connectionAttemptInfoHandler(correlationService))
+	mux.Handle("/", connectionAttemptTraceHandler(correlationService))
 
 	return &http.Server{
 		Addr:    address,
@@ -20,22 +20,22 @@ func NewHTTPServer(address string, correlationService *correlation.CorrelationSe
 	}
 }
 
-func connectionAttemptInfoHandler(correlationService *correlation.CorrelationService) http.Handler {
+func connectionAttemptTraceHandler(correlationService *correlation.CorrelationService) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		host := request.Header.Get("X-SNI")
-		if host == "" {
+		sni := request.Header.Get("X-SNI")
+		if sni == "" {
 			http.Error(writer, "X-SNI header is missing", http.StatusBadRequest)
 			return
 		}
 
 		// allow some time to process the last packet of this connection
 		time.Sleep(200 * time.Millisecond)
-		slog.Info("connection attempt info request", "host", host)
+		slog.Info("connection attempt trace request", "sni", sni)
 
-		correlatingPackets, found := correlationService.GetCorrelatingPacketsForSNI(host)
+		correlatingPackets, found := correlationService.GetCorrelatingPacketsForSNI(sni)
 		if found {
 			// delete the correlation after the request, since it's only queried once
-			correlationService.DeleteCorrelation(host)
+			correlationService.DeleteCorrelation(sni)
 		}
 
 		writer.Header().Set("Content-Type", "application/json")
