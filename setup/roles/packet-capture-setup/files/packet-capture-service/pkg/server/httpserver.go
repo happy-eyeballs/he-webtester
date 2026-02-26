@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"packet-capture-service/pkg/correlation"
 )
@@ -27,7 +28,17 @@ func connectionAttemptInfoHandler(correlationService *correlation.CorrelationSer
 			return
 		}
 
-		correlatingPackets := correlationService.GetCorrelatingPacketsForSNI(host)
+		// allow some time to process the last packet of this connection
+		time.Sleep(200 * time.Millisecond)
+		slog.Info("connection attempt info request", "host", host)
+
+		correlatingPackets, found := correlationService.GetCorrelatingPacketsForSNI(host)
+		if found {
+			// delete the correlation after the request, since it's only queried once
+			correlationService.DeleteCorrelation(host)
+		}
+
+		writer.Header().Set("Content-Type", "application/json")
 
 		err := json.NewEncoder(writer).Encode(correlatingPackets)
 		if err != nil {

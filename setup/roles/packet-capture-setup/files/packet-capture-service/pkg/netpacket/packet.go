@@ -2,7 +2,9 @@ package netpacket
 
 import (
 	"encoding/json"
+	"net"
 	"net/netip"
+	"strconv"
 	"time"
 )
 
@@ -20,14 +22,21 @@ func (p *Packet) MarshalJSON() ([]byte, error) {
 		ipVersion = "IPv6"
 	}
 
+	protocol := p.Protocol
+	if protocol == "TCP" {
+		protocol = "TCP (SYN)"
+	}
+
 	return json.Marshal(&struct {
-		Timestamp int64  `json:"timestamp"`
-		IPVersion string `json:"ip_version"`
-		Protocol  string `json:"protocol"`
+		Timestamp     int64  `json:"timestamp"`
+		IPVersion     string `json:"ipVersion"`
+		Protocol      string `json:"protocol"`
+		SourceAddress string `json:"sourceAddress"`
 	}{
-		Timestamp: p.Timestamp.UnixMilli(),
-		IPVersion: ipVersion,
-		Protocol:  p.Protocol,
+		Timestamp:     p.Timestamp.UnixMilli(),
+		IPVersion:     ipVersion,
+		Protocol:      protocol,
+		SourceAddress: net.JoinHostPort(p.SourceIP.String(), strconv.Itoa(p.SourcePort)),
 	})
 }
 

@@ -3,7 +3,7 @@ package correlation
 import (
 	"fmt"
 	"log/slog"
-	"slices"
+	"sync"
 
 	"packet-capture-service/pkg/capture"
 	"packet-capture-service/pkg/netpacket"
@@ -14,6 +14,7 @@ type CorrelationService struct {
 
 	uncorrelatedPackets []*netpacket.Packet
 	correlationsBySNI   map[string]*packetCorrelation
+	mutex               sync.RWMutex
 }
 
 func NewCorrelationService(packetCapturePipePath string) (*CorrelationService, error) {
@@ -29,17 +30,30 @@ func NewCorrelationService(packetCapturePipePath string) (*CorrelationService, e
 	}
 
 	go s.start()
+	// TODO: add goroutine that removes old uncorrelated packets
+	// TODO: cleanup old correlations (that were never queried and deleted)
 
 	return s, nil
 }
 
-func (s *CorrelationService) GetCorrelatingPacketsForSNI(sni string) []*netpacket.Packet {
+func (s *CorrelationService) GetCorrelatingPacketsForSNI(sni string) ([]*netpacket.Packet, bool) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
 	correlation, ok := s.correlationsBySNI[sni]
 	if !ok {
-		return []*netpacket.Packet{}
+		return nil, false
 	}
 
-	return correlation.packets
+	return correlation.packets, true
+}
+
+func (s *CorrelationService) DeleteCorrelation(sni string) {
+	s.mutex.Lock()
+	delete(s.correlationsBySNI, sni)
+	s.mutex.Unlock()
+
+	slog.Info("deleted correlation", "sni", sni)
 }
 
 func (s *CorrelationService) start() {
@@ -51,37 +65,46 @@ func (s *CorrelationService) start() {
 }
 
 func (s *CorrelationService) processPacket(packet *netpacket.Packet) {
-	// search all correlations for packets with the same IP address
-	// (e.g., an IPv6 TCP SYN packet following an IPv6 QUIC packet)
-	for _, correlation := range s.correlationsBySNI {
-		if correlation.doesPacketCorrelate(packet) {
-			correlation.packets = append(correlation.packets, packet)
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	// if the packet has an SNI set, find the corresponding correlation or create it
+	if packet.SNI != "" {
+		// if there is already a correlation for this SNI, add the packet to it
+		// (e.g., a TLS packet with the same SNI as a previous QUIC packet)
+		correlation, ok := s.correlationsBySNI[packet.SNI]
+		if ok {
+			correlation.addPacket(packet)
 			s.moveAllUncorrelatedPacketsToCorrelation(correlation)
+			slog.Info("added packet to correlation with same SNI")
+			return
+		}
+
+		// create a new correlation for this SNI
+		// (e.g., the first QUIC packet)
+		correlation = &packetCorrelation{packets: []*netpacket.Packet{packet}}
+		s.moveAllUncorrelatedPacketsToCorrelation(correlation)
+		s.correlationsBySNI[packet.SNI] = correlation
+		slog.Info("new correlation created", "sni", packet.SNI)
+		return
+	}
+
+	// if there is no SNI set, search all correlations for packets with the same IP address that do correlate
+	// (e.g., an IPv6 TCP SYN packet following an IPv6 QUIC packet)
+	for correlationSNI, correlation := range s.correlationsBySNI {
+		if correlation.doesPacketCorrelate(packet) {
+			correlation.addPacket(packet)
+			s.moveAllUncorrelatedPacketsToCorrelation(correlation)
+			slog.Info("added packet to existing correlation", "correlation_sni", correlationSNI)
 			return
 		}
 	}
 
 	// if there was no matching correlation and the packet has no SNI, we cannot correlate it yet
 	// (e.g., an IPv4 TCP SYN packet)
-	if packet.SNI == "" {
-		s.uncorrelatedPackets = append(s.uncorrelatedPackets, packet)
-		return
-	}
-
-	// if there is already a correlation for this SNI, add the packet to it
-	// (e.g., a TLS packet with the same SNI as a previous QUIC packet)
-	correlation, ok := s.correlationsBySNI[packet.SNI]
-	if ok {
-		correlation.packets = append(correlation.packets, packet)
-		s.moveAllUncorrelatedPacketsToCorrelation(correlation)
-		return
-	}
-
-	// create a new correlation for this SNI
-	// (e.g., the first QUIC packet)
-	correlation = &packetCorrelation{packets: []*netpacket.Packet{packet}}
-	s.moveAllUncorrelatedPacketsToCorrelation(correlation)
-	s.correlationsBySNI[packet.SNI] = correlation
+	s.uncorrelatedPackets = append(s.uncorrelatedPackets, packet)
+	slog.Info("added packet to uncorrelated packets list")
+	return
 }
 
 func (s *CorrelationService) moveAllUncorrelatedPacketsToCorrelation(correlation *packetCorrelation) {
@@ -97,23 +120,14 @@ func (s *CorrelationService) moveOneUncorrelatedPacketToCorrelation(correlation 
 	for i := 0; i < len(s.uncorrelatedPackets); i++ {
 		uncorrelatedPacket := s.uncorrelatedPackets[i]
 
-		for _, correlatedPacket := range correlation.packets {
-			// TODO: check that the timestamp is reasonable to fit in correlation
+		if correlation.doesPacketCorrelate(uncorrelatedPacket) {
+			// add the uncorrelated packet to the correlation
+			correlation.addPacket(s.uncorrelatedPackets[i])
 
-			if uncorrelatedPacket.SourceIP.Compare(correlatedPacket.SourceIP) == 0 {
-				// add the uncorrelated packet to the correlation
-				correlation.packets = append(correlation.packets, s.uncorrelatedPackets[i])
+			// remove uncorrelated packet from the list of uncorrelated packets
+			s.uncorrelatedPackets = append(s.uncorrelatedPackets[:i], s.uncorrelatedPackets[i+1:]...)
 
-				// sort the correlation by time
-				slices.SortFunc(correlation.packets, func(a, b *netpacket.Packet) int {
-					return a.Timestamp.Compare(b.Timestamp)
-				})
-
-				// remove uncorrelated packet from the list of uncorrelated packets
-				s.uncorrelatedPackets = append(s.uncorrelatedPackets[:i], s.uncorrelatedPackets[i+1:]...)
-
-				return true
-			}
+			return true
 		}
 	}
 
