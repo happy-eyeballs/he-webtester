@@ -27,26 +27,6 @@ export const HEv3QuicTlsTest: React.FC = () => {
     settings.protocolHandshakeDelayRange.step,
   );
 
-  const responseHandler = async (
-    response: Response,
-  ): Promise<ResponseHandlerResult> => {
-    const { protocol, server_ip } = (await response.json()) as {
-      protocol: string;
-      server_ip: string;
-    };
-
-    const isHTTP3 = protocol === "HTTP/3.0";
-
-    return {
-      value: isHTTP3 ? "QUIC" : "TLS",
-      color: isHTTP3 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
-      metadata: {
-        Protocol: protocol,
-        "Address Family": server_ip.includes(":") ? "IPv6" : "IPv4",
-      },
-    } satisfies ResponseHandlerResult;
-  };
-
   const buildSubtests = async (): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
@@ -123,4 +103,25 @@ const enabledSettings: EnabledTestSettings = {
   randomizeDomains: true,
   autoTransmitResults: false,
   deviceInfo: {},
+};
+
+const responseHandler = async (
+  response: Response,
+): Promise<ResponseHandlerResult> => {
+  const httpProtocol = response.headers.get("X-Protocol") ?? "UNKNOWN";
+  const serverIP = response.headers.get("X-Server-IP") ?? "UNKNOWN";
+
+  const trace = await response.json();
+
+  const isQUIC = httpProtocol === "HTTP/3.0";
+
+  return {
+    value: isQUIC ? "QUIC" : "TLS",
+    color: isQUIC ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
+    connectionAttemptTrace: trace,
+    metadata: {
+      "HTTP Protocol": httpProtocol,
+      "Address Family": serverIP.includes(":") ? "IPv6" : "IPv4",
+    },
+  } satisfies ResponseHandlerResult;
 };

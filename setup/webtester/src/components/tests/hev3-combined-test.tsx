@@ -167,13 +167,13 @@ const enabledSettings: EnabledTestSettings = {
 const responseHandler = async (
   response: Response,
 ): Promise<ResponseHandlerResult> => {
-  const { protocol: httpProtocol, server_ip } = (await response.json()) as {
-    protocol: string;
-    server_ip: string;
-  };
+  const httpProtocol = response.headers.get("X-Protocol") ?? "UNKNOWN";
+  const serverIP = response.headers.get("X-Server-IP") ?? "UNKNOWN";
+
+  const trace = await response.json();
 
   const isQUIC = httpProtocol === "HTTP/3.0";
-  const isIPv6 = server_ip.includes(":");
+  const isIPv6 = serverIP.includes(":");
 
   const ipVersion = isIPv6 ? "IPv6" : "IPv4";
   const protocol = isQUIC ? "QUIC" : "TLS";
@@ -187,6 +187,7 @@ const responseHandler = async (
       : isQUIC
         ? TestRunResultColor.Option3
         : TestRunResultColor.Option4,
+    connectionAttemptTrace: trace,
     metadata: {
       "HTTP Protocol": httpProtocol,
     },

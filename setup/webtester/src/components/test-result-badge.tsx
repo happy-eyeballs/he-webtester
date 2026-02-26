@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { type SubtestResult } from "@/lib/test-run.ts";
+import {
+  type ConnectionAttemptTrace,
+  type SubtestResult,
+} from "@/lib/test-run.ts";
 import {
   Tooltip,
   TooltipContent,
@@ -70,9 +73,9 @@ const ResultBadgeTooltipContent: React.FC<Props> = ({
         )}
       </KeyValueTable>
 
-      {result.additionalMetadata && (
+      {result.metadata && Object.entries(result.metadata).length > 0 && (
         <KeyValueTable>
-          {Object.entries(result.additionalMetadata).map(([key, value]) => (
+          {Object.entries(result.metadata).map(([key, value]) => (
             <KeyValueTableRow name={key} key={key}>
               {value}
             </KeyValueTableRow>
@@ -103,6 +106,17 @@ const ResultBadgeTooltipContent: React.FC<Props> = ({
           </KeyValueTableRow>
         </KeyValueTable>
       )}
+
+      {result.connectionAttemptTrace &&
+        result.connectionAttemptTrace.length > 0 && (
+          <KeyValueTable>
+            <KeyValueTableRow name="Connection Attempt Trace">
+              <ConnectionAttemptTraceVisualization
+                trace={result.connectionAttemptTrace}
+              />
+            </KeyValueTableRow>
+          </KeyValueTable>
+        )}
     </>
   );
 };
@@ -111,7 +125,7 @@ const KeyValueTable: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <div className="grid grid-cols-[minmax(11em,auto)_1fr] gap-x-4 gap-y-1.5 p-2">
+    <div className="grid grid-cols-[minmax(auto,11em)_1fr] gap-x-4 gap-y-1.5 p-2">
       {children}
     </div>
   );
@@ -126,5 +140,31 @@ const KeyValueTableRow: React.FC<{
       <div className="text-muted text-right font-semibold">{name}</div>
       <div>{children}</div>
     </>
+  );
+};
+
+const ConnectionAttemptTraceVisualization: React.FC<{
+  trace: ConnectionAttemptTrace;
+}> = ({ trace }) => {
+  const baseTimestamp = trace[0]?.timestamp ?? 0;
+
+  return (
+    <div className="grid grid-cols-[max-content_max-content_max-content_max-content] gap-x-4 gap-y-1.5">
+      <div className="text-right">Time</div>
+      <div>Protocol</div>
+      <div>IP Version</div>
+      <div>Source Address/Port</div>
+
+      {trace.map((attempt, index) => (
+        <React.Fragment key={index}>
+          <pre className="text-right">
+            T+{attempt.timestamp - baseTimestamp} ms
+          </pre>
+          <pre>{attempt.protocol}</pre>
+          <pre>{attempt.ipVersion}</pre>
+          <pre>{attempt.sourceAddress}</pre>
+        </React.Fragment>
+      ))}
+    </div>
   );
 };

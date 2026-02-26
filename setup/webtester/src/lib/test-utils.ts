@@ -38,7 +38,7 @@ export const generateHEv3TestUrl = async (
     [IPDelayType.Network]: "l3",
   }[delayType];
 
-  return `https://${layer}_https-${httpsRR}_ipv4-${ipv4Delay}_ipv6-${ipv6Delay}_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/ping`;
+  return `https://${layer}_https-${httpsRR}_ipv4-${ipv4Delay}_ipv6-${ipv6Delay}_quic-${quicDelay}_tls-${tlsDelay}_id-${id}.v3-quic.${happyEyeballsTestDomain}/trace`;
 };
 
 export const generateRange = (

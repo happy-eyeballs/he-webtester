@@ -114,7 +114,8 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
     color: result.color,
     url: subtest.url,
     requestTiming,
-    additionalMetadata: result.metadata ?? {},
+    connectionAttemptTrace: result.connectionAttemptTrace ?? [],
+    metadata: result.metadata ?? {},
   } satisfies SubtestResult;
 };
 
@@ -212,7 +213,8 @@ export type SubtestResult = {
   url: string;
   error?: string;
   requestTiming?: RequestTiming;
-  additionalMetadata?: SubtestResultMetadata;
+  connectionAttemptTrace?: ConnectionAttemptTrace;
+  metadata?: SubtestResultMetadata;
 };
 
 export type RequestTiming = {
@@ -234,9 +236,19 @@ export const enum TestRunResultColor {
 
 export type SubtestResultMetadata = Record<string, string>;
 
+export type ConnectionAttemptInfo = {
+  timestamp: number;
+  ipVersion: string;
+  protocol: string;
+  sourceAddress: string;
+};
+
+export type ConnectionAttemptTrace = ConnectionAttemptInfo[];
+
 export type ResponseHandlerResult = {
   value: string;
   color: TestRunResultColor;
+  connectionAttemptTrace?: ConnectionAttemptTrace;
   metadata?: SubtestResultMetadata;
 };
 

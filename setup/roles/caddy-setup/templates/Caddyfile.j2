@@ -168,6 +168,7 @@
         Access-Control-Allow-Origin *
         Access-Control-Allow-Methods "GET, POST, OPTIONS"
         Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Expose-Headers "X-Protocol, X-Server-IP"
         Access-Control-Max-Age 1728000
         Timing-Allow-Origin *
     }
@@ -249,7 +250,19 @@
     header -Alt-Svc
 
     import cors
-    import respond_with_json_layer4
+
+    handle /trace {
+        reverse_proxy {{ happy_eyeballs.packet_capture.service.host }}:{{ happy_eyeballs.packet_capture.service.port }} {
+            header_up X-SNI {host}
+
+            header_down X-Protocol {http.request.proto}
+            header_down X-Server-IP {http.request.local.host}
+        }
+    }
+
+    handle {
+        import respond_with_json_layer4
+    }
 }
 
 *.http3.http3.{{ happy_eyeballs.nameserver.base_domain }}, *.http3-https.http3.{{ happy_eyeballs.nameserver.base_domain }} {
