@@ -8,10 +8,11 @@ OnFailure=status-email@%n.service
 {% endif %}
 
 [Service]
-Type=oneshot
-RemainAfterExit=true
+Type=simple
 WorkingDirectory={{ happy_eyeballs.base_path }}/packet-capture/service
-ExecStart=/usr/bin/docker compose up --build -d --remove-orphans
+ExecStartPre=-/usr/bin/mkfifo {{ happy_eyeballs.packet_capture.tshark.pipe_path }}
+ExecStartPre=/bin/chmod 666 {{ happy_eyeballs.packet_capture.tshark.pipe_path }}
+ExecStart=/usr/bin/docker compose up --build --abort-on-container-exit --remove-orphans
 ExecStop=/usr/bin/docker compose down
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Environment=DOCKER_HOST=unix:///run/user/{{ happy_eyeballs.user.uid }}/podman/podman.sock
