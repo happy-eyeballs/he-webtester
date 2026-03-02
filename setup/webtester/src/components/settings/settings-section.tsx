@@ -23,6 +23,11 @@ import {
 } from "@/components/settings/settings-item";
 import type { EnabledTestSettings } from "@/lib/settings.ts";
 import { DelayRangeInput } from "@/components/settings/delay-range-input.tsx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 
 type Props = {
   enabledSettings: EnabledTestSettings;
@@ -77,7 +82,14 @@ export const SettingsSection: React.FC<Props> = ({
         )}
 
         {enabledSettings.httpsRecord !== undefined && (
-          <SettingsItem label="HTTPS RR">
+          <SettingsItem
+            label="HTTPS RR"
+            helpText={
+              "Our DNS server configures an HTTPS resource record for each test domain " +
+              "so clients can discover HTTP/3 availability. You can customize the HTTPS " +
+              "record values for advanced test cases."
+            }
+          >
             <Select
               value={settings.httpsRecord}
               onValueChange={(value) =>
@@ -102,7 +114,42 @@ export const SettingsSection: React.FC<Props> = ({
         {showDividers && <SettingsDivider />}
 
         {enabledSettings.ipDelayType !== undefined && (
-          <SettingsItem label="IP delay type">
+          <SettingsItem
+            label="IP delay type"
+            helpText={
+              <div className="space-y-2">
+                <p>
+                  The test environment offers two methods for introducing IPv4
+                  or IPv6 delays:
+                </p>
+                <ul className="space-y-2">
+                  <li>
+                    <b>Network Latency</b>: The server simulates network latency
+                    by delaying every incoming IP packet. This is implemented
+                    using tc netem, which assigns a specific delay to each of
+                    the server's individual IP addresses. Please note two
+                    limitations of this setup: First, because the server has a
+                    limited number of IP addresses, only a limited number of
+                    distinct delays can be configured. Second, due to the
+                    current server configuration, this method only supports
+                    delaying IPv6 packets (though this is typically the desired
+                    testing behavior).
+                  </li>
+                  <li>
+                    <b>Handshake Delay</b>: The test environment can also
+                    introduce delays once during the transport or application
+                    layer handshake, similar to the how QUIC and TLS delays are
+                    introduced. While this feature offers the flexibility to
+                    test an arbitrary range of delays, it might not trigger the
+                    expected behavior in all clients. This is because some
+                    clients do not use the transport/application layer handshake
+                    as a signal for a successful connection attempt, as defined
+                    by the Happy Eyeballs version 3 standard.
+                  </li>
+                </ul>
+              </div>
+            }
+          >
             <Select
               value={settings.ipDelayType}
               onValueChange={(value) =>
@@ -267,14 +314,22 @@ export const SettingsSection: React.FC<Props> = ({
           Run test
         </Button>
 
-        <Button
-          type="button"
-          variant="secondary"
-          disabled={disabled}
-          onClick={downloadTestConfiguration}
-        >
-          Download test configuration
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={disabled}
+              onClick={downloadTestConfiguration}
+            >
+              Download test configuration
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            Download generated test domains and corresponding delay
+            configurations and metadata for dedicated testing.
+          </TooltipContent>
+        </Tooltip>
       </div>
     </form>
   );
