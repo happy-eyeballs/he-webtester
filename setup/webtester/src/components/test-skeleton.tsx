@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TestSettingsSection } from "@/components/settings/test-settings-section.tsx";
+import { SettingsSection } from "@/components/settings/settings-section.tsx";
 import {
   type TestRun,
   type TestSettings,
@@ -112,7 +112,7 @@ export const TestSkeleton: React.FC<Props> = ({
           <CardTitle>Settings</CardTitle>
         </CardHeader>
         <CardContent>
-          <TestSettingsSection
+          <SettingsSection
             enabledSettings={enabledSettings}
             settings={settings}
             setSettings={setSettings}

@@ -35,7 +35,7 @@ type Props = {
   disableProtocolHandshakeDelayRangeSetting?: boolean;
 };
 
-export const TestSettingsSection: React.FC<Props> = ({
+export const SettingsSection: React.FC<Props> = ({
   enabledSettings,
   settings,
   setSettings,
