@@ -1,4 +1,5 @@
 import type { TestRun } from "@/lib/test-run.ts";
+import { downloadJSONData } from "@/lib/test-utils.ts";
 
 export const transmitResults = async (
   url: string,
@@ -58,18 +59,4 @@ const mapTestRunsToResults = (testRuns: TestRun[]) => {
       userAgent: window.navigator.userAgent,
     })),
   );
-};
-
-const downloadJSONData = (fileName: string, data: string) => {
-  const blob = new Blob([data], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link); // Required for Firefox
-  link.click();
-
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 };

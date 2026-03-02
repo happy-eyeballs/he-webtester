@@ -59,3 +59,17 @@ export const generateRange = (
 
   return range;
 };
+
+export const downloadJSONData = (fileName: string, data: string) => {
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link); // Required for Firefox
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

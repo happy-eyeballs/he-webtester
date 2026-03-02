@@ -49,16 +49,19 @@ export const HTTP3AvailabilityTest: React.FC = () => {
         subtests: [
           {
             url: `https://id-${id()}.http3.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "" },
             responseHandler: http3ResponseHandler,
             sleepAfterSubtest: 2000,
           },
           {
             url: `https://id-${id()}.http3-https.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "https-record" },
             responseHandler: http3ResponseHandler,
             sleepAfterSubtest: 2000,
           },
           {
             url: `https://id-${id()}.http3-altsvc.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "alt-svc" },
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
             sleepBetweenRequests: 2000,
@@ -66,6 +69,7 @@ export const HTTP3AvailabilityTest: React.FC = () => {
           },
           {
             url: `https://id-${id()}.http3-https-altsvc.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "https-record,alt-svc" },
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
             sleepBetweenRequests: 2000,

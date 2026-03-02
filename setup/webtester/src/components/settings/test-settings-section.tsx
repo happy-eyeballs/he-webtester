@@ -28,7 +28,8 @@ type Props = {
   enabledSettings: EnabledTestSettings;
   settings: TestSettings;
   setSettings: (settings: TestSettings) => void;
-  startTestRun: () => void;
+  runTest: () => void;
+  downloadTestConfiguration: () => void;
   showDividers?: boolean;
   disabled?: boolean;
   disableProtocolHandshakeDelayRangeSetting?: boolean;
@@ -38,7 +39,8 @@ export const TestSettingsSection: React.FC<Props> = ({
   enabledSettings,
   settings,
   setSettings,
-  startTestRun,
+  runTest,
+  downloadTestConfiguration,
   showDividers = false,
   disabled = false,
   disableProtocolHandshakeDelayRangeSetting = false,
@@ -47,7 +49,7 @@ export const TestSettingsSection: React.FC<Props> = ({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        startTestRun();
+        runTest();
       }}
     >
       <div className="grid gap-y-7 md:gap-y-3">
@@ -260,9 +262,18 @@ export const TestSettingsSection: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="mt-8 flex gap-8 items-center">
+      <div className="mt-8 flex gap-4 items-center">
         <Button type="submit" disabled={disabled}>
           Run test
+        </Button>
+
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={disabled}
+          onClick={downloadTestConfiguration}
+        >
+          Download test configuration
         </Button>
       </div>
     </form>

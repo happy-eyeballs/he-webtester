@@ -37,7 +37,11 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
         testRunId,
       );
 
-      subtests.push({ url, sleepAfterSubtest: 500 } satisfies Subtest);
+      subtests.push({
+        url,
+        metadata: { ipv6_delay: availableDelays[i] },
+        sleepAfterSubtest: 500,
+      } satisfies Subtest);
     }
 
     return [{ subtests }];

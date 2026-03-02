@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
-  IPDelayType,
   HTTPSRecord,
+  IPDelayType,
   Protocol,
   type ResponseHandlerResult,
   type Subtest,
@@ -56,6 +56,11 @@ export const HEv3QuicTlsTest: React.FC = () => {
 
         subtests.push({
           url,
+          metadata: {
+            [`${part.protocol === Protocol.QUIC ? "quic" : "tls"}_handshake_delay`]:
+              delay,
+            https_record: settings.httpsRecord,
+          },
           responseHandler,
           sleepAfterSubtest: 2000,
         } satisfies Subtest);

@@ -44,7 +44,10 @@ export const ResolutionDelayTest: React.FC = () => {
           testRunId,
         );
 
-        subtests.push({ url } satisfies Subtest);
+        subtests.push({
+          url,
+          metadata: { [`dns_${part.dnsRecordType}_delay`]: availableDelays[i] },
+        } satisfies Subtest);
       }
 
       testParts.push({ name: part.name, subtests } satisfies TestPart);

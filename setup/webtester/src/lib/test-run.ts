@@ -101,7 +101,9 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
   const response = await fetch(subtest.url, { cache: "no-store" });
 
   if (!response.ok) {
-    throw new Error(`Response has status code: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Response has status code: ${response.status} ${response.statusText}`,
+    );
   }
 
   const responseHandler = subtest.responseHandler ?? defaultResponseHandler;
@@ -150,7 +152,9 @@ const defaultResponseHandler = async (
   const serverIP = response.headers.get("X-Server-IP");
   const protocol = response.headers.get("X-Protocol");
   if (!serverIP || !protocol) {
-    throw new Error('X-Server-IP" or X-Protocol header not present in response');
+    throw new Error(
+      'X-Server-IP" or X-Protocol header not present in response',
+    );
   }
 
   const trace = await response.json();
@@ -209,6 +213,7 @@ export type Subtest = {
   numberOfRequests?: number;
   sleepBetweenRequests?: number;
   sleepAfterSubtest?: number;
+  metadata?: Record<string, string | number | undefined>;
 };
 
 export type SubtestResult = {
@@ -266,6 +271,7 @@ export const enum IPVersion {
   IPv4 = "IPv4",
   IPv6 = "IPv6",
 }
+
 export const enum Protocol {
   QUIC = "QUIC",
   TLS = "TLS/TCP",

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/card.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import type { EnabledTestSettings } from "@/lib/settings.ts";
+import { downloadJSONData, generateRandomId } from "@/lib/test-utils.ts";
 
 type Props = {
   enabledSettings: EnabledTestSettings;
@@ -80,6 +81,18 @@ export const TestSkeleton: React.FC<Props> = ({
       );
     });
 
+  const downloadTestConfiguration = async () => {
+    const testParts = await buildSubtests(generateRandomId());
+    const configuration = testParts.flatMap((part) =>
+      part.subtests.map((subtest) => ({
+        ...subtest.metadata,
+        url: subtest.url,
+      })),
+    );
+
+    downloadJSONData("test-configuration.json", JSON.stringify(configuration));
+  };
+
   const transmitTestResults = () =>
     withDisabledUserInteraction(async () => {
       setStatusMessage("Transmitting results...");
@@ -103,7 +116,8 @@ export const TestSkeleton: React.FC<Props> = ({
             enabledSettings={enabledSettings}
             settings={settings}
             setSettings={setSettings}
-            startTestRun={executeTest}
+            runTest={executeTest}
+            downloadTestConfiguration={downloadTestConfiguration}
             showDividers={showSettingsDividers}
             disabled={isUserInteractionDisabled}
             disableProtocolHandshakeDelayRangeSetting={testRuns.length > 0}

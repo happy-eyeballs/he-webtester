@@ -77,6 +77,15 @@ export const HEv3CombinedTest: React.FC = () => {
 
         subtests.push({
           url,
+          metadata: {
+            [settings.ipDelayType === IPDelayType.Network
+              ? "ipv6_delay"
+              : `${settings.delayedIPVersion === "IPv4" ? "ipv4" : "ipv6"}_handshake_delay`]:
+              ipDelay,
+            [`${settings.delayedProtocol === Protocol.QUIC ? "quic" : "tls"}_handshake_delay`]:
+              protocolDelay,
+            https_record: settings.httpsRecord,
+          },
           responseHandler,
           sleepAfterSubtest: 2000,
         } satisfies Subtest);
