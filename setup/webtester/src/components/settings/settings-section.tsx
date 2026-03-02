@@ -218,7 +218,10 @@ export const SettingsSection: React.FC<Props> = ({
         {showDividers && <SettingsDivider />}
 
         {enabledSettings.delayedProtocol !== undefined && (
-          <SettingsItem label="Delayed protocol">
+          <SettingsItem
+            label="Delayed protocol"
+            helpText="The delay is applied once to the first packet of the QUIC or TLS handshake."
+          >
             <Select
               value={settings.delayedProtocol}
               onValueChange={(value) =>
@@ -258,7 +261,14 @@ export const SettingsSection: React.FC<Props> = ({
         {showDividers && <SettingsDivider />}
 
         {enabledSettings.randomizeDomains !== undefined && (
-          <SettingsItem label="Randomize domains">
+          <SettingsItem
+            label="Randomize domains"
+            helpText={
+              "When enabled, the a randomized segment is added to the test domain. " +
+              "This prevents DNS caching, ensuring that individual tests do not " +
+              "interfere with or skew each other's results."
+            }
+          >
             <Checkbox
               checked={settings.randomizeDomains}
               onCheckedChange={(checked) =>
@@ -270,7 +280,30 @@ export const SettingsSection: React.FC<Props> = ({
         )}
 
         {enabledSettings.autoTransmitResults !== undefined && (
-          <SettingsItem label="Automatically transmit results">
+          <SettingsItem
+            label="Automatically transmit results"
+            helpText={
+              <div className="space-y-2">
+                <p>
+                  By default, measurement results are not transmitted
+                  automatically. If you wish to contribute to our analysis, you
+                  can enable this setting to transmit your test results
+                  automatically after the run completes. Alternatively, you can
+                  manually submit your results using the button at the bottom of
+                  the page.
+                </p>
+                <p>
+                  If you choose to transmit your results, the web-tester
+                  collects the measurement data along with your user agent and
+                  browser vendor information. The system does not collect or
+                  store your IP address during this measurement. To help us
+                  better interpret the test results, you can optionally provide
+                  details about your network environment in the device and user
+                  information field.
+                </p>
+              </div>
+            }
+          >
             <Checkbox
               checked={settings.autoTransmitResults}
               onCheckedChange={(checked) =>
@@ -282,7 +315,14 @@ export const SettingsSection: React.FC<Props> = ({
         )}
 
         {enabledSettings.resolverAddresses !== undefined && (
-          <SettingsItem label="Configured Resolver IP Addresses (optional)">
+          <SettingsItem
+            label="Configured Resolver IP Addresses (optional)"
+            helpText={
+              "Specifying the client's configured DNS resolver IP addresses assists in " +
+              "interpreting transmitted results. This data is attached solely as " +
+              "metadata and does not affect the test execution."
+            }
+          >
             <Input
               type="text"
               placeholder="e.g., 8.8.8.8, 8.8.4.4"
@@ -297,7 +337,14 @@ export const SettingsSection: React.FC<Props> = ({
         )}
 
         {enabledSettings.deviceInfo !== undefined && (
-          <SettingsItem label="Device and user information for easier debugging (optional)">
+          <SettingsItem
+            label="Device and user information (optional)"
+            helpText={
+              "To help us better interpret the test results, you can optionally provide " +
+              "details about your network environment in this field. This data is " +
+              "attached solely as metadata and does not affect the test execution."
+            }
+          >
             <DeviceInfoInput
               deviceInfo={settings.deviceInfo}
               setDeviceInfo={(deviceInfo) =>
