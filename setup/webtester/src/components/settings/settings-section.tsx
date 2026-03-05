@@ -314,7 +314,7 @@ export const SettingsSection: React.FC<Props> = ({
             helpText={
               "Specifying the client's configured DNS resolver IP addresses assists in " +
               "interpreting transmitted results. This data is attached solely as " +
-              "metadata and does not affect the test execution."
+              "metadata to transmitted results and does not affect the test execution."
             }
           >
             <Input
@@ -334,9 +334,9 @@ export const SettingsSection: React.FC<Props> = ({
           <SettingsItem
             label="Device and user information (optional)"
             helpText={
-              "To help us better interpret the test results, you can optionally provide " +
+              "To help us better interpret transmitted test results, you can optionally provide " +
               "details about your network environment in this field. This data is " +
-              "attached solely as metadata and does not affect the test execution."
+              "attached solely as metadata to transmitted results and does not affect the test execution."
             }
           >
             <DeviceInfoInput
