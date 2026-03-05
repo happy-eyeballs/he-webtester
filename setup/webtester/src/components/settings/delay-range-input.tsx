@@ -18,7 +18,7 @@ export const DelayRangeInput: React.FC<Props> = ({
   disabled,
 }) => {
   return (
-    <div className="flex gap-4 sm:gap-8 items-center">
+    <div className="flex gap-x-4 sm:gap-x-8 gap-y-2 items-center flex-wrap">
       <div className="flex gap-2 items-center">
         <span className="text-sm">From</span>
         <InputGroup className="max-w-25">
