@@ -223,7 +223,7 @@
     tls {{ certbot.email }}
 
     handle /results/* {
-        reverse_proxy {{ happy_eyeballs.uploadserver.host }}:{{ happy_eyeballs.uploadserver.port }}
+        reverse_proxy {{ happy_eyeballs.result_upload.service.host }}:{{ happy_eyeballs.result_upload.service.port }}
     }
 
     handle {

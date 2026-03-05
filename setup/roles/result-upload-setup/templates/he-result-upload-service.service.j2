@@ -1,5 +1,5 @@
 [Unit]
-Description=Happy Eyeballs Upload Server
+Description=Happy Eyeballs Result Upload Service
 Wants=network-online.target
 After=network-online.target
 RequiresMountsFor=%t/containers
@@ -10,7 +10,7 @@ OnFailure=status-email@%n.service
 [Service]
 Type=oneshot
 RemainAfterExit=true
-WorkingDirectory={{ happy_eyeballs.base_path }}/upload-server
+WorkingDirectory={{ happy_eyeballs.base_path }}/result-upload-service
 ExecStart=/usr/bin/docker compose up --build -d --remove-orphans
 ExecStop=/usr/bin/docker compose down
 Environment=PODMAN_SYSTEMD_UNIT=%n

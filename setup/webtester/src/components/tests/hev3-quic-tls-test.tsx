@@ -78,7 +78,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
       settings={settings}
       setSettings={setSettings}
       buildSubtests={buildSubtests}
-      resultsUrl="/results/hev3-quic-tls" // TODO
+      resultsUrl="/results/hev3-quic-tls"
       subtestColumnDescription="Protocol Handshake Delay [ms]"
       subtestColumnLabels={handshakeDelays.map((delay) => delay.toString())}
     />

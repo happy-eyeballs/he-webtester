@@ -122,7 +122,7 @@ export const HEv3CombinedTest: React.FC = () => {
       setSettings={setSettings}
       buildSubtests={buildSubtests}
       showSettingsDividers={true}
-      resultsUrl="/results/hev3-combined" // TODO
+      resultsUrl="/results/hev3-combined"
       subtestColumnDescription="Protocol Handshake Delay [ms]"
       subtestColumnLabels={protocolHandshakeDelays.map((delay) =>
         delay.toString(),

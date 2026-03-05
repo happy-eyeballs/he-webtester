@@ -8,7 +8,7 @@
     - webtester-setup
     - { role: nginx-setup, tags: [ 'never' ] }
     - caddy-setup
-    - upload-server-setup
+    - result-upload-setup
     - packet-capture-setup
   vars:
     happy_eyeballs_domains:

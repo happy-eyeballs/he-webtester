@@ -1,6 +1,6 @@
-- name: restart he-upload-server
+- name: restart he-result-upload-service
   ansible.builtin.systemd:
-    name: he-upload-server
+    name: he-result-upload-service
     enabled: true
     daemon_reload: true
     state: restarted
