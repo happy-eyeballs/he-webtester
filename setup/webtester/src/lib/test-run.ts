@@ -250,6 +250,7 @@ export type ConnectionAttemptInfo = {
   ipVersion: string;
   protocol: string;
   sourceAddress: string;
+  sourcePort: number;
 };
 
 export type ConnectionAttemptTrace = ConnectionAttemptInfo[];

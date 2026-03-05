@@ -350,7 +350,7 @@ export const SettingsSection: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="mt-8 flex gap-4 items-center">
+      <div className="mt-8 flex gap-x-4 gap-y-2 items-center flex-wrap">
         <Button disabled={disabled} onClick={runTest}>
           Run test
         </Button>

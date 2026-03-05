@@ -32,11 +32,13 @@ func (p *Packet) MarshalJSON() ([]byte, error) {
 		IPVersion     string `json:"ipVersion"`
 		Protocol      string `json:"protocol"`
 		SourceAddress string `json:"sourceAddress"`
+		SourcePort    int    `json:"sourcePort"`
 	}{
 		Timestamp:     p.Timestamp.UnixMilli(),
 		IPVersion:     ipVersion,
 		Protocol:      protocol,
 		SourceAddress: net.JoinHostPort(p.SourceIP.String(), strconv.Itoa(p.SourcePort)),
+		SourcePort:    p.SourcePort,
 	})
 }
 

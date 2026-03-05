@@ -20,7 +20,7 @@ export const SettingsItem: React.FC<{
           <TooltipTrigger asChild={true}>
             <CircleHelpIcon className="size-4.5 inline align-text-bottom text-blue-400" />
           </TooltipTrigger>
-          <TooltipContent className="text-sm max-w-200 text-left">
+          <TooltipContent className="text-sm max-w-200">
             {helpText}
           </TooltipContent>
         </Tooltip>

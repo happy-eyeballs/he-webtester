@@ -125,7 +125,7 @@ const KeyValueTable: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <div className="grid grid-cols-[minmax(auto,11em)_1fr] gap-x-4 gap-y-1.5 p-2">
+    <div className="grid grid-cols-1 sm:grid-cols-[11em_1fr] gap-x-4 gap-y-1.5 p-2">
       {children}
     </div>
   );
@@ -137,7 +137,9 @@ const KeyValueTableRow: React.FC<{
 }> = ({ name, children }) => {
   return (
     <>
-      <div className="text-muted text-right font-semibold">{name}</div>
+      <div className="text-muted font-semibold mt-3 sm:mt-0 sm:text-right">
+        {name}
+      </div>
       <div>{children}</div>
     </>
   );
@@ -153,7 +155,8 @@ const ConnectionAttemptTraceVisualization: React.FC<{
       <div className="text-right">Relative Time</div>
       <div>Protocol</div>
       <div>IP Version</div>
-      <div>Source Address/Port</div>
+      <div className="max-sm:hidden">Source Address</div>
+      <div className="sm:hidden">Source Port</div>
 
       {trace.map((attempt, index) => (
         <React.Fragment key={index}>
@@ -162,7 +165,8 @@ const ConnectionAttemptTraceVisualization: React.FC<{
           </pre>
           <pre>{attempt.protocol}</pre>
           <pre>{attempt.ipVersion}</pre>
-          <pre>{attempt.sourceAddress}</pre>
+          <pre className="max-sm:hidden">{attempt.sourceAddress}</pre>
+          <pre className="sm:hidden">{attempt.sourcePort}</pre>
         </React.Fragment>
       ))}
     </div>
