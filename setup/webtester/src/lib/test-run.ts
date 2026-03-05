@@ -90,7 +90,7 @@ export const executeTestRun = async (
   if (settings.autoTransmitResults) {
     setStatusMessage("Transmitting results...");
 
-    await transmitResults(resultsUrl, [testRun]);
+    await transmitResults(resultsUrl, [testRun], settings);
     forceTableRerender();
   }
 };
@@ -194,7 +194,7 @@ export type TestRun = {
   repetitions: TestRunRepetition[];
 };
 
-type TestRunRepetition = {
+export type TestRunRepetition = {
   repetitionNumber: number;
   startedAt: Date;
   parts: TestPart[];

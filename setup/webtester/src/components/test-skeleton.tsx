@@ -97,7 +97,7 @@ export const TestSkeleton: React.FC<Props> = ({
     withDisabledUserInteraction(async () => {
       setStatusMessage("Transmitting results...");
 
-      await transmitResults(resultsUrl, testRuns);
+      await transmitResults(resultsUrl, testRuns, settings);
       forceTableRerender();
     });
 
@@ -165,9 +165,12 @@ export const TestSkeleton: React.FC<Props> = ({
                 </TooltipContent>
               ) : (
                 <TooltipContent className="max-w-md">
-                  If you want to help us interpret the results, you can describe
-                  your network environment as part of the device and the user
-                  information input field.
+                  If you choose to transmit your results, the web-tester
+                  transmits the measurement data along with your user agent and
+                  browser vendor information. We do not collect or store your IP
+                  address. To help us better interpret the test results, you can
+                  optionally provide details about your network environment in
+                  the device and user information field.
                 </TooltipContent>
               )}
             </Tooltip>
@@ -175,7 +178,7 @@ export const TestSkeleton: React.FC<Props> = ({
             <Button
               variant="secondary"
               disabled={isUserInteractionDisabled}
-              onClick={() => downloadResults(testRuns)}
+              onClick={() => downloadResults(testRuns, settings)}
             >
               Download results
             </Button>

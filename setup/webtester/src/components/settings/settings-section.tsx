@@ -51,12 +51,7 @@ export const SettingsSection: React.FC<Props> = ({
   disableProtocolHandshakeDelayRangeSetting = false,
 }) => {
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        runTest();
-      }}
-    >
+    <div>
       <div className="grid gap-y-7 md:gap-y-3">
         {enabledSettings.repetitions !== undefined && (
           <SettingsItem label="Repetitions">
@@ -294,12 +289,11 @@ export const SettingsSection: React.FC<Props> = ({
                 </p>
                 <p>
                   If you choose to transmit your results, the web-tester
-                  collects the measurement data along with your user agent and
-                  browser vendor information. The system does not collect or
-                  store your IP address during this measurement. To help us
-                  better interpret the test results, you can optionally provide
-                  details about your network environment in the device and user
-                  information field.
+                  transmits the measurement data along with your user agent and
+                  browser vendor information. We do not collect or store your IP
+                  address. To help us better interpret the test results, you can
+                  optionally provide details about your network environment in
+                  the device and user information field.
                 </p>
               </div>
             }
@@ -316,7 +310,7 @@ export const SettingsSection: React.FC<Props> = ({
 
         {enabledSettings.resolverAddresses !== undefined && (
           <SettingsItem
-            label="Configured Resolver IP Addresses (optional)"
+            label="Configured resolver IP addresses (optional)"
             helpText={
               "Specifying the client's configured DNS resolver IP addresses assists in " +
               "interpreting transmitted results. This data is attached solely as " +
@@ -357,14 +351,13 @@ export const SettingsSection: React.FC<Props> = ({
       </div>
 
       <div className="mt-8 flex gap-4 items-center">
-        <Button type="submit" disabled={disabled}>
+        <Button disabled={disabled} onClick={runTest}>
           Run test
         </Button>
 
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="button"
               variant="secondary"
               disabled={disabled}
               onClick={downloadTestConfiguration}
@@ -378,6 +371,6 @@ export const SettingsSection: React.FC<Props> = ({
           </TooltipContent>
         </Tooltip>
       </div>
-    </form>
+    </div>
   );
 };

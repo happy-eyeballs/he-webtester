@@ -11,7 +11,7 @@ export const SettingsItem: React.FC<{
   helpText?: React.ReactNode;
   children?: React.ReactNode;
 }> = ({ label, helpText, children }) => (
-  <div className="grid md:grid-cols-[220px_1fr] md:gap-x-14 gap-y-2 items-center min-h-8">
+  <div className="grid md:grid-cols-[230px_1fr] md:gap-x-14 gap-y-2 items-center min-h-8">
     <div className="text-sm leading-snug">
       <div className="inline mr-2">{label}</div>
 
