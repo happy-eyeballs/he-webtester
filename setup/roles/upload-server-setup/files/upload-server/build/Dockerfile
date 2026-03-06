@@ -3,7 +3,7 @@ FROM python:3.14-slim-trixie
 WORKDIR /app
 
 RUN apt update
-RUN apt install gcc -y
+RUN apt install gcc libexpat1 -y
 
 COPY build/requirements.txt .
 RUN pip install -r requirements.txt
