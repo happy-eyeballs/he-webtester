@@ -13,10 +13,8 @@ RemainAfterExit=true
 WorkingDirectory={{ happy_eyeballs.base_path }}/upload-server
 ExecStart=/usr/bin/docker compose up --build -d --remove-orphans
 ExecStop=/usr/bin/docker compose down
-{% if use_podman|bool %}
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Environment=DOCKER_HOST=unix:///run/user/{{ happy_eyeballs.user.uid }}/podman/podman.sock
-{% endif %}
 {% if systemd_send_email_on_failure|bool %}
 ExecStopPost=/usr/local/bin/systemd-email %n --no-send-on-success
 {% endif %}

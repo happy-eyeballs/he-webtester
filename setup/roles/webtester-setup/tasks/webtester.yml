@@ -6,13 +6,14 @@
     group: false
     rsync_opts:
       - '--exclude=.DS_Store'
+      - '--chown={{ happy_eyeballs.user.name }}:{{ happy_eyeballs.user.name }}'
 
 - name: Copy webtester static files
   ansible.builtin.template:
     src: 'static/{{ item }}.j2'
     dest: '{{ happy_eyeballs.base_path }}/www-root/{{ item }}'
-    owner: root
-    group: root
+    owner: '{{ happy_eyeballs.user.name }}'
+    group: '{{ happy_eyeballs.user.name }}'
     mode: '0644'
   with_items:
     - 'delays.csv'
