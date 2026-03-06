@@ -1,0 +1,19 @@
+---
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import { MeasurementDomainBuilderTool } from "@/components/tools/measurement-domain-builder-tool.tsx";
+---
+
+<PageLayout title="Measurement Domain Builder | Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs" titleLine2="Measurement Domain Builder">
+    <p>
+      This is a tool to generate a specific domain for a selected test
+      configuration. The domain can then be used with any client to test its
+      Happy Eyeballs behavior. The server always returns the IP address at which
+      it was contacted. This enables you to easily know if your client used IPv4
+      or IPv6.
+    </p>
+  </Header>
+
+  <MeasurementDomainBuilderTool client:load />
+</PageLayout>

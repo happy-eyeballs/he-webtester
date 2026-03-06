@@ -3,10 +3,10 @@ services:
     container_name: he-caddy
     image: caddy:latest
     restart: unless-stopped
-    command: 'caddy run --config /etc/caddy/caddy.json'
+    command: 'caddy run --config /etc/caddy/Caddyfile'
     network_mode: host
     volumes:
-      - '{{ happy_eyeballs.base_path }}/caddy/caddy.json:/etc/caddy/caddy.json:ro'
+      - '{{ happy_eyeballs.base_path }}/caddy/Caddyfile:/etc/caddy/Caddyfile:ro'
       - '{{ happy_eyeballs.base_path }}/caddy/data:/data/caddy'
       - '{{ happy_eyeballs.base_path }}/www-root:{{ happy_eyeballs.base_path }}/www-root:ro'
 

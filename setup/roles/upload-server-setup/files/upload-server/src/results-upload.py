@@ -18,7 +18,7 @@ V2OUTPUT_DIR = '/var/he-upload-server/v2-results-data'
 V3_QUIC_OUTPUT_DIR = '/var/he-upload-server/v3-quic-results-data'
 DNSOUTPUT_DIR = '/var/he-upload-server/dns-query-data'
 
-@app.route('/results/v1', methods=['POST'])
+@app.route('/results/connection-attempt-delay', methods=['POST'])
 def upload_data():
     # Get JSON data from request
     try:
@@ -46,7 +46,7 @@ def upload_data():
         return 'FAILURE', 500
 
 
-@app.route('/results/v2', methods=['POST'])
+@app.route('/results/resolution-delay', methods=['POST'])
 def upload_v2data():
     # Get JSON data from request
     try:
@@ -74,7 +74,7 @@ def upload_v2data():
         return 'FAILURE', 500
 
 
-@app.route('/results/v3_quic', methods=['POST'])
+@app.route('/results/http3-availability', methods=['POST'])
 def upload_v3_quic_data():
     # Get JSON data from request
     try:

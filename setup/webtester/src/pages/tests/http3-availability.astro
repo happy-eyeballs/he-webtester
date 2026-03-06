@@ -1,0 +1,27 @@
+---
+import PageLayout from "@/layouts/main.astro";
+import Header from "@/components/header.astro";
+import { HTTP3AvailabilityTest } from "@/components/tests/http3-availability-test.tsx";
+---
+
+<PageLayout title="HE CAD Test | Happy Eyeballs Webtester">
+  <Header titleLine1="Happy Eyeballs" titleLine2="HTTP/3 Availability Test">
+    <p>
+      We operate a web server with HTTP/3 (QUIC) enabled. A subset of the test
+      domains pointing to this server publish an HTTPS record that includes the
+      <code>h3</code> protocol in the <code>alpn</code> parameter. Additionally, certain
+      paths on the server respond with an <code>Alt-Svc</code> header advertising
+      HTTP/3 availability. The different test scenarios combine these domains and
+      paths in various permutations.
+    </p>
+    <p>
+      We randomize domains to prevent caching effects on the browsers side.
+      However, the web server is only assigned a single IP address. Clients that
+      cache connection information on a per-address basis rather than a
+      per-domain basis may therefore produce skewed results in subsequent test
+      runs.
+    </p>
+  </Header>
+
+  <HTTP3AvailabilityTest client:load />
+</PageLayout>
