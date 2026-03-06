@@ -42,7 +42,9 @@ We added several tags to control the setup process:
 - `interface`: assigns the configured addresses to the interfaces and configures the tc delays
   - `interface-ip-delete`: include this tag specifically if you want to delete the configured addresses from the interface
 - `dns`: sets up the nameserver
-- `nginx`: sets up nginx, certificates, and the webtester
+- `nginx`: sets up nginx
+- `caddy`: sets up caddy
+- `webtester`: sets up the webtester
 - `uploadserver`: sets up the result upload server
 
 Note: all tags have their own "sub-tags" (such as `nginx-certs`) for only executing specific subtasks.

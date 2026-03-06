@@ -1,11 +1,2 @@
-- ansible.builtin.import_tasks: certbot.yml
-  tags: [ 'nginx', 'nginx-certbot' ]
-
 - ansible.builtin.import_tasks: nginx.yml
   tags: [ 'nginx', 'nginx-nginx' ]
-
-- ansible.builtin.import_tasks: create-certs.yml
-  tags: [ 'nginx', 'nginx-certs' ]
-
-- ansible.builtin.import_tasks: webtester.yml
-  tags: [ 'nginx', 'nginx-webtester' ]

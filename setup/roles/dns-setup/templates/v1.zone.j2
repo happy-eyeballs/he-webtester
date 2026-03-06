@@ -5,8 +5,8 @@ $ORIGIN v1.{{ happy_eyeballs.nameserver.base_domain }}.
 @                 IN  NS     ns1.{{ happy_eyeballs.nameserver.base_domain }}.
 @                 IN  NS     ns2.{{ happy_eyeballs.nameserver.base_domain }}.
 
-ipv4-only          IN  A        {{ happy_eyeballs.webserver.ipv4_only_ip }}
-ipv6-only          IN  AAAA     {{ happy_eyeballs.webserver.ipv6_only_ip }}
+ipv4-only          IN  A        {{ happy_eyeballs.webserver.ipv4 }}
+ipv6-only          IN  AAAA     {{ happy_eyeballs.webserver.ipv6 }}
 
 
 $TTL 300

@@ -1,0 +1,42 @@
+- name: Create caddy directory
+  ansible.builtin.file:
+    path: '{{ happy_eyeballs.base_path }}/caddy'
+    owner: root
+    group: root
+    mode: '0755'
+    state: 'directory'
+
+- name: Create caddy data directory
+  ansible.builtin.file:
+    path: '{{ happy_eyeballs.base_path }}/caddy/data'
+    owner: root
+    group: root
+    mode: '0755'
+    state: 'directory'
+
+- name: Copy caddy docker compose file
+  ansible.builtin.template:
+    src: 'docker-compose.yml.j2'
+    dest: '{{ happy_eyeballs.base_path }}/caddy/docker-compose.yml'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart he-caddy
+
+- name: Copy caddy.json config
+  ansible.builtin.template:
+    src: 'caddy.json.j2'
+    dest: '{{ happy_eyeballs.base_path }}/caddy/caddy.json'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart he-caddy
+
+- name: Copy caddy systemd service file
+  ansible.builtin.template:
+    src: 'he-caddy.service.j2'
+    dest: '/etc/systemd/system/he-caddy.service'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart he-caddy
