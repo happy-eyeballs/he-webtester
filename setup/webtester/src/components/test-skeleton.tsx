@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-  type EnabledTestSettings,
-  TestSettingsSection,
-} from "@/components/settings/test-settings-section.tsx";
+import { TestSettingsSection } from "@/components/settings/test-settings-section.tsx";
 import {
   type TestRun,
   type TestSettings,
@@ -25,20 +22,29 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
+import type { EnabledTestSettings } from "@/lib/settings.ts";
 
 type Props = {
-  buildSubtests: (settings: TestSettings) => Promise<TestPart[]>;
   enabledSettings: EnabledTestSettings;
+  settings: TestSettings;
+  setSettings: (settings: TestSettings) => void;
+  showSettingsDividers?: boolean;
+  buildSubtests: () => Promise<TestPart[]>;
   resultsUrl: string;
   subtestColumnDescription: string;
   subtestColumnLabels: string[];
+  subtestRowDescription?: string;
 };
 
 export const TestSkeleton: React.FC<Props> = ({
   buildSubtests,
   enabledSettings,
+  settings,
+  setSettings,
+  showSettingsDividers = false,
   resultsUrl,
   subtestColumnDescription,
+  subtestRowDescription,
   subtestColumnLabels,
 }) => {
   const [testRuns, setTestRuns] = useState<TestRun[]>([]);
@@ -62,7 +68,7 @@ export const TestSkeleton: React.FC<Props> = ({
     }
   };
 
-  const executeTest = (settings: TestSettings) =>
+  const executeTest = () =>
     withDisabledUserInteraction(async () => {
       await executeTestRun(
         settings,
@@ -95,8 +101,12 @@ export const TestSkeleton: React.FC<Props> = ({
         <CardContent>
           <TestSettingsSection
             enabledSettings={enabledSettings}
-            onStartTestRun={executeTest}
+            settings={settings}
+            setSettings={setSettings}
+            startTestRun={executeTest}
+            showDividers={showSettingsDividers}
             disabled={isUserInteractionDisabled}
+            disableProtocolHandshakeDelayRangeSetting={testRuns.length > 0}
           />
         </CardContent>
       </Card>
@@ -114,6 +124,7 @@ export const TestSkeleton: React.FC<Props> = ({
           <TestResultTable
             columnDescription={subtestColumnDescription}
             columns={subtestColumnLabels}
+            testPartDescription={subtestRowDescription}
             testRuns={testRuns}
           />
 

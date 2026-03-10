@@ -10,24 +10,29 @@ import {
   fetchAvailableDelays,
 } from "@/lib/he-configuration.ts";
 import { generateRandomId } from "@/lib/test-utils.ts";
+import {
+  buildInitialSettingsFromEnabledSettings,
+  type EnabledTestSettings,
+} from "@/lib/settings.ts";
 
 export const ConnectionAttemptDelayTest: React.FC = () => {
+  const [settings, setSettings] = useState<TestSettings>(
+    buildInitialSettingsFromEnabledSettings(enabledSettings),
+  );
   const [availableDelays, setAvailableDelays] = useState<number[]>([]);
 
   useEffect(() => {
-    const setup = async () => {
-      setAvailableDelays(await fetchAvailableDelays());
-    };
-
-    setup();
+    fetchAvailableDelays().then((delays) =>
+      setAvailableDelays(delays.v1_delays),
+    );
   }, []);
 
-  const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
+  const buildSubtests = async (): Promise<TestPart[]> => {
     const subtests: Subtest[] = [];
 
     for (let i = 0; i < availableDelays.length; i++) {
       const url = await generateConnectAttemptDelayUrl(
-        settings.randomizeDomains ?? false,
+        settings.randomizeDomains,
         availableDelays[i] ?? 0,
       );
 
@@ -39,21 +44,25 @@ export const ConnectionAttemptDelayTest: React.FC = () => {
 
   return (
     <TestSkeleton
+      enabledSettings={enabledSettings}
+      settings={settings}
+      setSettings={setSettings}
       buildSubtests={buildSubtests}
-      enabledSettings={{
-        repetitions: {
-          options: [1, 5, 10, 20, 30, 40, 50],
-          defaultOption: 10,
-        },
-        autoTransmitResults: true,
-        randomizeDomains: true,
-        deviceInfo: true,
-      }}
       resultsUrl="/results/connection-attempt-delay"
       subtestColumnDescription="IPv6 Delay [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}
     />
   );
+};
+
+const enabledSettings: EnabledTestSettings = {
+  repetitions: {
+    options: [1, 5, 10, 20, 30, 40, 50],
+    defaultOption: 10,
+  },
+  randomizeDomains: true,
+  autoTransmitResults: false,
+  deviceInfo: {},
 };
 
 export const generateConnectAttemptDelayUrl = async (
@@ -66,5 +75,5 @@ export const generateConnectAttemptDelayUrl = async (
     return `https://id-${generateRandomId()}.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
   }
 
-  return `https://delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
+  return `https://id-0.delay-${delay}.v1.${happyEyeballsTestDomain}/ping`;
 };

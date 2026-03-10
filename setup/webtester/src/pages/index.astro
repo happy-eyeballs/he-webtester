@@ -37,20 +37,41 @@ import { CitationDialog } from "@/components/citation-dialog.tsx";
         title="Connection Attempt Delay Test"
         href="tests/connection-attempt-delay"
       >
-        <i>Happy Eyeballs version 1</i> defines the racing of IPv4 vs. IPv6. The term
-        <i>Connection Attempt Delay (CAD)</i> describes the delay a client waits for
-        the IPv6 response before issuing an IPv4 connection. We test this behavior
-        of your client by artificially adding latency to IPv6 packets. Depending on
-        your client's settings, it will wait for the IPv6 connection attempt.
+        Happy Eyeballs version 1 defines the racing of IPv4 vs. IPv6. The term
+        Connection Attempt Delay (CAD) describes the delay a client waits for
+        the IPv6 response before issuing an IPv4 connection. We test this
+        behavior of your client by artificially adding latency to IPv6 packets.
+        Depending on your client's settings, it will wait for the IPv6
+        connection attempt.
       </TestCard>
 
       <TestCard title="Resolution Delay Test" href="tests/resolution-delay">
-        <i>Happy Eyeballs version 2</i> defines the racing of A vs AAAA DNS queries
-        and uses the term <i>Resolution Delay (RD)</i> to describe the configured
-        accepted delay between A and AAAA responses. We test this behavior of your
-        client by artificially adding latency to A or AAAA queries. In this test,
-        not only your client but also the configured resolver and any forwarder in
+        Happy Eyeballs version 2 defines the racing of A vs AAAA DNS queries and
+        uses the term Resolution Delay (RD) to describe the configured accepted
+        delay between A and AAAA responses. We test this behavior of your client
+        by artificially adding latency to A or AAAA queries. In this test, not
+        only your client but also the configured resolver and any forwarder in
         the resolution chain can impact the result.
+      </TestCard>
+
+      <TestCard
+        title="[BETA] Happy Eyeballs v3 QUIC vs. TLS/TCP Test"
+        href="tests/hev3-quic-tls"
+      >
+        Happy Eyeballs version 3 extends connection racing to the application
+        layer, specifically racing QUIC against TLS/TCP. Browsers implementing
+        this version should fall back to the alternative protocol if one is
+        unresponsive to avoid blocking. We test this by varying the handshake
+        delay to determine if and when your client decides to switch protocols.
+      </TestCard>
+
+      <TestCard
+        title="[BETA] Happy Eyeballs v3 Combined Test"
+        href="tests/hev3-combined"
+      >
+        Happy Eyeballs version 3 extends connection racing to the application
+        layer. Browsers implementing this version should fall back between IP
+        versions and protocols to avoid blocking if one is unresponsive.
       </TestCard>
     </div>
 

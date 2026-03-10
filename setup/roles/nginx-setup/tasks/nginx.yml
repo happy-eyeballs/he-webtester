@@ -60,5 +60,4 @@
     - 'happy-eyeballs-v1-delay.conf'
     - 'happy-eyeballs-v1-version-only.conf'
     - 'happy-eyeballs-v2-delay.conf'
-    - 'happy-eyeballs-v3-quic.conf'
   notify: restart nginx

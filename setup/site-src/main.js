@@ -817,8 +817,6 @@ const hev3ScenarioIDs = [
     'http3_https',
     'http3_altsvc',
     'http3_altsvc_https',
-    'http3_only',
-    'http3_only_https',
 ];
 
 export async function setupHappyEyeballsV3() {
@@ -834,8 +832,6 @@ export async function setupHappyEyeballsV3() {
         'HTTP/3\nwith HTTPS RR',
         'HTTP/3\nwith Alt-Svc',
         'HTTP/3\nwith Alt-Svc\nand HTTPS RR',
-        'HTTP/3 only',
-        'HTTP/3 only\nwith HTTPS RR',
     ].map((scenario) => {
         const element = document.createElement("th");
         element.style.verticalAlign = "bottom";
@@ -1003,38 +999,6 @@ async function executeHeV3TestRun(runInfo, infoElementText, repetition, totalRep
         tableColumns[3].textContent = results.join(',\n');
         tableColumns[3].setAttribute("class", results.some((result) => result.includes('ERR')) ? "bg-danger"
             : results.some((result) => result.includes('HTTP/3.0')) ? "bg-success" : "bg-warning");
-    }
-
-    await sleep(50);
-
-    // HTTP/3 only
-    {
-        const url = `https://id-${getRandomRunId()}.http3-only.v3-quic.${basedomain}/ping`;
-        const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null);
-        console.log('HTTP/3 only', result);
-
-        const protocol = result === null ? 'ERR' : result['protocol'];
-        const expected = 'HTTP/3.0';
-
-        runInfo['results'][hev3ScenarioIDs[4]] = protocol;
-        tableColumns[4].textContent = protocol;
-        tableColumns[4].setAttribute("class", protocol === 'ERR' ? "bg-danger" : protocol === expected ? "bg-success" : "bg-warning");
-    }
-
-    await sleep(50);
-
-    // HTTP/3 only with HTTPS RR
-    {
-        const url = `https://id-${getRandomRunId()}.http3-only-https.v3-quic.${basedomain}/ping`;
-        const result = await fetch(url, { cache: 'no-store' }).then(response => response.json()).catch(_ => null);
-        console.log('HTTP/3 only (with HTTPS RR)', result);
-
-        const protocol = result === null ? 'ERR' : result['protocol'];
-        const expected = 'HTTP/3.0';
-
-        runInfo['results'][hev3ScenarioIDs[5]] = protocol;
-        tableColumns[5].textContent = protocol;
-        tableColumns[5].setAttribute("class", protocol === 'ERR' ? "bg-danger" : protocol === expected ? "bg-success" : "bg-warning");
     }
 
     runInfo["timestampEnd"] = Date.now();

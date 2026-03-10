@@ -14,6 +14,15 @@
     mode: '0755'
     state: 'directory'
 
+- name: Copy caddy dockerfile
+  ansible.builtin.template:
+    src: 'Dockerfile.j2'
+    dest: '{{ happy_eyeballs.base_path }}/caddy/Dockerfile'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart he-caddy
+
 - name: Copy caddy docker compose file
   ansible.builtin.template:
     src: 'docker-compose.yml.j2'
@@ -30,6 +39,14 @@
     owner: '{{ happy_eyeballs.user.name }}'
     group: '{{ happy_eyeballs.user.name }}'
     mode: '0644'
+  notify: restart he-caddy
+
+- name: Copy custom caddy module src
+  ansible.posix.synchronize:
+    src: 'custom-caddy-module/'
+    dest: '{{ happy_eyeballs.base_path }}/caddy/custom-caddy-module/'
+    owner: false
+    group: false
   notify: restart he-caddy
 
 - name: Copy caddy systemd service file

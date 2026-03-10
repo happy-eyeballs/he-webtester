@@ -15,18 +15,16 @@ export const getHappyEyeballsTestDomain = async (): Promise<string> => {
   return domain;
 };
 
-export const fetchAvailableDelays = async (): Promise<number[]> => {
-  const response = await fetch("/delays.csv", { cache: "no-store" });
+export const fetchAvailableDelays = async (): Promise<Delays> => {
+  const response = await fetch("/delays.json", { cache: "no-store" });
   if (!response.ok) {
     throw new Error("Failed to fetch the available delays");
   }
 
-  const responseBody = await response.text();
+  return await response.json() as Delays;
+};
 
-  return responseBody
-    .split("\n")
-    .filter((line) => line.trim() !== "")
-    .map((line) => Number(line.trim()));
-
-  // TODO: pop last two delays in if not v2 test
+export type Delays = {
+  v1_delays: number[];
+  v2_delays: number[];
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   type ResponseHandlerResult,
   type TestPart,
@@ -8,9 +8,17 @@ import {
 import { TestSkeleton } from "@/components/test-skeleton.tsx";
 import { getHappyEyeballsTestDomain } from "@/lib/he-configuration.ts";
 import { generateRandomId } from "@/lib/test-utils.ts";
+import {
+  buildInitialSettingsFromEnabledSettings,
+  type EnabledTestSettings,
+} from "@/lib/settings.ts";
 
 export const HTTP3AvailabilityTest: React.FC = () => {
-  const buildSubtests = async (settings: TestSettings): Promise<TestPart[]> => {
+  const [settings, setSettings] = useState<TestSettings>(
+    buildInitialSettingsFromEnabledSettings(enabledSettings),
+  );
+
+  const buildSubtests = async (): Promise<TestPart[]> => {
     const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
     const id = () => (settings.randomizeDomains ? generateRandomId() : 0);
@@ -36,21 +44,21 @@ export const HTTP3AvailabilityTest: React.FC = () => {
       {
         subtests: [
           {
-            url: `https://id-${id()}.http3.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
           },
           {
-            url: `https://id-${id()}.http3-https.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-https.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
           },
           {
-            url: `https://id-${id()}.http3-altsvc.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-altsvc.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
             sleepBetweenRequests: 500,
           },
           {
-            url: `https://id-${id()}.http3-https-altsvc.v3-quic.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-https-altsvc.http3.${happyEyeballsTestDomain}/ping`,
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
             sleepBetweenRequests: 500,
@@ -62,16 +70,10 @@ export const HTTP3AvailabilityTest: React.FC = () => {
 
   return (
     <TestSkeleton
+      enabledSettings={enabledSettings}
+      settings={settings}
+      setSettings={setSettings}
       buildSubtests={buildSubtests}
-      enabledSettings={{
-        repetitions: {
-          options: [1, 5, 10, 20, 30, 40, 50],
-          defaultOption: 5,
-        },
-        autoTransmitResults: true,
-        randomizeDomains: true,
-        deviceInfo: true,
-      }}
       resultsUrl="/results/http3-availability"
       subtestColumnDescription="Scenario"
       subtestColumnLabels={[
@@ -82,4 +84,14 @@ export const HTTP3AvailabilityTest: React.FC = () => {
       ]}
     />
   );
+};
+
+const enabledSettings: EnabledTestSettings = {
+  repetitions: {
+    options: [1, 5, 10, 20, 30, 40, 50],
+    defaultOption: 5,
+  },
+  randomizeDomains: true,
+  autoTransmitResults: false,
+  deviceInfo: {},
 };

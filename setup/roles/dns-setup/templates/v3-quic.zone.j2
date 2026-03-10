@@ -7,25 +7,29 @@ $ORIGIN v3-quic.{{ happy_eyeballs.nameserver.base_domain }}.
 
 
 $TTL 300
+l4_*                      IN  A         {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}
+l4_*                      IN  AAAA      {{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}
 
-id-*.http3               IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3               IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+l4_https-h3h2_*           IN  HTTPS  1  . alpn=h3,h2
+l4_https-h2h3_*           IN  HTTPS  1  . alpn=h2,h3
+l4_https-h3_*             IN  HTTPS  1  . alpn=h3
+l4_https-h3-no-default_*  IN  HTTPS  1  . alpn=h3 no-default-alpn
+l4_https-h2_*             IN  HTTPS  1  . alpn=h2
 
-id-*.http3-https         IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3-https         IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
-id-*.http3-https         IN  HTTPS  1  . alpn=h3,h2
 
-id-*.http3-altsvc        IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3-altsvc        IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
+# netem delays
 
-id-*.http3-https-altsvc  IN  A         {{ happy_eyeballs.webserver.http3.ipv4 }}
-id-*.http3-https-altsvc  IN  AAAA      {{ happy_eyeballs.webserver.http3.ipv6 }}
-id-*.http3-https-altsvc  IN  HTTPS  1  . alpn=h3,h2
+{% for item in happy_eyeballs.webserver.delays %}
+{% for https_rr in ['https-h3h2', 'https-h2h3', 'https-h3', 'https-h3-no-default', 'https-h2', 'https-none'] %}
 
-id-*.http3-only          IN  A         {{ happy_eyeballs.webserver.http3_only.ipv4 }}
-id-*.http3-only          IN  AAAA      {{ happy_eyeballs.webserver.http3_only.ipv6 }}
+l3_{{ https_rr }}_ipv4-0_ipv6-{{ item.delay }}_*  IN A     {{ item.ipv4 }}
+l3_{{ https_rr }}_ipv4-0_ipv6-{{ item.delay }}_*  IN AAAA  {{ item.ipv6 }}
 
-id-*.http3-only-https    IN  A         {{ happy_eyeballs.webserver.http3_only.ipv4 }}
-id-*.http3-only-https    IN  AAAA      {{ happy_eyeballs.webserver.http3_only.ipv6 }}
-id-*.http3-only-https    IN  HTTPS  1  . alpn=h3
+{% endfor %}
+{% endfor %}
 
+l3_https-h3h2_*           IN  HTTPS  1  . alpn=h3,h2
+l3_https-h2h3_*           IN  HTTPS  1  . alpn=h2,h3
+l3_https-h3_*             IN  HTTPS  1  . alpn=h3
+l3_https-h3-no-default_*  IN  HTTPS  1  . alpn=h3 no-default-alpn
+l3_https-h2_*             IN  HTTPS  1  . alpn=h2

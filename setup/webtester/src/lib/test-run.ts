@@ -26,12 +26,6 @@ export const executeTestRun = async (
     repetition <= (settings.repetitions ?? 1);
     repetition++
   ) {
-    setStatusMessage(
-      settings.repetitions
-        ? `Running test repetition ${repetition} / ${settings.repetitions}...`
-        : `Running test...`,
-    );
-
     const parts = await buildTestParts(settings);
 
     testRun.repetitions.push({
@@ -42,6 +36,12 @@ export const executeTestRun = async (
 
     for (const part of parts) {
       for (const subtest of part.subtests) {
+        setStatusMessage(
+          settings.repetitions
+            ? `Running tests in repetition ${repetition} / ${settings.repetitions}...`
+            : `Running tests...`,
+        );
+
         subtest.isRunning = true;
         forceTableRerender();
 
@@ -69,6 +69,13 @@ export const executeTestRun = async (
 
         subtest.isRunning = false;
         forceTableRerender();
+
+        if (subtest.sleepAfterSubtest) {
+          setStatusMessage(
+            `Waiting for ${subtest.sleepAfterSubtest} ms before continuing...`,
+          );
+          await sleep(subtest.sleepAfterSubtest);
+        }
       }
     }
 
@@ -107,6 +114,7 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
     color: result.color,
     url: subtest.url,
     requestTiming,
+    additionalMetadata: result.metadata ?? {},
   } satisfies SubtestResult;
 };
 
@@ -155,11 +163,19 @@ const defaultResponseHandler = async (
 };
 
 export type TestSettings = {
-  repetitions: number | undefined;
-  autoTransmitResults: boolean | undefined;
-  randomizeDomains: boolean | undefined;
-  resolverAddresses: string | undefined;
-  deviceInfo: string | undefined;
+  repetitions: number;
+
+  httpsRecord: HTTPSRecord;
+  ipDelayType: IPDelayType;
+  delayedIPVersion: IPVersion;
+  delayedProtocol: Protocol;
+  protocolHandshakeDelayRange: DelayRange;
+  ipHandshakeDelayRange: DelayRange;
+
+  autoTransmitResults: boolean;
+  randomizeDomains: boolean;
+  resolverAddresses: string;
+  deviceInfo: string;
 };
 
 export type TestRun = {
@@ -187,6 +203,7 @@ export type Subtest = {
   responseHandler?: (response: Response) => Promise<ResponseHandlerResult>;
   numberOfRequests?: number;
   sleepBetweenRequests?: number;
+  sleepAfterSubtest?: number;
 };
 
 export type SubtestResult = {
@@ -195,6 +212,7 @@ export type SubtestResult = {
   url: string;
   error?: string;
   requestTiming?: RequestTiming;
+  additionalMetadata?: SubtestResultMetadata;
 };
 
 export type RequestTiming = {
@@ -210,9 +228,43 @@ export const enum TestRunResultColor {
   Error = "#b91c1c", // red-700
   Option1 = "#0e7490", // cyan-700
   Option2 = "#b45309", // amber-700
+  Option3 = "#6d28d9", // violet-700
+  Option4 = "#4d7c0f", // lime-700
 }
+
+export type SubtestResultMetadata = Record<string, string>;
 
 export type ResponseHandlerResult = {
   value: string;
   color: TestRunResultColor;
+  metadata?: SubtestResultMetadata;
 };
+
+export type DelayRange = {
+  from: number;
+  to: number;
+  step: number;
+};
+
+export const enum IPVersion {
+  IPv4 = "IPv4",
+  IPv6 = "IPv6",
+}
+export const enum Protocol {
+  QUIC = "QUIC",
+  TLS = "TLS/TCP",
+}
+
+export const enum IPDelayType {
+  Handshake = "Handshake (introduced once during QUIC or TLS handshake)",
+  Network = "Network latency (introduced for every packet)",
+}
+
+export const enum HTTPSRecord {
+  H3H2 = "alpn=h3,h2",
+  H2H3 = "alpn=h2,h3",
+  H3 = "alpn=h3",
+  H3NoDefault = "alpn=h3 no-default-alpn",
+  H2 = "alpn=h2",
+  None = "NONE",
+}

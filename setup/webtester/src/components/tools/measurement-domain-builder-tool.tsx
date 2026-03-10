@@ -25,7 +25,7 @@ export const MeasurementDomainBuilderTool: React.FC = () => {
 
   useEffect(() => {
     const setup = async () => {
-      setAvailableDelays(await fetchAvailableDelays());
+      setAvailableDelays((await fetchAvailableDelays()).v2_delays);
     };
 
     setup();

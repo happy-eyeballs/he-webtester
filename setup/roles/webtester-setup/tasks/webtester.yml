@@ -52,5 +52,5 @@
     group: '{{ happy_eyeballs.user.name }}'
     mode: '0644'
   with_items:
-    - 'delays.csv'
+    - 'delays.json'
     - 'he-test-domain'
