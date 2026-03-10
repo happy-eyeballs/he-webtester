@@ -5,7 +5,7 @@ import { generateRandomId, sleep } from "@/lib/test-utils.ts";
 export const executeTestRun = async (
   settings: TestSettings,
   resultsUrl: string,
-  buildTestParts: (settings: TestSettings) => Promise<TestPart[]>,
+  buildSubtests: (testRunId: number) => Promise<TestPart[]>,
   addTestRunToTable: (testRun: TestRun) => void,
   setStatusMessage: (message: string) => void,
   forceTableRerender: () => void,
@@ -26,7 +26,7 @@ export const executeTestRun = async (
     repetition <= (settings.repetitions ?? 1);
     repetition++
   ) {
-    const parts = await buildTestParts(settings);
+    const parts = await buildSubtests(testRun.testRunId);
 
     testRun.repetitions.push({
       repetitionNumber: repetition,
@@ -90,7 +90,7 @@ export const executeTestRun = async (
   if (settings.autoTransmitResults) {
     setStatusMessage("Transmitting results...");
 
-    await transmitResults(resultsUrl, [testRun]);
+    await transmitResults(resultsUrl, [testRun], settings);
     forceTableRerender();
   }
 };
@@ -101,7 +101,9 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
   const response = await fetch(subtest.url, { cache: "no-store" });
 
   if (!response.ok) {
-    throw new Error(`Response has non-200 status code: ${response.status}`);
+    throw new Error(
+      `Response has status code: ${response.status} ${response.statusText}`,
+    );
   }
 
   const responseHandler = subtest.responseHandler ?? defaultResponseHandler;
@@ -114,7 +116,8 @@ const executeSubtest = async (subtest: Subtest): Promise<SubtestResult> => {
     color: result.color,
     url: subtest.url,
     requestTiming,
-    additionalMetadata: result.metadata ?? {},
+    connectionAttemptTrace: result.connectionAttemptTrace ?? [],
+    metadata: result.metadata ?? {},
   } satisfies SubtestResult;
 };
 
@@ -146,20 +149,26 @@ const observeRequestTiming = (url: string): Promise<RequestTiming> =>
 const defaultResponseHandler = async (
   response: Response,
 ): Promise<ResponseHandlerResult> => {
-  const clientIP = await response.text();
-  const isIPv6 = clientIP.includes(":");
-
-  if (isIPv6) {
-    return {
-      value: "IPv6",
-      color: TestRunResultColor.Option1,
-    };
-  } else {
-    return {
-      value: "IPv4",
-      color: TestRunResultColor.Option2,
-    };
+  const serverIP = response.headers.get("X-Server-IP");
+  const protocol = response.headers.get("X-Protocol");
+  if (!serverIP || !protocol) {
+    throw new Error(
+      'X-Server-IP" or X-Protocol header not present in response',
+    );
   }
+
+  const trace = await response.json();
+
+  const isIPv6 = serverIP.includes(":");
+
+  return {
+    value: isIPv6 ? "IPv6" : "IPv4",
+    color: isIPv6 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
+    connectionAttemptTrace: trace,
+    metadata: {
+      Protocol: protocol,
+    },
+  };
 };
 
 export type TestSettings = {
@@ -185,7 +194,7 @@ export type TestRun = {
   repetitions: TestRunRepetition[];
 };
 
-type TestRunRepetition = {
+export type TestRunRepetition = {
   repetitionNumber: number;
   startedAt: Date;
   parts: TestPart[];
@@ -204,6 +213,7 @@ export type Subtest = {
   numberOfRequests?: number;
   sleepBetweenRequests?: number;
   sleepAfterSubtest?: number;
+  metadata?: Record<string, string | number | undefined>;
 };
 
 export type SubtestResult = {
@@ -212,7 +222,8 @@ export type SubtestResult = {
   url: string;
   error?: string;
   requestTiming?: RequestTiming;
-  additionalMetadata?: SubtestResultMetadata;
+  connectionAttemptTrace?: ConnectionAttemptTrace;
+  metadata?: SubtestResultMetadata;
 };
 
 export type RequestTiming = {
@@ -234,9 +245,20 @@ export const enum TestRunResultColor {
 
 export type SubtestResultMetadata = Record<string, string>;
 
+export type ConnectionAttemptInfo = {
+  timestamp: number;
+  ipVersion: string;
+  protocol: string;
+  sourceAddress: string;
+  sourcePort: number;
+};
+
+export type ConnectionAttemptTrace = ConnectionAttemptInfo[];
+
 export type ResponseHandlerResult = {
   value: string;
   color: TestRunResultColor;
+  connectionAttemptTrace?: ConnectionAttemptTrace;
   metadata?: SubtestResultMetadata;
 };
 
@@ -250,6 +272,7 @@ export const enum IPVersion {
   IPv4 = "IPv4",
   IPv6 = "IPv6",
 }
+
 export const enum Protocol {
   QUIC = "QUIC",
   TLS = "TLS/TCP",

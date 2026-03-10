@@ -1,11 +1,20 @@
-import type { TestRun } from "@/lib/test-run.ts";
+import type {
+  Subtest,
+  SubtestResult,
+  TestRun,
+  TestRunRepetition,
+  TestSettings,
+} from "@/lib/test-run.ts";
+import { downloadJSONData } from "@/lib/test-utils.ts";
 
 export const transmitResults = async (
   url: string,
   testRuns: TestRun[],
+  settings: TestSettings,
 ): Promise<void> => {
   const results = mapTestRunsToResults(
     testRuns.filter((testRun) => !testRun.isTransmitted),
+    settings,
   );
 
   const response = await fetch(url, {
@@ -25,51 +34,55 @@ export const transmitResults = async (
   }
 };
 
-export const downloadResults = async (testRuns: TestRun[]): Promise<void> => {
+export const downloadResults = async (
+  testRuns: TestRun[],
+  settings: TestSettings,
+): Promise<void> => {
   downloadJSONData(
     `${Math.floor(Date.now() / 1000)}.json`,
-    JSON.stringify(mapTestRunsToResults(testRuns)),
+    JSON.stringify(mapTestRunsToResults(testRuns, settings)),
   );
 };
 
-const mapTestRunsToResults = (testRuns: TestRun[]) => {
+const mapTestRunsToResults = (testRuns: TestRun[], settings: TestSettings) => {
+  const mapSubtestResult = (result: SubtestResult, subtest: Subtest) => ({
+    ...(subtest.metadata ?? {}),
+    url: result.url,
+    value: result.value,
+    error: result.error ?? null,
+    metadata: result.metadata ?? {},
+  });
+
+  const mapSubtest = (subtest: Subtest) =>
+    subtest.results && subtest.results.length === 1
+      ? mapSubtestResult(subtest.results[0]!, subtest)
+      : (subtest.results ?? []).map((result) =>
+          mapSubtestResult(result, subtest),
+        );
+
+  const mapTestRunRepetitionResults = (testRunRepetition: TestRunRepetition) =>
+    testRunRepetition.parts.length === 1
+      ? testRunRepetition.parts[0]!.subtests.map(mapSubtest)
+      : testRunRepetition.parts.reduce(
+          (acc, testPart, testPartIndex) => ({
+            ...acc,
+            [testPart.name ?? `${testPartIndex}`]:
+              testPart.subtests.map(mapSubtest),
+          }),
+          {},
+        );
+
   return testRuns.flatMap((testRun) =>
     testRun.repetitions.map((testRunRepetition) => ({
-      id: testRun.testRunId,
-      runCount: testRunRepetition.repetitionNumber,
-      timestampStart: testRunRepetition.startedAt,
-      settings: testRun.settings,
-      results:
-        testRunRepetition.parts.length === 1
-          ? testRunRepetition.parts[0]?.subtests.map(
-              (subtest) => subtest.results,
-            )
-          : testRunRepetition.parts.reduce(
-              (result, testPart, testPartIndex) => ({
-                ...result,
-                [testPart.name ?? `${testPartIndex}`]: testPart.subtests.map(
-                  (subtest) => subtest.results,
-                ),
-              }),
-              {},
-            ),
+      testRunId: testRun.testRunId,
+      repetitionNumber: testRunRepetition.repetitionNumber,
+      startedAt: testRunRepetition.startedAt,
       platform: window.navigator.platform,
       vendor: window.navigator.vendor,
       userAgent: window.navigator.userAgent,
+      userInformation: settings.deviceInfo,
+      resolverAddresses: settings.resolverAddresses,
+      results: mapTestRunRepetitionResults(testRunRepetition),
     })),
   );
-};
-
-const downloadJSONData = (fileName: string, data: string) => {
-  const blob = new Blob([data], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link); // Required for Firefox
-  link.click();
-
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 };

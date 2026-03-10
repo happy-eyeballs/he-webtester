@@ -18,14 +18,14 @@ export const DelayRangeInput: React.FC<Props> = ({
   disabled,
 }) => {
   return (
-    <div className="flex gap-4 sm:gap-8 items-center">
+    <div className="flex gap-x-4 sm:gap-x-8 gap-y-2 items-center flex-wrap">
       <div className="flex gap-2 items-center">
         <span className="text-sm">From</span>
         <InputGroup className="max-w-25">
           <InputGroupInput
             type="number"
             min={0}
-            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             disabled={disabled}
             value={delayRange.from}
             onChange={(e) =>
@@ -47,7 +47,7 @@ export const DelayRangeInput: React.FC<Props> = ({
           <InputGroupInput
             type="number"
             min={0}
-            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             disabled={disabled}
             value={delayRange.to}
             onChange={(e) =>
@@ -69,7 +69,7 @@ export const DelayRangeInput: React.FC<Props> = ({
           <InputGroupInput
             type="number"
             min={0}
-            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             disabled={disabled}
             value={delayRange.step}
             onChange={(e) =>

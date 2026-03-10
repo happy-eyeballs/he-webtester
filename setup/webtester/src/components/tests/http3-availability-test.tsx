@@ -18,25 +18,29 @@ export const HTTP3AvailabilityTest: React.FC = () => {
     buildInitialSettingsFromEnabledSettings(enabledSettings),
   );
 
-  const buildSubtests = async (): Promise<TestPart[]> => {
+  const buildSubtests = async (testRunId: number): Promise<TestPart[]> => {
     const happyEyeballsTestDomain = await getHappyEyeballsTestDomain();
 
-    const id = () => (settings.randomizeDomains ? generateRandomId() : 0);
+    const id = () =>
+      settings.randomizeDomains ? generateRandomId() : testRunId;
 
     const http3ResponseHandler = async (
       response: Response,
     ): Promise<ResponseHandlerResult> => {
-      const { protocol } = (await response.json()) as {
-        protocol: string;
-      };
+      const protocol = response.headers.get("X-Protocol");
+      if (!protocol) {
+        throw new Error("X-Protocol header not present in response");
+      }
 
-      const isHTTP3 = protocol === "HTTP/3.0";
+      const trace = await response.json();
 
       return {
         value: protocol,
-        color: isHTTP3
-          ? TestRunResultColor.Option1
-          : TestRunResultColor.Option2,
+        color:
+          protocol === "HTTP/3.0"
+            ? TestRunResultColor.Option1
+            : TestRunResultColor.Option2,
+        connectionAttemptTrace: trace,
       };
     };
 
@@ -44,24 +48,31 @@ export const HTTP3AvailabilityTest: React.FC = () => {
       {
         subtests: [
           {
-            url: `https://id-${id()}.http3.http3.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "" },
             responseHandler: http3ResponseHandler,
+            sleepAfterSubtest: 2000,
           },
           {
-            url: `https://id-${id()}.http3-https.http3.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-https.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "https-record" },
             responseHandler: http3ResponseHandler,
+            sleepAfterSubtest: 2000,
           },
           {
-            url: `https://id-${id()}.http3-altsvc.http3.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-altsvc.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "alt-svc" },
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
-            sleepBetweenRequests: 500,
+            sleepBetweenRequests: 2000,
+            sleepAfterSubtest: 2000,
           },
           {
-            url: `https://id-${id()}.http3-https-altsvc.http3.${happyEyeballsTestDomain}/ping`,
+            url: `https://id-${id()}.http3-https-altsvc.http3.${happyEyeballsTestDomain}/trace`,
+            metadata: { h3_discovery: "https-record,alt-svc" },
             responseHandler: http3ResponseHandler,
             numberOfRequests: 2,
-            sleepBetweenRequests: 500,
+            sleepBetweenRequests: 2000,
           },
         ],
       },

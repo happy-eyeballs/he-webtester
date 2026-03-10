@@ -8,7 +8,8 @@
     - webtester-setup
     - { role: nginx-setup, tags: [ 'never' ] }
     - caddy-setup
-    - upload-server-setup
+    - result-upload-setup
+    - packet-capture-setup
   vars:
     happy_eyeballs_domains:
       v1: '{{ happy_eyeballs.webserver.delays | map(attribute="delay") | map("string") | map("regex_replace", "(.+)", "*.delay-\1.v1." ~ happy_eyeballs.nameserver.base_domain) | unique | list }}'

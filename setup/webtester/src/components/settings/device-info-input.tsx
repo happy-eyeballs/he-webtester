@@ -32,7 +32,7 @@ export const DeviceInfoInput: React.FC<{
       />
       <InputGroupAddon align="inline-end">
         <Tooltip>
-          <TooltipTrigger asChild>
+          <TooltipTrigger>
             <AutofillButton disabled={disabled} setDeviceInfo={setDeviceInfo} />
           </TooltipTrigger>
           <TooltipContent>

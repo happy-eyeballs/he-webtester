@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TestSettingsSection } from "@/components/settings/test-settings-section.tsx";
+import { SettingsSection } from "@/components/settings/settings-section.tsx";
 import {
   type TestRun,
   type TestSettings,
@@ -23,13 +23,14 @@ import {
 } from "@/components/ui/card.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import type { EnabledTestSettings } from "@/lib/settings.ts";
+import { downloadJSONData, generateRandomId } from "@/lib/test-utils.ts";
 
 type Props = {
   enabledSettings: EnabledTestSettings;
   settings: TestSettings;
   setSettings: (settings: TestSettings) => void;
   showSettingsDividers?: boolean;
-  buildSubtests: () => Promise<TestPart[]>;
+  buildSubtests: (testRunId: number) => Promise<TestPart[]>;
   resultsUrl: string;
   subtestColumnDescription: string;
   subtestColumnLabels: string[];
@@ -80,11 +81,23 @@ export const TestSkeleton: React.FC<Props> = ({
       );
     });
 
+  const downloadTestConfiguration = async () => {
+    const testParts = await buildSubtests(generateRandomId());
+    const configuration = testParts.flatMap((part) =>
+      part.subtests.map((subtest) => ({
+        ...subtest.metadata,
+        url: subtest.url,
+      })),
+    );
+
+    downloadJSONData("test-configuration.json", JSON.stringify(configuration));
+  };
+
   const transmitTestResults = () =>
     withDisabledUserInteraction(async () => {
       setStatusMessage("Transmitting results...");
 
-      await transmitResults(resultsUrl, testRuns);
+      await transmitResults(resultsUrl, testRuns, settings);
       forceTableRerender();
     });
 
@@ -99,11 +112,12 @@ export const TestSkeleton: React.FC<Props> = ({
           <CardTitle>Settings</CardTitle>
         </CardHeader>
         <CardContent>
-          <TestSettingsSection
+          <SettingsSection
             enabledSettings={enabledSettings}
             settings={settings}
             setSettings={setSettings}
-            startTestRun={executeTest}
+            runTest={executeTest}
+            downloadTestConfiguration={downloadTestConfiguration}
             showDividers={showSettingsDividers}
             disabled={isUserInteractionDisabled}
             disableProtocolHandshakeDelayRangeSetting={testRuns.length > 0}
@@ -151,9 +165,12 @@ export const TestSkeleton: React.FC<Props> = ({
                 </TooltipContent>
               ) : (
                 <TooltipContent className="max-w-md">
-                  If you want to help us interpret the results, you can describe
-                  your network environment as part of the device and the user
-                  information input field.
+                  If you choose to transmit your results, the web-tester
+                  transmits the measurement data along with your user agent and
+                  browser vendor information. We do not collect or store your IP
+                  address. To help us better interpret the test results, you can
+                  optionally provide details about your network environment in
+                  the device and user information field.
                 </TooltipContent>
               )}
             </Tooltip>
@@ -161,7 +178,7 @@ export const TestSkeleton: React.FC<Props> = ({
             <Button
               variant="secondary"
               disabled={isUserInteractionDisabled}
-              onClick={() => downloadResults(testRuns)}
+              onClick={() => downloadResults(testRuns, settings)}
             >
               Download results
             </Button>

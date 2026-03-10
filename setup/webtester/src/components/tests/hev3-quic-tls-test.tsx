@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
-  IPDelayType,
   HTTPSRecord,
+  IPDelayType,
   Protocol,
   type ResponseHandlerResult,
   type Subtest,
@@ -27,27 +27,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
     settings.protocolHandshakeDelayRange.step,
   );
 
-  const responseHandler = async (
-    response: Response,
-  ): Promise<ResponseHandlerResult> => {
-    const { protocol, server_ip } = (await response.json()) as {
-      protocol: string;
-      server_ip: string;
-    };
-
-    const isHTTP3 = protocol === "HTTP/3.0";
-
-    return {
-      value: isHTTP3 ? "QUIC" : "TLS",
-      color: isHTTP3 ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
-      metadata: {
-        Protocol: protocol,
-        "Address Family": server_ip.includes(":") ? "IPv6" : "IPv4",
-      },
-    } satisfies ResponseHandlerResult;
-  };
-
-  const buildSubtests = async (): Promise<TestPart[]> => {
+  const buildSubtests = async (testRunId: number): Promise<TestPart[]> => {
     const testParts: TestPart[] = [];
 
     for (const part of [
@@ -71,10 +51,16 @@ export const HEv3QuicTlsTest: React.FC = () => {
           part.protocol === Protocol.TLS ? delay : 0,
           (settings.httpsRecord as HTTPSRecord) ?? HTTPSRecord.H3H2,
           IPDelayType.Handshake,
+          testRunId,
         );
 
         subtests.push({
           url,
+          metadata: {
+            [`${part.protocol === Protocol.QUIC ? "quic" : "tls"}_handshake_delay`]:
+              delay,
+            https_record: settings.httpsRecord,
+          },
           responseHandler,
           sleepAfterSubtest: 2000,
         } satisfies Subtest);
@@ -92,7 +78,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
       settings={settings}
       setSettings={setSettings}
       buildSubtests={buildSubtests}
-      resultsUrl="/results/hev3-quic-tls" // TODO
+      resultsUrl="/results/hev3-quic-tls"
       subtestColumnDescription="Protocol Handshake Delay [ms]"
       subtestColumnLabels={handshakeDelays.map((delay) => delay.toString())}
     />
@@ -123,4 +109,30 @@ const enabledSettings: EnabledTestSettings = {
   randomizeDomains: true,
   autoTransmitResults: false,
   deviceInfo: {},
+};
+
+const responseHandler = async (
+  response: Response,
+): Promise<ResponseHandlerResult> => {
+  const serverIP = response.headers.get("X-Server-IP");
+  const protocol = response.headers.get("X-Protocol");
+  if (!serverIP || !protocol) {
+    throw new Error(
+      'X-Server-IP" or X-Protocol header not present in response',
+    );
+  }
+
+  const trace = await response.json();
+
+  const isQUIC = protocol === "HTTP/3.0";
+
+  return {
+    value: isQUIC ? "QUIC" : "TLS",
+    color: isQUIC ? TestRunResultColor.Option1 : TestRunResultColor.Option2,
+    connectionAttemptTrace: trace,
+    metadata: {
+      Protocol: protocol,
+      "Address Family": serverIP.includes(":") ? "IPv6" : "IPv4",
+    },
+  } satisfies ResponseHandlerResult;
 };

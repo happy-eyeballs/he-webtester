@@ -15,11 +15,10 @@ import { HTTP3AvailabilityTest } from "@/components/tests/http3-availability-tes
       paths in various permutations.
     </p>
     <p>
-      We randomize domains to prevent caching effects on the browsers side.
-      However, the web server is only assigned a single IP address. Clients that
-      cache connection information on a per-address basis rather than a
-      per-domain basis may therefore produce skewed results in subsequent test
-      runs.
+      We randomize domains to try to prevent caching effects on the browser's
+      side as much as possible. Furthermore, we aggressively close connections
+      on the server side after every request, forcing the browser to perform a
+      fresh handshake for each new request.
     </p>
   </Header>
 
