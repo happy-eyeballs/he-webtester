@@ -1,3 +1,6 @@
+// Copyright (c) 2023 shadcn
+// Licensed under the MIT license (see LICENSES/MIT.txt)
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

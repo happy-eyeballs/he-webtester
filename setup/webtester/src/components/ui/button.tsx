@@ -1,3 +1,6 @@
+// Copyright (c) 2023 shadcn
+// Licensed under the MIT license (see LICENSES/MIT.txt)
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
