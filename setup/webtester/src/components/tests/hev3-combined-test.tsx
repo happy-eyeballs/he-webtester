@@ -122,6 +122,7 @@ export const HEv3CombinedTest: React.FC = () => {
       setSettings={setSettings}
       buildSubtests={buildSubtests}
       showSettingsDividers={true}
+      requiresIPv4AndIPv6={false}
       resultsUrl="/results/hev3-combined"
       subtestColumnDescription="Protocol Handshake Delay [ms]"
       subtestColumnLabels={protocolHandshakeDelays.map((delay) =>
@@ -158,8 +159,8 @@ const enabledSettings: EnabledTestSettings = {
   },
   ipHandshakeDelayRange: {
     from: 0,
-    to: 500,
-    step: 100,
+    to: 800,
+    step: 200,
   },
   delayedProtocol: {
     options: [Protocol.QUIC, Protocol.TLS],
@@ -167,8 +168,8 @@ const enabledSettings: EnabledTestSettings = {
   },
   protocolHandshakeDelayRange: {
     from: 0,
-    to: 500,
-    step: 100,
+    to: 800,
+    step: 200,
   },
   randomizeDomains: true,
   autoTransmitResults: false,

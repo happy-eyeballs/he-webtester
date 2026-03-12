@@ -85,6 +85,7 @@ export const HTTP3AvailabilityTest: React.FC = () => {
       settings={settings}
       setSettings={setSettings}
       buildSubtests={buildSubtests}
+      requiresIPv4AndIPv6={false}
       resultsUrl="/results/http3-availability"
       subtestColumnDescription="Scenario"
       subtestColumnLabels={[

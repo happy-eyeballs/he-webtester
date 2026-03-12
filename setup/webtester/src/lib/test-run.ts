@@ -9,9 +9,12 @@ export const executeTestRun = async (
   addTestRunToTable: (testRun: TestRun) => void,
   setStatusMessage: (message: string) => void,
   forceTableRerender: () => void,
+  requiresIPv4AndIPv6: boolean,
 ) => {
-  setStatusMessage("Checking if IPv4 and IPv6 are available...");
-  await checkIfIPv4AndIPv6AreAvailable();
+  if (requiresIPv4AndIPv6) {
+    setStatusMessage("Checking if IPv4 and IPv6 are available...");
+    await checkIfIPv4AndIPv6AreAvailable();
+  }
 
   const testRun: TestRun = {
     testRunId: generateRandomId(),

@@ -30,6 +30,7 @@ type Props = {
   settings: TestSettings;
   setSettings: (settings: TestSettings) => void;
   showSettingsDividers?: boolean;
+  requiresIPv4AndIPv6: boolean;
   buildSubtests: (testRunId: number) => Promise<TestPart[]>;
   resultsUrl: string;
   subtestColumnDescription: string;
@@ -43,6 +44,7 @@ export const TestSkeleton: React.FC<Props> = ({
   settings,
   setSettings,
   showSettingsDividers = false,
+  requiresIPv4AndIPv6,
   resultsUrl,
   subtestColumnDescription,
   subtestRowDescription,
@@ -78,6 +80,7 @@ export const TestSkeleton: React.FC<Props> = ({
         (testRun) => setTestRuns((prev) => [...prev, testRun]),
         setStatusMessage,
         forceTableRerender,
+        requiresIPv4AndIPv6,
       );
     });
 
