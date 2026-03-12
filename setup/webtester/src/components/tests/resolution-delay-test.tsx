@@ -62,6 +62,7 @@ export const ResolutionDelayTest: React.FC = () => {
       settings={settings}
       setSettings={setSettings}
       buildSubtests={buildSubtests}
+      requiresIPv4AndIPv6={true}
       resultsUrl="/results/resolution-delay"
       subtestColumnDescription="IPv6 Delay [ms]"
       subtestColumnLabels={availableDelays.map((delay) => delay.toString())}

@@ -78,6 +78,7 @@ export const HEv3QuicTlsTest: React.FC = () => {
       settings={settings}
       setSettings={setSettings}
       buildSubtests={buildSubtests}
+      requiresIPv4AndIPv6={false}
       resultsUrl="/results/hev3-quic-tls"
       subtestColumnDescription="Protocol Handshake Delay [ms]"
       subtestColumnLabels={handshakeDelays.map((delay) => delay.toString())}
@@ -87,8 +88,8 @@ export const HEv3QuicTlsTest: React.FC = () => {
 
 const enabledSettings: EnabledTestSettings = {
   repetitions: {
-    options: [1, 5, 10, 20, 30, 40, 50],
-    defaultOption: 5,
+    options: [1, 2, 5, 10],
+    defaultOption: 1,
   },
   httpsRecord: {
     options: [
@@ -103,8 +104,8 @@ const enabledSettings: EnabledTestSettings = {
   },
   protocolHandshakeDelayRange: {
     from: 0,
-    to: 500,
-    step: 100,
+    to: 800,
+    step: 200,
   },
   randomizeDomains: true,
   autoTransmitResults: false,
