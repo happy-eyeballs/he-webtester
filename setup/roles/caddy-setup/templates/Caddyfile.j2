@@ -1,8 +1,6 @@
 ### GLOBAL
 
 {
-	debug # TODO
-
     admin off
 
     servers {{ happy_eyeballs.webserver.ipv4 }}:443 {
@@ -23,23 +21,23 @@
 
     servers {{ happy_eyeballs.webserver.he_v3_quic.ipv4 }}:8443 {
         timeouts {
-			idle 1000ms # TODO: adjust
+			idle 1000ms
         }
     }
     servers [{{ happy_eyeballs.webserver.he_v3_quic.ipv6 }}]:8443 {
         timeouts {
-			idle 1000ms # TODO: adjust
+			idle 1000ms
         }
     }
 
     servers {{ happy_eyeballs.webserver.http3.ipv4 }}:443 {
         timeouts {
-            idle 1000ms # TODO: adjust
+            idle 1000ms
         }
     }
     servers [{{ happy_eyeballs.webserver.http3.ipv6 }}]:443 {
         timeouts {
-            idle 1000ms # TODO: adjust
+            idle 1000ms
         }
     }
 

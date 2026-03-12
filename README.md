@@ -19,13 +19,13 @@ We use [Ansible](https://docs.ansible.com/ansible/latest/index.html) to automati
 ### Prerequisites
 
 - [Ansible](https://docs.ansible.com/ansible/latest/index.html) on the local machine
-- [Podman](https://podman.io) on the deployment host
-- An interface where [tc netem](https://www.man7.org/linux/man-pages/man8/tc-netem.8.html) delay is working (usually needs to be non virtual)
-- 2 IPv6 and 2 IPv4 addresses for the nameserver
-- One dedicated IPv4 and IPv6 address to check if the client actually supports both IP versions (currently it is not supported to reuse delay addresses, nameserver addresses might work but are untested)
-- As many IPv4 and IPv6 addresses as delays should be tested
-  - Our default configuration uses 21 delays.
-- 2 dedicated IPv4 and IPv6 addresses for HTTP/3 tests.
+- An interface where [tc netem](https://www.man7.org/linux/man-pages/man8/tc-netem.8.html) delay is working (usually needs to be non-virtual)
+- 2 IPv4 and 2 IPv6 addresses for the nameserver
+- One IPv4 and IPv6 address for the webtester frontend
+- One IPv4 and IPv6 address to check if the client actually supports both IP versions and for tests without netem delays
+- As many IPv4 and IPv6 addresses as delays should be tested (our default configuration uses 21 delays)
+- One IPv4 and IPv6 address for HTTP/3 tests
+- One IPv4 and IPv6 address for Happy Eyeballs version 3 related tests
 
 ### Configuration
 
@@ -42,12 +42,12 @@ We added several tags to control the setup process:
 - `interface`: assigns the configured addresses to the interfaces and configures the tc delays
   - `interface-ip-delete`: include this tag specifically if you want to delete the configured addresses from the interface
 - `dns`: sets up the nameserver
-- `nginx`: sets up nginx
 - `caddy`: sets up caddy
-- `webtester`: sets up the webtester
-- `uploadserver`: sets up the result upload server
+- `webtester`: sets up the webtester (frontend)
+- `resultupload`: sets up the result upload server
+- `packetcapture`: sets up the packet capture service and tshark service
 
-Note: all tags have their own "sub-tags" (such as `nginx-certs`) for only executing specific subtasks.
+Note: all tags have their own "subtags" (such as `system-podman`) for only executing specific subtasks.
 Those can be found in the `tasks/main.yml` inside the individual ansible roles.
 
 

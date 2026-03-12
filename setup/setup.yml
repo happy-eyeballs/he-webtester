@@ -6,7 +6,6 @@
     - interface-setup
     - dns-setup
     - webtester-setup
-    - { role: nginx-setup, tags: [ 'never' ] }
     - caddy-setup
     - result-upload-setup
     - packet-capture-setup

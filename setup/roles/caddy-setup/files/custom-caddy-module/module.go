@@ -6,6 +6,4 @@ import (
 
 func init() {
 	caddy.RegisterModule(&Layer4ThrottleVarHandler{})
-	caddy.RegisterModule(&Layer4ProcessingDelayEqualizationBeginHandler{})
-	caddy.RegisterModule(&Layer4ProcessingDelayEqualizationHandler{})
 }
