@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { DelayRange } from "@/lib/test-run.ts";
 import {
   InputGroup,
@@ -17,23 +17,26 @@ export const DelayRangeInput: React.FC<Props> = ({
   setDelayRange,
   disabled,
 }) => {
+  const [from, setFrom] = useState<string>(delayRange.from.toString());
+  const [to, setTo] = useState<string>(delayRange.to.toString());
+  const [step, setStep] = useState<string>(delayRange.step.toString());
+
   return (
     <div className="flex gap-x-4 sm:gap-x-8 gap-y-2 items-center flex-wrap">
       <div className="flex gap-2 items-center">
         <span className="text-sm">From</span>
         <InputGroup className="max-w-25">
           <InputGroupInput
-            type="number"
-            min={0}
-            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+            className="text-right"
             disabled={disabled}
-            value={delayRange.from}
-            onChange={(e) =>
-              setDelayRange({
-                ...delayRange,
-                from: Math.max(Number(e.target.value), 0),
-              })
-            }
+            value={from}
+            onChange={(e) => {
+              const numericValue = Number(e.target.value);
+              if (numericValue >= 0) {
+                setFrom(e.target.value);
+                setDelayRange({ ...delayRange, from: numericValue });
+              }
+            }}
           />
           <InputGroupAddon align="inline-end" className="pb-1">
             ms
@@ -45,17 +48,16 @@ export const DelayRangeInput: React.FC<Props> = ({
         <span className="text-sm">To</span>
         <InputGroup className="max-w-25">
           <InputGroupInput
-            type="number"
-            min={0}
-            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+            className="text-right"
             disabled={disabled}
-            value={delayRange.to}
-            onChange={(e) =>
-              setDelayRange({
-                ...delayRange,
-                to: Math.max(Number(e.target.value), 0),
-              })
-            }
+            value={to}
+            onChange={(e) => {
+              const numericValue = Number(e.target.value);
+              if (numericValue >= 0) {
+                setTo(e.target.value);
+                setDelayRange({ ...delayRange, to: numericValue });
+              }
+            }}
           />
           <InputGroupAddon align="inline-end" className="pb-1">
             ms
@@ -67,17 +69,16 @@ export const DelayRangeInput: React.FC<Props> = ({
         <span className="text-sm">Step</span>
         <InputGroup className="max-w-25">
           <InputGroupInput
-            type="number"
-            min={0}
-            className="text-right appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+            className="text-right"
             disabled={disabled}
-            value={delayRange.step}
-            onChange={(e) =>
-              setDelayRange({
-                ...delayRange,
-                step: Math.max(Number(e.target.value), 1),
-              })
-            }
+            value={step}
+            onChange={(e) => {
+              const numericValue = Number(e.target.value);
+              if (numericValue >= 0) {
+                setStep(e.target.value);
+                setDelayRange({ ...delayRange, step: numericValue });
+              }
+            }}
           />
           <InputGroupAddon align="inline-end" className="pb-1">
             ms
