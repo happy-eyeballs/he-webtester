@@ -22,6 +22,10 @@ import { ConnectionAttemptDelayTest } from "@/components/tests/connection-attemp
       performance measurements to select IP versions. The web server only offers
       HTTP/1.1 to prevent connection reuse between tests.
     </p>
+    <p>
+      Please note that the connection attempt trace for this test is currently
+      unreliable, as correlation requires an SNI to be present.
+    </p>
   </Header>
 
   <ConnectionAttemptDelayTest client:load />
