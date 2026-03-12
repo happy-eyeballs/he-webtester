@@ -17,6 +17,10 @@ import { ResolutionDelayTest } from "@/components/tests/resolution-delay-test.ts
       and resolver. Additionally, the web server only offers HTTP/1.1 to prevent
       connection reuse between tests.
     </p>
+    <p>
+      Please note that the connection attempt trace for this test is currently
+      unreliable, as correlation requires an SNI to be present.
+    </p>
   </Header>
 
   <ResolutionDelayTest client:load />

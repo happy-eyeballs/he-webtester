@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/netip"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -45,10 +46,11 @@ type tsharkPacket struct {
 
 type layers struct {
 	TimeEpoch     []string `json:"frame_time_epoch"`
-	SourceIP      []string `json:"_ws_col_def_src"`
+	IPv4Source    []string `json:"ip_src"`
+	IPv6Source    []string `json:"ipv6_src"`
 	SourceTCPPort []string `json:"tcp_srcport"`
 	SourceUDPPort []string `json:"udp_srcport"`
-	Protocol      []string `json:"_ws_col_protocol"`
+	Protocols     []string `json:"frame_protocols"`
 	SNI           []string `json:"tls_handshake_extensions_server_name"`
 }
 
@@ -66,11 +68,15 @@ func (p tsharkPacket) parseTime() (time.Time, error) {
 }
 
 func (p tsharkPacket) parseSourceIP() (netip.Addr, error) {
-	if len(p.Layers.SourceIP) == 0 {
-		return netip.Addr{}, errors.New("no source IP found")
+	if len(p.Layers.IPv4Source) != 0 {
+		return netip.ParseAddr(p.Layers.IPv4Source[0])
 	}
 
-	return netip.ParseAddr(p.Layers.SourceIP[0])
+	if len(p.Layers.IPv6Source) != 0 {
+		return netip.ParseAddr(p.Layers.IPv6Source[0])
+	}
+
+	return netip.Addr{}, errors.New("no source IP found")
 }
 
 func (p tsharkPacket) parseSourcePort() (int, error) {
@@ -82,15 +88,29 @@ func (p tsharkPacket) parseSourcePort() (int, error) {
 		return strconv.Atoi(p.Layers.SourceUDPPort[0])
 	}
 
-	return 0, errors.New("no port found")
+	return 0, errors.New("no source port found")
 }
 
 func (p tsharkPacket) getProtocol() string {
-	if len(p.Layers.Protocol) == 0 {
+	if len(p.Layers.Protocols) == 0 {
 		return ""
 	}
 
-	return p.Layers.Protocol[0]
+	protocols := p.Layers.Protocols[0]
+
+	if strings.HasSuffix(protocols, ":tcp") {
+		return "TCP (SYN)"
+	}
+
+	if strings.HasSuffix(protocols, ":tcp:tls") {
+		return "TLS"
+	}
+
+	if strings.HasSuffix(protocols, ":quic:tls") {
+		return "QUIC"
+	}
+
+	return protocols
 }
 
 func (p tsharkPacket) getSNI() string {

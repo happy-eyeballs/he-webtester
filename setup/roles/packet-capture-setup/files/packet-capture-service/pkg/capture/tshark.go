@@ -10,29 +10,42 @@ import (
 )
 
 func StartReadingFromPacketCapturePipe(pipePath string) (<-chan netpacket.Packet, error) {
-	file, err := os.Open(pipePath)
-	if err != nil {
-		return nil, err
-	}
-
 	channel := make(chan netpacket.Packet, 10000)
 
 	go func() {
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := scanner.Text()
-
-			if strings.HasPrefix(line, `{"index"`) {
-				continue
-			}
-
-			packet, err := netpacket.ParsePacketFromTShark(line)
+		for {
+			file, err := os.Open(pipePath)
 			if err != nil {
-				slog.Error("failed to parse packet from tshark", "error", err, "line", line)
-				continue
+				slog.Error("failed to open pipe", "error", err)
+				return
 			}
 
-			channel <- packet
+			slog.Info("Listening on pipe...")
+
+			scanner := bufio.NewScanner(file)
+			for scanner.Scan() {
+				line := scanner.Text()
+
+				if strings.HasPrefix(line, `{"index"`) {
+					continue
+				}
+
+				packet, err := netpacket.ParsePacketFromTShark(line)
+				if err != nil {
+					slog.Error("Failed to parse packet from tshark", "error", err, "line", line)
+					continue
+				}
+
+				channel <- packet
+			}
+
+			err = scanner.Err()
+			if err != nil {
+				slog.Error("Error reading from pipe", "error", err)
+			}
+
+			file.Close()
+			slog.Info("tshark disconnected")
 		}
 	}()
 
