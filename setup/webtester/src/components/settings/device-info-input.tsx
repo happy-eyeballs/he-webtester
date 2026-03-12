@@ -31,16 +31,7 @@ export const DeviceInfoInput: React.FC<{
         className="text-sm"
       />
       <InputGroupAddon align="inline-end">
-        <Tooltip>
-          <TooltipTrigger>
-            <AutofillButton disabled={disabled} setDeviceInfo={setDeviceInfo} />
-          </TooltipTrigger>
-          <TooltipContent>
-            Automatically detect device information.
-            <br />
-            Please update the auto-filled data if incorrect!
-          </TooltipContent>
-        </Tooltip>
+        <AutofillButton disabled={disabled} setDeviceInfo={setDeviceInfo} />
       </InputGroupAddon>
     </InputGroup>
   );
@@ -70,14 +61,23 @@ const AutofillButton: React.FC<{
   };
 
   return (
-    <InputGroupButton
-      variant="secondary"
-      disabled={disabled || isLoading}
-      onClick={autofill}
-      className="text-sm"
-    >
-      {isLoading ? <Spinner /> : <WandSparklesIcon />}
-      Autofill
-    </InputGroupButton>
+    <Tooltip>
+      <TooltipTrigger asChild={true}>
+        <InputGroupButton
+          variant="secondary"
+          disabled={disabled || isLoading}
+          onClick={autofill}
+          className="text-sm"
+        >
+          {isLoading ? <Spinner /> : <WandSparklesIcon />}
+          Autofill
+        </InputGroupButton>
+      </TooltipTrigger>
+      <TooltipContent>
+        Automatically detect device information.
+        <br />
+        Please update the auto-filled data if incorrect!
+      </TooltipContent>
+    </Tooltip>
   );
 };
