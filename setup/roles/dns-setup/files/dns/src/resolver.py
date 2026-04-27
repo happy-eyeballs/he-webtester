@@ -199,7 +199,7 @@ class Resolver:
             match = False
             query_info = None
             for name, rr in self._domains:
-                if name == qname:
+                if name == qname or qname.matchGlob(name):
                     log.put(LogItem(
                         id=request.header.id,
                         type="AUTHORITY",
