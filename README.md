@@ -76,3 +76,8 @@ Citation to use when referring to this project:
 }
 ```
 
+## License
+
+This project is licensed under the Mozilla Public License Version 2.0 ([see LICENSE](LICENSE)).
+
+UI elements in `setup/webtester/src/components/ui` are from shadcn and licensed with [MIT](LICENSES/MIT.txt)
